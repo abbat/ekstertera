@@ -19,7 +19,7 @@ REM *******************************
 %QT_QMAKE% -project -recursive -Wall -nopwd -o %PROJECT_FILE% ^
     "CODEC = UTF-8" ^
     "CODECFORTR = UTF-8" ^
-    "CONFIG += debug_and_release" ^
+    "CONFIG += release" ^
     "QT += network" ^
     "INCLUDEPATH += src" ^
     "TRANSLATIONS += src/translations/ekstertera_en.ts" ^
