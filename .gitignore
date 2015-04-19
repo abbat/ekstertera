@@ -1,0 +1,16 @@
+debug
+release
+doxygen
+
+ekstertera.pro
+
+Makefile
+Makefile.Debug
+Makefile.Release
+
+object_script.ekstertera.Debug
+object_script.ekstertera.Release
+
+ekstertera
+
+src/translations/*.qm

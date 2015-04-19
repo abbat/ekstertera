@@ -1,0 +1,29 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+override_dh_auto_clean:
+	if [ -f Makefile ]; then make clean; fi
+	rm -f Makefile
+	rm -f Makefile.Debug
+	rm -f Makefile.Release
+	rm -f ekstertera.pro
+	rm -f ekstertera
+
+override_dh_auto_build:
+	qmake -project -recursive -Wall -nopwd -o ekstertera.pro \
+		"CODEC = UTF-8" \
+		"CODECFORTR = UTF-8" \
+		"CONFIG += debug_and_release" \
+		"QT += network" \
+		"TRANSLATIONS += src/translations/ekstertera_en.ts" \
+		"QMAKE_CPPFLAGS *= $(shell dpkg-buildflags --get CPPFLAGS)" \
+		"QMAKE_CFLAGS   *= $(shell dpkg-buildflags --get CFLAGS)" \
+		"QMAKE_CXXFLAGS *= $(shell dpkg-buildflags --get CXXFLAGS)" \
+		"QMAKE_LFLAGS   *= $(shell dpkg-buildflags --get LDFLAGS)" \
+		src
+	lrelease -compress -removeidentical ekstertera.pro
+	qmake ekstertera.pro
+	make
+
+%:
+	dh $@

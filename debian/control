@@ -1,0 +1,16 @@
+Source: ekstertera
+Section: utils
+Priority: optional
+Maintainer: Anton Batenev <antonbatenev@yandex.ru>
+Build-Depends: debhelper (>= 7.0.50~), libqt4-dev (>= 4.4)
+Standards-Version: 3.9.4
+Vcs-Git: https://github.com/abbat/ekstertera.git
+Vcs-Browser: https://github.com/abbat/ekstertera
+Homepage: https://github.com/abbat/ekstertera
+
+Package: ekstertera
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Yandex.Disk GUI client
+ GUI tool to upload, retrieve and manage data in Yandex.Disk
+ service (https://disk.yandex.com).

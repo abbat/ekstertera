@@ -1,0 +1,15 @@
+compression = "bzip2"
+compression-level = 9
+tar-ignore = .git
+tar-ignore = .gitignore
+tar-ignore = .travis.yml
+tar-ignore = debug
+tar-ignore = release
+tar-ignore = doxygen
+tar-ignore = Doxyfile
+tar-ignore = ekstertera.spec
+tar-ignore = build.linux.sh
+tar-ignore = build.mingw.bat
+tar-ignore = src/resource.rc
+tar-ignore = src/icons/main.ico
+tar-ignore = src/translations/ekstertera_en.qm

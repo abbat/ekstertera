@@ -1,0 +1,10 @@
+[Desktop Entry]
+Version=1.0
+Encoding=UTF-8
+Type=Application
+Categories=Network;FileTransfer;Qt;
+Name=Ekstertera
+GenericName=Yandex.Disk GUI client
+Exec=ekstertera
+Icon=ekstertera
+Terminal=false

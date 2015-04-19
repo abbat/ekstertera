@@ -1,0 +1,41 @@
+<RCC>
+    <qresource prefix="">
+        <file>icons/exit16.png</file>
+
+        <!-- http://www.iconsearch.ru/detailed/4682/ (c) Everaldo Coelho, Creative Commons -->
+        <file>icons/oauth16.png</file>
+
+        <!-- http://www.iconsearch.ru/detailed/26087/ (c) Everaldo Coelho, GPL -->
+        <file>icons/main16.png</file>
+        <file>icons/main32.png</file>
+        <file>icons/main48.png</file>
+        <file>icons/main64.png</file>
+        <file>icons/main128.png</file>
+
+        <!-- http://www.iconsearch.ru/detailed/19538/ (c) Oxygen Team, GPL -->
+        <file>icons/settings16.png</file>
+        <file>icons/settings32.png</file>
+        <file>icons/settings48.png</file>
+        <file>icons/settings64.png</file>
+        <file>icons/settings128.png</file>
+
+        <!-- http://www.iconsearch.ru/detailed/19722/ (c) Oxygen Team, GPL -->
+        <file>icons/info16.png</file>
+        <file>icons/info32.png</file>
+        <file>icons/info48.png</file>
+        <file>icons/info64.png</file>
+        <file>icons/info128.png</file>
+
+        <!-- http://www.iconsearch.ru/detailed/21400/3/ (c) MidTone Design, ??? -->
+        <file>icons/upload32.png</file>
+
+        <!-- http://www.iconsearch.ru/detailed/649/3/ (c) Everaldo Coelho, LGPL -->
+        <file>icons/download32.png</file>
+
+        <file>icons/red16.png</file>
+        <file>icons/yellow16.png</file>
+        <file>icons/green16.png</file>
+
+        <file>translations/ekstertera_en.qm</file>
+    </qresource>
+</RCC>

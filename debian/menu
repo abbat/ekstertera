@@ -1,0 +1,7 @@
+?package(ekstertera): \
+needs="X11" \
+section="Applications/Network/Communication" \
+title="Ekstertera" \
+hints="GUI Yandex.Disk client" \
+icon="/usr/share/pixmaps/ekstertera.xpm" \
+command="/usr/bin/ekstertera"
