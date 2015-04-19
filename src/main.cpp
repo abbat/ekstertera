@@ -6,7 +6,7 @@
 #include "icon.h"
 #include "settings.h"
 #include "translator.h"
-#include "form_main.h"
+#include "forms/form_main.h"
 //----------------------------------------------------------------------------------------------
 /*!
  * (no comments)

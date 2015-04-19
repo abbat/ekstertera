@@ -15,6 +15,7 @@ override_dh_auto_build:
 		"CODECFORTR = UTF-8" \
 		"CONFIG += debug_and_release" \
 		"QT += network" \
+		"INCLUDEPATH += src" \
 		"TRANSLATIONS += src/translations/ekstertera_en.ts" \
 		"QMAKE_CPPFLAGS *= $(shell dpkg-buildflags --get CPPFLAGS)" \
 		"QMAKE_CFLAGS   *= $(shell dpkg-buildflags --get CFLAGS)" \

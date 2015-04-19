@@ -30,6 +30,7 @@ qmake -project -recursive -Wall -nopwd -o "${PROJECT_FILE}" \
     "CODECFORTR = UTF-8" \
     "CONFIG += debug_and_release" \
     "QT += ${QT_OPTS}" \
+    "INCLUDEPATH += src" \
     "TRANSLATIONS += \
     src/translations/ekstertera_en.ts" \
     src

@@ -3,7 +3,7 @@
 #include "widget_disk_item.h"
 //----------------------------------------------------------------------------------------------
 #include "settings.h"
-#include "form_info.h"
+#include "forms/form_info.h"
 //----------------------------------------------------------------------------------------------
 
 WidgetDisk::WidgetDisk(QWidget* parent) :

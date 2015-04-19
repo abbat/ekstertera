@@ -21,6 +21,7 @@ REM *******************************
     "CODECFORTR = UTF-8" ^
     "CONFIG += debug_and_release" ^
     "QT += network" ^
+    "INCLUDEPATH += src" ^
     "TRANSLATIONS += src/translations/ekstertera_en.ts" ^
     "RC_FILE += src/resource.rc" ^
     src

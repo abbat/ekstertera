@@ -6,8 +6,8 @@
 #ifndef _ekstertera_forms_form_main_ui_h_
 #define _ekstertera_forms_form_main_ui_h_
 
-#include "widget_disk.h"
-#include "widget_disk_path.h"
+#include "widgets/widget_disk.h"
+#include "widgets/widget_disk_path.h"
 
 /*!
  * \brief Класс для генерации GUI части главной формы

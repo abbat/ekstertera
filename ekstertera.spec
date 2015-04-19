@@ -34,6 +34,7 @@ GUI tool to upload, retrieve and manage data in Yandex.Disk service
     "CODECFORTR = UTF-8" \
     "CONFIG += debug_and_release" \
     "QT += network" \
+    "INCLUDEPATH += src" \
     "TRANSLATIONS += src/translations/ekstertera_en.ts" \
     src
 %{lrelease} -compress -removeidentical ekstertera.pro
