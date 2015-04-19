@@ -11,7 +11,7 @@ BuildRequires: libqt4-devel >= 4.4
 %define qmake qmake
 %define lrelease lrelease
 
-%if 0%{?fedora}
+%if 0%{?fedora} || 0%{?centos}
 %define qmake qmake-qt4
 %define lrelease lrelease-qt4
 %endif
