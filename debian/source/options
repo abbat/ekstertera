@@ -11,5 +11,5 @@ tar-ignore = ekstertera.spec
 tar-ignore = build.linux.sh
 tar-ignore = build.mingw.bat
 tar-ignore = src/resource.rc
-tar-ignore = src/icons/main.ico
+tar-ignore = src/icons/ekstertera.ico
 tar-ignore = src/translations/ekstertera_en.qm

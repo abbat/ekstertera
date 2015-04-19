@@ -1,0 +1,35 @@
+#include "winver.h"
+
+MAINICON ICON "icons/ekstertera.ico"
+
+VS_VERSION_INFO VERSIONINFO
+    PRODUCTVERSION 0,0,1,0
+    FILEVERSION 0,0,1,0
+    FILEFLAGSMASK 0x17L
+#ifdef _DEBUG
+    FILEFLAGS 0x1L
+#else
+    FILEFLAGS 0x0L
+#endif
+    FILEOS 0x4L
+    FILETYPE 0x0L
+    FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "041904b0"
+        BEGIN
+            VALUE "ProductName", "ekstertera"
+            VALUE "ProductVersion", "0.0.1"
+            VALUE "FileVersion", "0.0.1"
+            VALUE "FileDescription", "ekstertera 0.0.1"
+            VALUE "InternalName", "ekstertera"
+            VALUE "LegalCopyright", "2015, Anton Batenev"
+            VALUE "OriginalFilename", "ekstertera.exe"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x419, 1200
+    END
+END

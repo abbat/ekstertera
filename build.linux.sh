@@ -13,15 +13,15 @@ PROJECT_FILE="${PROJECT}.pro"
 
 # очистка
 if [ -f "Makefile" ]; then
-	make clean
+    make clean
 fi
 
 # опции (модули) qt
 QT_OPTS="network"
 if [ "${QT_SELECT}" -eq "4" ]; then
-	QT_OPTS="${QT_OPTS}"
+    QT_OPTS="${QT_OPTS}"
 else
-	QT_OPTS="${QT_OPTS} core widgets"
+    QT_OPTS="${QT_OPTS} core widgets"
 fi
 
 # создание pro-файла
@@ -49,5 +49,5 @@ strip -s "${PROJECT}"
 
 # запуск
 if [ -z "${TRAVIS}" ]; then
-	"./${PROJECT}"
+    "./${PROJECT}"
 fi
