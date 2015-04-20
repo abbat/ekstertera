@@ -9,3 +9,4 @@
 * [Debian, Ubuntu](http://software.opensuse.org/download.html?project=home:antonbatenev:ekstertera&package=ekstertera)
 * [Fedora, openSUSE, CentOS](http://software.opensuse.org/download.html?project=home:antonbatenev:ekstertera&package=ekstertera)
 * [Ubuntu PPA](https://launchpad.net/~abbat/+archive/ubuntu/ekstertera) - `ppa:abbat/ekstertera`
+* [Windows](https://yadi.sk/d/nEL4v5gjg6nhx)
