@@ -1,8 +1,8 @@
 #include "form_settings.h"
 //----------------------------------------------------------------------------------------------
-#include "api.h"
-#include "settings.h"
-#include "translator.h"
+#include "utils/api.h"
+#include "utils/settings.h"
+#include "utils/translator.h"
 //----------------------------------------------------------------------------------------------
 
 FormSettings::FormSettings(QWidget* parent) : FormSettingsUI(parent)

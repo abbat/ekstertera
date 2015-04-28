@@ -6,7 +6,7 @@
 #ifndef _ekstertera_widgets_widget_disk_item_h_
 #define _ekstertera_widgets_widget_disk_item_h_
 
-#include "api.h"
+#include "utils/api.h"
 
 /*!
  * \brief Элемент виджета проводника Яндекс.Диск

@@ -153,6 +153,28 @@ bool EteraItem::parse(const QtJson::JsonObject& json)
 }
 //----------------------------------------------------------------------------------------------
 
+QString EteraItem::basePath() const
+{
+    if (isDir() == true)
+        return m_path + "/";
+    else if (isFile() == true)
+        return m_path.left(m_path.length() - m_name.length());
+
+    return "";
+}
+//----------------------------------------------------------------------------------------------
+
+QString EteraItem::parentPath() const
+{
+    if (isDir() == true)
+        return m_path.left(m_path.length() - m_name.length());
+    else if (isFile() == true)
+        return basePath();
+
+    return "";
+}
+//----------------------------------------------------------------------------------------------
+
 void EteraAPI::init()
 {
 #if QT_VERSION < 0x050400
@@ -263,6 +285,10 @@ void EteraAPI::init()
     ssl_default.setCiphers(cipher_list);
 
     QSslConfiguration::setDefaultConfiguration(ssl_default);
+
+    qRegisterMetaType<EteraInfo>("EteraInfo");
+    qRegisterMetaType<EteraItem>("EteraItem");
+    qRegisterMetaType<EteraItemList>("EteraItemList");
 }
 //----------------------------------------------------------------------------------------------
 
@@ -271,16 +297,18 @@ void EteraAPI::cleanup()
 }
 //----------------------------------------------------------------------------------------------
 
-EteraAPI::EteraAPI() : QObject(NULL)
+EteraAPI::EteraAPI(bool noprogress) : QObject(NULL)
 {
     m_temp_io    = NULL;
     m_temp_reply = NULL;
 
-    m_user_agent = "ekstertera/0.0.1";
+    m_user_agent = QString("ekstertera/%1").arg(ETERA_VERSION);
     m_base_url   = "https://cloud-api.yandex.net/v1/disk";
     m_app_id     = "51cba73d70c343fd96f0765e1eeb0435";
     m_app_secret = "73cf4dacd4f74e7a97b77d036f90eb91";
     m_limit      = 1000;
+
+    m_noprogress = noprogress;
 
     retranslateUi();
 
@@ -394,11 +422,11 @@ void EteraAPI::setDefaultHeaders(QNetworkRequest& request, quint64 length, bool 
         request.setRawHeader("Authorization", m_token.toUtf8());
 
     if (length != 0)
-        request.setRawHeader("Content-Length", QString::number(length).toUtf8());
+        request.setHeader(QNetworkRequest::ContentLengthHeader, QString::number(length).toUtf8());
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, const EteraStringHash& args, quint64 length)
+void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, const EteraArgs& args, quint64 length)
 {
     QUrl url(m_base_url + relurl);
 
@@ -406,7 +434,7 @@ void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, c
     QUrlQuery query;
 #endif
 
-    for (EteraStringHash::const_iterator i = args.constBegin(); i != args.constEnd(); i++)
+    for (EteraArgs::const_iterator i = args.constBegin(); i != args.constEnd(); i++)
 #if QT_VERSION < 0x050000
         url.addQueryItem(i.key(), i.value());
 #else
@@ -455,8 +483,11 @@ bool EteraAPI::makeRequest(const QNetworkRequest& request, int& code, QString& b
     }
 
     QObject::connect(reply, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(onSSLErrors(const QList<QSslError>&)));
-    QObject::connect(reply, SIGNAL(downloadProgress(qint64, qint64)),   this, SLOT(onDownloadProgress(qint64, qint64)));
-    QObject::connect(reply, SIGNAL(uploadProgress(qint64, qint64)),     this, SLOT(onUploadProgress(qint64, qint64)));
+
+    if (m_noprogress == false) {
+        QObject::connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64)));
+        QObject::connect(reply, SIGNAL(uploadProgress(qint64, qint64)),   this, SLOT(onUploadProgress(qint64, qint64)));
+    }
 
     if (method == ermGET && io != NULL) {
         m_temp_io    = io;
@@ -495,12 +526,19 @@ bool EteraAPI::makeRequest(const QNetworkRequest& request, int& code, QString& b
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::makeSimpleRequest(int& code, QString& body, const QString& url, const EteraStringHash& args, EteraRequestMethod method)
+bool EteraAPI::makeSimpleRequest(int& code, QString& body, const QString& url, const EteraArgs& args, EteraRequestMethod method)
 {
     setLastError(0);
 
     QNetworkRequest request;
     prepareRequest(request, url, args);
+
+    if (method == ermPOST) {
+        // content-type missing in HTTP POST, defaulting to application/x-www-form-urlencoded.
+        // Use QNetworkRequest::setHeader() to fix this problem.
+        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        request.setHeader(QNetworkRequest::ContentLengthHeader, "0");
+    }
 
     return makeRequest(request, code, body, method);
 }
@@ -674,7 +712,7 @@ bool EteraAPI::info(EteraInfo& result)
 
 bool EteraAPI::stat(const QString& path, EteraItem& result)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"]   = path;
     args["offset"] = "0";
@@ -700,7 +738,7 @@ bool EteraAPI::ls(const QString& path, EteraItemList& result)
 {
     quint64 offset = 0;
 
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"]   = path;
     args["offset"] = QString::number(offset);
@@ -759,7 +797,7 @@ bool EteraAPI::ls(const QString& path, EteraItemList& result)
 
 bool EteraAPI::mkdir(const QString& path)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"] = path;
 
@@ -778,7 +816,7 @@ bool EteraAPI::mkdir(const QString& path)
 
 bool EteraAPI::rm(const QString& path, bool permanently)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"] = path;
 
@@ -804,7 +842,7 @@ bool EteraAPI::rm(const QString& path, bool permanently)
 
 bool EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["from"] = source;
     args["path"] = target;
@@ -831,7 +869,7 @@ bool EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
 
 bool EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["from"] = source;
     args["path"] = target;
@@ -859,7 +897,7 @@ bool EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
 
 bool EteraAPI::put(const QString& source, const QString& target, bool overwrite)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"] = target;
 
@@ -906,7 +944,7 @@ bool EteraAPI::put(const QString& source, const QString& target, bool overwrite)
 
 bool EteraAPI::get(const QString& source, const QString& target)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"] = source;
 
@@ -962,7 +1000,7 @@ bool EteraAPI::get(const QString& source, const QString& target)
 
 bool EteraAPI::publish(const QString& path)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"] = path;
 
@@ -981,7 +1019,7 @@ bool EteraAPI::publish(const QString& path)
 
 bool EteraAPI::unpublish(const QString& path)
 {
-    EteraStringHash args;
+    EteraArgs args;
 
     args["path"] = path;
 
@@ -997,3 +1035,4 @@ bool EteraAPI::unpublish(const QString& path)
     return setLastError(0);
 }
 //----------------------------------------------------------------------------------------------
+

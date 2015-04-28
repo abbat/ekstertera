@@ -160,6 +160,22 @@ class EteraItem
         QString path() const { return m_path; }
 
         /*!
+         * \brief Базовый путь объекта
+         * \return Базовый путь объекта
+         * Для директории будет имя самой директории со слешем
+         * Для файла будет имя директории, содержащей файл со слешем
+         */
+        QString basePath() const;
+
+        /*!
+         * \brief Родительский путь объекта
+         * \return Родительский путь объекта
+         * Для директории будет имя родительской директории со слешем
+         * Для файла будет равно вызову basePath()
+         */
+        QString parentPath() const;
+
+        /*!
          * \brief Тип объекта
          * \return Тип объекта
          */
@@ -270,7 +286,11 @@ class EteraAPI : public QObject
 
     public:
 
-        EteraAPI();
+        /*!
+         * \brief Конструктор
+         * \param noprogress Не посылать сигналы прогресса операции
+         */
+        EteraAPI(bool noprogress = false);
         ~EteraAPI();
 
         /*!
@@ -373,7 +393,7 @@ class EteraAPI : public QObject
          * \param permanently Флаг полного удаления (false - удаление в корзину)
          * \return Флаг успеха
          */
-        bool rm(const QString& path, bool permanently = true);
+        bool rm(const QString& path, bool permanently);
 
         /*!
          * \brief Копирование объекта на диске
@@ -382,7 +402,7 @@ class EteraAPI : public QObject
          * \param overwrite Флаг перезаписи (false - перезапись запрещена)
          * \return Флаг успеха
          */
-        bool cp(const QString& source, const QString& target, bool overwrite = true);
+        bool cp(const QString& source, const QString& target, bool overwrite);
 
         /*!
          * \brief Перемещение объекта
@@ -391,7 +411,7 @@ class EteraAPI : public QObject
          * \param overwrite Флаг перезаписи (false - перезапись запрещена)
          * \return Флаг успеха
          */
-        bool mv(const QString& source, const QString& target, bool overwrite = true);
+        bool mv(const QString& source, const QString& target, bool overwrite);
 
         /*!
          * \brief Загрузка локального файла на диск
@@ -400,7 +420,7 @@ class EteraAPI : public QObject
          * \param overwrite Признак перезаписи (false - перезапись запрещена)
          * \return Флаг успеха
          */
-        bool put(const QString& source, const QString& target, bool overwrite = true);
+        bool put(const QString& source, const QString& target, bool overwrite);
 
         /*!
          * \brief Получение файла с диска
@@ -436,6 +456,8 @@ class EteraAPI : public QObject
         int     m_error_code;      /*!< \brief Код последней ошибки    */
         QString m_error_message;   /*!< \brief Текст последней ошибки  */
         bool    m_async_error;     /*!< \brief Флаг асинхронной ошибки */
+
+        bool m_noprogress;   /*!< \brief Флаг запрета посылать сигналы прогресса операции */
 
         QNetworkAccessManager m_http;   /*!< \brief Транспорт HTTPS */
 
@@ -487,7 +509,7 @@ class EteraAPI : public QObject
         /*!
          * \brief Список строковых key/value для параметров запроса
          */
-        typedef QHash<QString, QString> EteraStringHash;
+        typedef QMap<QString, QString> EteraArgs;
 
         /*!
          * \brief Подготовка запроса, установка стандартных заголовков
@@ -496,7 +518,7 @@ class EteraAPI : public QObject
          * \param args Аргументы запроса
          * \param length Длина тела для POST/PUT запроса
          */
-        void prepareRequest(QNetworkRequest& request, const QString& relurl, const EteraStringHash& args = EteraStringHash(), quint64 length = 0);
+        void prepareRequest(QNetworkRequest& request, const QString& relurl, const EteraArgs& args = EteraArgs(), quint64 length = 0);
 
         /*!
          * \brief Тип запроса к api
@@ -529,7 +551,7 @@ class EteraAPI : public QObject
          * \param args Аргументы запроса
          * \return Флаг успеха
          */
-        bool makeSimpleRequest(int& code, QString& body, const QString& url, const EteraStringHash& args = EteraStringHash(), EteraRequestMethod method = ermGET);
+        bool makeSimpleRequest(int& code, QString& body, const QString& url, const EteraArgs& args = EteraArgs(), EteraRequestMethod method = ermGET);
 
         /*!
          * \brief Проверка, что URL принадлежит домену yandex
@@ -578,7 +600,7 @@ class EteraAPI : public QObject
          * \brief Сигнал ошибки ssl
          * \param error Ошибки
          */
-        void onError(const QString error);
+        void onError(const QString& error);
 };
 
 #endif   // _ekstertera_api_h_

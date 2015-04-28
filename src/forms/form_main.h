@@ -44,21 +44,19 @@ class FormMain : public FormMainUI
          */
         void updateInfoStatus();
 
-        /*!
-         * \brief Обновление статуса операции
-         * \param status Статус
-         * \param tooltip Всплывающее сообщение
-         */
-        void setOperationStatus(OperationStatus status, const QString& tooltip = "");
-
     private slots:
 
         //
-        // меню "Файл"
+        // меню
         //
 
+        // Файл
         void menu_file_settings_triggered();   /*!< \brief Файл / Настройки */
         void menu_file_exit_triggered();       /*!< \brief Файл / Выход     */
+
+        // ?
+        void menu_help_about_triggered();      /*!< \brief ? / О программе */
+        void menu_help_about_qt_triggered();   /*!< \brief ? / О Qt        */
 
         //
         // тулбар
@@ -71,18 +69,21 @@ class FormMain : public FormMainUI
         // обработчики виджета диска
         //
 
-        void widget_disk_on_api_error(int code, const QString& message);   /*!< \brief Ошибка API                     */
-        void widget_disk_on_api_progress(const QString& message);          /*!< \brief Начало работы API              */
-        void widget_disk_on_api_progress(qint64 done, qint64 total);       /*!< \brief Прогресс работы API            */
-        void widget_disk_on_api_success();                                 /*!< \brief Успешное завершение работы API */
-        void widget_disk_on_path_changed(const QString& path);             /*!< \brief Смена пути в виджете           */
-        void widget_disk_on_change_possible_actions(bool download);        /*!< \brief Смена возможных действий       */
+        void widget_disk_on_path_changed(const QString& path);        /*!< \brief Смена пути в виджете     */
+        void widget_disk_on_change_possible_actions(bool download);   /*!< \brief Смена возможных действий */
 
         //
         // обработчики виджета путей
         //
 
         void widget_path_on_path_change_request(const QString& path);   /*!< \brief Запрос на смену пути */
+
+        //
+        // обработчики получения информации о диске
+        //
+
+        void task_on_info_success(quint64 id, const EteraInfo& info, const QVariantMap& args);
+        void task_on_info_error(quint64 id, int code, const QString& error, const QVariantMap& args);
 };
 
 #endif   // _ekstertera_forms_form_main_h_

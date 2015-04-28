@@ -1,6 +1,6 @@
 #include "widget_disk_item.h"
 //----------------------------------------------------------------------------------------------
-#include "icon.h"
+#include "utils/icon.h"
 //----------------------------------------------------------------------------------------------
 
 WidgetDiskItem::WidgetDiskItem(QListWidget* parent, const EteraItem& item) : QListWidgetItem(parent, QListWidgetItem::UserType)

@@ -1,5 +1,5 @@
 Name:          ekstertera
-Version:       0.0.1
+Version:       0.0.2
 Release:       1
 Summary:       Yandex.Disk GUI client
 Group:         Applications/Internet
@@ -65,5 +65,5 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sun Apr 19 2015 Anton Batenev <antonbatenev@yandex.ru> 0.0.1-1
+* Tue Apr 28 2015 Anton Batenev <antonbatenev@yandex.ru> 0.0.2-1
 - Initial RPM release

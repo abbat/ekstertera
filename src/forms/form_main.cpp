@@ -1,6 +1,7 @@
 #include "form_main.h"
 //----------------------------------------------------------------------------------------------
-#include "settings.h"
+#include "utils/settings.h"
+#include "tasks/task_info.h"
 //----------------------------------------------------------------------------------------------
 #include "form_settings.h"
 //----------------------------------------------------------------------------------------------
@@ -11,6 +12,10 @@ FormMain::FormMain() : FormMainUI()
     connect(m_menu_file_settings, SIGNAL(triggered()), this, SLOT(menu_file_settings_triggered()));
     connect(m_menu_file_exit,     SIGNAL(triggered()), this, SLOT(menu_file_exit_triggered()));
 
+    // меню "?"
+    connect(m_menu_about,    SIGNAL(triggered()), this, SLOT(menu_help_about_triggered()));
+    connect(m_menu_about_qt, SIGNAL(triggered()), this, SLOT(menu_help_about_qt_triggered()));
+
     // тулбар
     connect(m_action_upload,   SIGNAL(triggered()), this, SLOT(action_upload_triggered()));
     connect(m_action_download, SIGNAL(triggered()), this, SLOT(action_download_triggered()));
@@ -19,10 +24,6 @@ FormMain::FormMain() : FormMainUI()
     connect(m_widget_path, SIGNAL(onPathChangeRequest(const QString&)), this, SLOT(widget_path_on_path_change_request(const QString&)));
 
     // виджет диска
-    connect(m_widget_disk, SIGNAL(onApiError(int, const QString&)), this, SLOT(widget_disk_on_api_error(int, const QString&)));
-    connect(m_widget_disk, SIGNAL(onApiProgress(const QString&)),   this, SLOT(widget_disk_on_api_progress(const QString&)));
-    connect(m_widget_disk, SIGNAL(onApiProgress(qint64, qint64)),   this, SLOT(widget_disk_on_api_progress(qint64, qint64)));
-    connect(m_widget_disk, SIGNAL(onApiSuccess()),                  this, SLOT(widget_disk_on_api_success()));
     connect(m_widget_disk, SIGNAL(onPathChanged(const QString&)),   this, SLOT(widget_disk_on_path_changed(const QString&)));
     connect(m_widget_disk, SIGNAL(onChangePossibleActions(bool)),   this, SLOT(widget_disk_on_change_possible_actions(bool)));
 
@@ -30,7 +31,6 @@ FormMain::FormMain() : FormMainUI()
     updateInfoStatus();
 
     // получение корня диска
-    m_widget_disk->setToken(EteraSettings::instance()->token());
     m_widget_disk->changePath("disk:/");
 }
 //----------------------------------------------------------------------------------------------
@@ -66,94 +66,55 @@ void FormMain::menu_file_exit_triggered()
 }
 //----------------------------------------------------------------------------------------------
 
-void FormMain::setOperationStatus(OperationStatus status, const QString& tooltip)
+void FormMain::menu_help_about_triggered()
 {
-    switch (status) {
-        case opGreen:
-            m_action_upload->setEnabled(true);
-            m_label_operation->setPixmap(QPixmap(":icons/green16.png"));
-            break;
-        case opYellow:
-            m_action_upload->setEnabled(false);
-            m_label_operation->setPixmap(QPixmap(":icons/yellow16.png"));
-            break;
-        case opRed:
-            m_action_upload->setEnabled(false);
-            m_label_operation->setPixmap(QPixmap(":icons/red16.png"));
-            break;
-    }
+    QString text;
+    text += QString("<b>Ekstertera v%1</b><br><br>").arg(ETERA_VERSION);
+    text += QString("<a href=\"%1\">%1</a><br>").arg("https://github.com/abbat/ekstertera");
 
-    m_label_operation->setToolTip(tooltip);
+    QMessageBox::about(this, trUtf8("О программе"), text);
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::menu_help_about_qt_triggered()
+{
+    QMessageBox::aboutQt(this, trUtf8("О Qt"));
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::task_on_info_success(quint64 /*id*/, const EteraInfo& info, const QVariantMap& /*args*/)
+{
+    m_label_used->setText(EteraAPI::humanBytes(info.used()));
+    m_label_total->setText(EteraAPI::humanBytes(info.total()));
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::task_on_info_error(quint64 /*id*/, int /*code*/, const QString& /*error*/, const QVariantMap& /*args*/)
+{
+    m_label_used->setText("");
+    m_label_total->setText("");
 }
 //----------------------------------------------------------------------------------------------
 
 void FormMain::updateInfoStatus()
 {
-    setOperationStatus(opYellow);
-
-    m_label_used->setText("");
-    m_label_total->setText("");
-
     QString token = EteraSettings::instance()->token();
 
-    if (token.isEmpty() == true) {
-        setOperationStatus(opGreen);
+    if (token.isEmpty() == true)
         return;
-    }
 
-    EteraAPI api;
-    api.setToken(token);
+    EteraTaskINFO* info = new EteraTaskINFO();
 
-    EteraInfo info;
-    if (api.info(info) == false) {
-        setOperationStatus(opRed);
-        return;
-    }
+    connect(info, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_info_error(quint64, int, const QString&, const QVariantMap&)));
+    connect(info, SIGNAL(onSuccess(quint64, const EteraInfo&, const QVariantMap&)), this, SLOT(task_on_info_success(quint64, const EteraInfo&, const QVariantMap&)));
 
-    m_label_used->setText(EteraAPI::humanBytes(info.used()));
-    m_label_total->setText(EteraAPI::humanBytes(info.total()));
-
-    setOperationStatus(opGreen);
+    QThreadPool::globalInstance()->start(info);
 }
 //----------------------------------------------------------------------------------------------
 
 void FormMain::widget_path_on_path_change_request(const QString& path)
 {
     m_widget_disk->changePath(path);
-}
-//----------------------------------------------------------------------------------------------
-
-void FormMain::widget_disk_on_api_error(int /*code*/, const QString& message)
-{
-    m_progress->setVisible(false);
-
-    setOperationStatus(opRed, message);
-}
-//----------------------------------------------------------------------------------------------
-
-void FormMain::widget_disk_on_api_progress(const QString& message)
-{
-    m_progress->setMaximum(0);
-    m_progress->setMinimum(0);
-    m_progress->setValue(0);
-    m_progress->setVisible(true);
-
-    setOperationStatus(opYellow, message);
-}
-//----------------------------------------------------------------------------------------------
-
-void FormMain::widget_disk_on_api_progress(qint64 done, qint64 total)
-{
-    m_progress->setMaximum(total);
-    m_progress->setValue(done);
-}
-//----------------------------------------------------------------------------------------------
-
-void FormMain::widget_disk_on_api_success()
-{
-    m_progress->setVisible(false);
-
-    setOperationStatus(opGreen, trUtf8("OK"));
 }
 //----------------------------------------------------------------------------------------------
 

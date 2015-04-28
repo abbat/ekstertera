@@ -54,7 +54,7 @@ FormSettingsUI::FormSettingsUI(QWidget* parent) : QDialog(parent, Qt::WindowTitl
     m_layout_token->addWidget(m_text_token);
 
     m_button_token = new QPushButton(this);
-    m_button_token->setIcon(QIcon::fromTheme("dialog-password", QIcon(":/icons/oauth16.png")));
+    m_button_token->setIcon(QIcon(":/icons/oauth16.png"));
     m_button_token->setMaximumSize(m_text_token->height(), m_text_token->height());
     m_layout_token->addWidget(m_button_token);
 

@@ -6,7 +6,7 @@
 #ifndef _ekstertera_forms_form_info_h_
 #define _ekstertera_forms_form_info_h_
 
-#include "api.h"
+#include "utils/api.h"
 #include "form_info_ui.h"
 
 /*!
@@ -32,6 +32,11 @@ class FormInfo : public FormInfoUI
          * \brief Функция отработки смены состояния формы
          */
         void virtual changeEvent(QEvent* event);
+
+        /*!
+         * \brief Функция перевода надписей на элементах управления
+         */
+        void retranslateUi();
 
     private:
 

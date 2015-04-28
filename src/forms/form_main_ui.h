@@ -41,6 +41,9 @@ class FormMainUI : public QMainWindow
           QMenu*     m_menu_file;            /*!< \brief Файл / ...       */
             QAction* m_menu_file_settings;   /*!< \brief Файл / Настройки */
             QAction* m_menu_file_exit;       /*!< \brief Файл / Выход     */
+          QMenu*     m_menu_help;            /*!< \brief ? / ...          */
+            QAction* m_menu_about;           /*!< \brief ? / О программе  */
+            QAction* m_menu_about_qt;        /*!< \brief ? / О Qt         */
 
         /*!
          * \brief Тулбар
@@ -60,11 +63,9 @@ class FormMainUI : public QMainWindow
         /*!
          * \brief Статусбар
          */
-        QStatusBar*     m_status_bar;
-          QLabel*       m_label_operation;   /*!< \brief Статус операции (красный/желтый/зеленый) */
-          QLabel*       m_label_used;        /*!< \brief Размер используемого пространства        */
-          QLabel*       m_label_total;       /*!< \brief Общий размер диска                       */
-          QProgressBar* m_progress;          /*!< \brief Прогресс                                 */
+        QStatusBar* m_status_bar;
+          QLabel*   m_label_used;    /*!< \brief Размер используемого пространства */
+          QLabel*   m_label_total;   /*!< \brief Общий размер диска                */
 
         /*!
          * \brief Функция перевода надписей на элементах управления

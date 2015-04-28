@@ -6,12 +6,13 @@
 #ifndef _ekstertera_widgets_widget_disk_h_
 #define _ekstertera_widgets_widget_disk_h_
 
-#include "clipboard.h"
+#include "widget_tasks.h"
+#include "widget_disk_item.h"
 
 /*!
  * \brief Виджет проводника Яндекс.Диск
  */
-class WidgetDisk : public QWidget
+class WidgetDisk : public QTabWidget
 {
     Q_OBJECT
 
@@ -25,17 +26,10 @@ class WidgetDisk : public QWidget
         ~WidgetDisk();
 
         /*!
-         * \brief Установка токена
-         * \param token Токен
-         */
-        void setToken(const QString& token);
-
-        /*!
          * \brief Сменить отображаемый путь
          * \param path Путь
-         * \return Флаг успеха
          */
-        bool changePath(const QString& path);
+        void changePath(const QString& path);
 
         /*!
          * \brief Получение текущего пути
@@ -68,11 +62,6 @@ class WidgetDisk : public QWidget
         virtual void wheelEvent(QWheelEvent* event);
 
         /*!
-         * Изменение размера
-         */
-        virtual void resizeEvent(QResizeEvent* event);
-
-        /*!
          * D&D
          */
         virtual void dragEnterEvent(QDragEnterEvent* event);
@@ -90,24 +79,20 @@ class WidgetDisk : public QWidget
         QString m_path;
 
         /*!
-         * \brief API
+         * Виджет списка файлов и директорий
          */
-        EteraAPI m_api;
+        QListWidget* m_explorer;
 
         /*!
-         * \brief Буфер обмена
+         * Виджет списка асинхронных задач
          */
-        EteraClipboard* m_clipboard;
+        WidgetTasks* m_tasks;
 
         /*!
-         * \brief Последний ответ на вопрос
+         * Блокиратор вызова QMessageBox::question для ситуаций, когда
+         * сигнал посылается из разных потоков, а требуется только один ответ
          */
-        QMessageBox::StandardButton m_answer;
-
-        /*!
-         * Основной виджет списка
-         */
-        QListWidget* m_list;
+        QMutex m_question_mutex;
 
         /*!
          * Контекстное меню
@@ -131,51 +116,67 @@ class WidgetDisk : public QWidget
         void updateBufferList(bool copy_mode);
 
         /*!
-         * Обертка для обработчика фатальной ошибки API
-         * (когда виджет переходит в неопределенное состояние)
-         * \param clear Очистка виджета
-         * \return Всегда false
+         * Поиск элемента в виджете файлов и директорий
+         * \param path Путь к элементу
+         * \return Виджет или NULL
          */
-        bool fatalApiError(bool clear = true);
+        WidgetDiskItem* findByPath(const QString& path);
+
+        /*!
+         * Удаление элемента в виджете файлов и директорий
+         * \param path Путь к элементу
+         */
+        void removeByPath(const QString& path);
 
         /*!
          * Загрузка локального файла или директории на диск
          * \param path Имя файла или директории
-         * \return Флаг успеха
+         * \param parent ID родительской задачи
          */
-        bool putLocalObject(const QString& path);
+        void putLocalObject(const QString& path, quint64 parent);
 
         /*!
          * Загрузка локального файла на диск
          * \param source Имя локального файла
          * \param target Имя файла на диске
-         * \return Флаг успеха
+         * \param overwrite Флаг принудительной перезаписи
+         * \param parent ID родительской задачи
          */
-        bool putLocalFile(const QString& source, const QString& target);
+        void putLocalFile(const QString& source, const QString& target, bool overwrite, quint64 parent);
 
         /*!
          * Загрузка локальной директории на диск
          * \param source Имя локальной директории
          * \param target Имя директории на диске
-         * \return Флаг успеха
+         * \param overwrite Флаг принудительной перезаписи
+         * \param parent ID родительской задачи
          */
-        bool putLocalDir(const QString& source, const QString& target);
+        void putLocalDir(const QString& source, const QString& target, bool overwrite, quint64 parent);
+
+        /*!
+         * Синхронизация локальной директории и директории на диске
+         * \param source Имя локальной директории
+         * \param target Имя директории на диске
+         * \param overwrite Флаг принудительной перезаписи
+         * \param parent ID родительской задачи
+         */
+        void syncLocalDir(const QString& source, const QString& target, bool overwrite, quint64 parent);
 
         /*!
          * Получение файла с диска
          * \param source Имя файла на диске
          * \param target Имя локального файла
-         * \return Флаг успеха
+         * \param parent ID родительской задачи
          */
-        bool getRemoteFile(const QString& source, const QString& target);
+        void getRemoteFile(const QString& source, const QString& target, quint64 parent);
 
         /*!
          * Получение директории с диска
          * \param source Имя директории на диске
          * \param target Имя локальной директории
-         * \return Флаг успеха
+         * \param parent ID родительской задачи
          */
-        bool getRemoteDir(const QString& source, const QString& target);
+        void getRemoteDir(const QString& source, const QString& target, quint64 parent);
 
         /*!
          * Рекурсивное удаление локальной директории
@@ -187,7 +188,6 @@ class WidgetDisk : public QWidget
         /*!
          * Публикация выделенных ресурсов
          * \param share Флаг публикации или закрытия доступа
-         * \return Флаг успеха
          */
         void shareObjects(bool share);
 
@@ -231,38 +231,62 @@ class WidgetDisk : public QWidget
         void menu_info_triggered();     /*!< \brief Свойства       */
 
         //
-        // обработчики api
+        // обработчики виджета задач
         //
 
-        void api_on_progress(qint64 done, qint64 total);   /*!< \brief Прогресс операции */
-        void api_on_error(const QString& error);           /*!< \brief Ошибки SSL        */
+        void widget_tasks_on_change_count(int count);
+
+        //
+        // обработчики асинхронных задач
+        //
+
+        void task_on_start(quint64 id, const QString& message, const QVariantMap& args);
+
+        void task_on_ls_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_ls_success(quint64 id, const EteraItemList& list, const QVariantMap& args);
+
+        void task_on_mkdir_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_mkdir_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_rm_error(quint64 id, int code, const QString& error, bool async, const QVariantMap& args);
+        void task_on_rm_success(quint64 id, const QVariantMap& args);
+
+        void task_on_rename_error(quint64 id, int code, const QString& error, bool async, const QVariantMap& args);
+        void task_on_rename_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_copy_paste_error(quint64 id, int code, const QString& error, bool async, const QVariantMap& args);
+        void task_on_copy_paste_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_cut_paste_error(quint64 id, int code, const QString& error, bool async, const QVariantMap& args);
+        void task_on_cut_paste_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_share_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_share_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_revoke_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_revoke_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_put_rm_error(quint64 id, int code, const QString& error, bool async, const QVariantMap& args);
+        void task_on_put_rm_success(quint64 id, const QVariantMap& args);
+
+        void task_on_put_ensure_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_put_ensure_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_put_file_progress(quint64 id, qint64 done, qint64 total);
+        void task_on_put_file_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_put_file_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_put_dir_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_put_dir_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+
+        void task_on_get_file_progress(quint64 id, qint64 done, qint64 total);
+        void task_on_get_file_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_get_file_success(quint64 id, const QVariantMap& args);
+
+        void task_on_get_dir_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_get_dir_success(quint64 id, const EteraItemList& list, const QVariantMap& args);
 
     signals:
-
-        /*!
-         * \brief Сигнал ошибки API
-         * \param code Код ошибки
-         * \param message Сообщение ошибки
-         */
-        void onApiError(int code, const QString& message);
-
-        /*!
-         * \brief Сигнал начала работы API
-         * \param message Информационное сообщение
-         */
-        void onApiProgress(const QString& message);
-
-        /*!
-         * \brief Сигнал прогресса работы API
-         * \param done Выполнено
-         * \param total Всего
-         */
-        void onApiProgress(qint64 done, qint64 total);
-
-        /*!
-         * \brief Сигнал успешного окончания работы API
-         */
-        void onApiSuccess();
 
         /*!
          * \brief Сигнал смены пути

@@ -11,6 +11,8 @@ FormMainUI::FormMainUI() : QMainWindow()
     icon.addFile(":/icons/main128.png", QSize(128, 128));
     setWindowIcon(icon);
 
+    setMinimumSize(280, 280);
+
     //
     // меню
     //
@@ -19,6 +21,7 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     // верхний ряд меню
     m_menu_file = m_menubar->addMenu("");
+    m_menu_help = m_menubar->addMenu("");
 
     //
     // меню "Файл"
@@ -32,6 +35,13 @@ FormMainUI::FormMainUI() : QMainWindow()
     // Файл / Выход
     m_menu_file_exit = m_menu_file->addAction(QIcon::fromTheme("application-exit", QIcon(":/icons/exit16.png")), "");
     m_menu_file_exit->setMenuRole(QAction::QuitRole);
+
+    //
+    // меню "?"
+    //
+
+    m_menu_about = m_menu_help->addAction(QIcon::fromTheme("help-about"), "");
+    m_menu_about_qt = m_menu_help->addAction("");
 
     setMenuBar(m_menubar);
 
@@ -69,18 +79,11 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     m_status_bar = new QStatusBar(this);
 
-    m_label_operation = new QLabel(m_status_bar);
-    m_status_bar->addWidget(m_label_operation);
-
     m_label_used = new QLabel(m_status_bar);
     m_status_bar->addWidget(m_label_used);
 
     m_label_total = new QLabel(m_status_bar);
     m_status_bar->addWidget(m_label_total);
-
-    m_progress = new QProgressBar(m_status_bar);
-    m_progress->setVisible(false);
-    m_status_bar->addPermanentWidget(m_progress, 1);
 
     setStatusBar(m_status_bar);
 
@@ -111,10 +114,15 @@ void FormMainUI::retranslateUi()
 {
     setWindowTitle(trUtf8("Ekstertera"));
 
-    m_menu_file->setTitle(trUtf8("Файл"));
+    m_menu_file->setTitle(trUtf8("&Файл"));
 
     m_menu_file_settings->setText(trUtf8("Настройки"));
     m_menu_file_exit->setText(trUtf8("Выход"));
+
+    m_menu_help->setTitle(trUtf8("&?"));
+
+    m_menu_about->setText(trUtf8("О программе"));
+    m_menu_about_qt->setText(trUtf8("О Qt"));
 
     m_toolbar->setWindowTitle(trUtf8("Панель инструментов"));
 

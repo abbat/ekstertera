@@ -2,6 +2,12 @@ Format: http://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 Upstream-Name: ekstertera
 Source: https://github.com/abbat/ekstertera
 
+Filse: src/3dparty/json.*
+Copyright: 2011, Eeli Reilin <gaudecker@fea.st>
+License: GPL-3
+ On Debian systems, the complete text of the GNU General Public License
+ version 3 can be found in "/usr/share/common-licenses/GPL-3".
+
 Files: *
 Copyright: 2015, Anton Batenev <antonbatenev@yandex.ru>
 License: BSD

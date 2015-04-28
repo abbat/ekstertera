@@ -3,9 +3,10 @@
  * \brief Точка входа
  */
 //----------------------------------------------------------------------------------------------
-#include "icon.h"
-#include "settings.h"
-#include "translator.h"
+#include "utils/icon.h"
+#include "utils/settings.h"
+#include "utils/clipboard.h"
+#include "utils/translator.h"
 #include "forms/form_main.h"
 //----------------------------------------------------------------------------------------------
 /*!
