@@ -2,6 +2,11 @@
 //----------------------------------------------------------------------------------------------
 #include <unistd.h>
 //----------------------------------------------------------------------------------------------
+/*!
+ * \brief Флаг инициализации api
+ */
+static bool g_api_inited = false;
+//----------------------------------------------------------------------------------------------
 
 EteraInfo::EteraInfo()
 {
@@ -289,18 +294,21 @@ void EteraAPI::init()
     qRegisterMetaType<EteraInfo>("EteraInfo");
     qRegisterMetaType<EteraItem>("EteraItem");
     qRegisterMetaType<EteraItemList>("EteraItemList");
+
+    g_api_inited = true;
 }
 //----------------------------------------------------------------------------------------------
 
 void EteraAPI::cleanup()
 {
+    g_api_inited = false;
 }
 //----------------------------------------------------------------------------------------------
 
 EteraAPI::EteraAPI(bool noprogress) : QObject(NULL)
 {
-    m_temp_io    = NULL;
-    m_temp_reply = NULL;
+    m_io    = NULL;
+    m_reply = NULL;
 
     m_user_agent = QString("ekstertera/%1").arg(ETERA_VERSION);
     m_base_url   = "https://cloud-api.yandex.net/v1/disk";
@@ -331,19 +339,32 @@ void EteraAPI::retranslateUi()
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::onDownloadProgress(qint64 done, qint64 total)
+void EteraAPI::on_about_to_quit()
 {
-    emit onProgress(done, total);
+    if (m_reply != NULL)
+        m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::onUploadProgress(qint64 done, qint64 total)
+void EteraAPI::on_download_progress(qint64 done, qint64 total)
 {
-    emit onProgress(done, total);
+    if (g_api_inited == true)
+        emit onProgress(done, total);
+    else
+        m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::onSSLErrors(const QList<QSslError>& errors)
+void EteraAPI::on_upload_progress(qint64 done, qint64 total)
+{
+    if (g_api_inited == true)
+        emit onProgress(done, total);
+    else
+        m_reply->abort();
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_ssl_errors(const QList<QSslError>& errors)
 {
     QString message;
     for (int i = 0; i < errors.count(); i++)
@@ -353,9 +374,12 @@ void EteraAPI::onSSLErrors(const QList<QSslError>& errors)
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::onReadyRead()
+void EteraAPI::on_ready_read()
 {
-    m_temp_io->write(m_temp_reply->readAll());
+    if (g_api_inited == true)
+        m_io->write(m_reply->readAll());
+    else
+        m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -453,6 +477,9 @@ void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, c
 
 bool EteraAPI::makeRequest(const QNetworkRequest& request, int& code, QString& body, EteraRequestMethod method, const QString& data, QIODevice* io)
 {
+    if (g_api_inited == false)
+        return setLastError(1, trUtf8("API не инициализировано"));
+
     QNetworkReply* reply;
 
     switch (method) {
@@ -482,26 +509,27 @@ bool EteraAPI::makeRequest(const QNetworkRequest& request, int& code, QString& b
             return setLastError(1, "Not implemented");
     }
 
-    QObject::connect(reply, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(onSSLErrors(const QList<QSslError>&)));
+    m_reply = reply;
+
+    QObject::connect(reply, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(on_ssl_errors(const QList<QSslError>&)));
 
     if (m_noprogress == false) {
-        QObject::connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(onDownloadProgress(qint64, qint64)));
-        QObject::connect(reply, SIGNAL(uploadProgress(qint64, qint64)),   this, SLOT(onUploadProgress(qint64, qint64)));
+        QObject::connect(reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(on_download_progress(qint64, qint64)));
+        QObject::connect(reply, SIGNAL(uploadProgress(qint64, qint64)),   this, SLOT(on_upload_progress(qint64, qint64)));
     }
 
     if (method == ermGET && io != NULL) {
-        m_temp_io    = io;
-        m_temp_reply = reply;
-
-        QObject::connect(reply, SIGNAL(readyRead()), this, SLOT(onReadyRead()));
+        m_io = io;
+        QObject::connect(reply, SIGNAL(readyRead()), this, SLOT(on_ready_read()));
     }
 
     QEventLoop loop;
-    QObject::connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    connect(reply, SIGNAL(finished()), &loop, SLOT(quit()));
+    connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(on_about_to_quit()));
     loop.exec();
 
-    m_temp_io    = NULL;
-    m_temp_reply = NULL;
+    m_io    = NULL;
+    m_reply = NULL;
 
     QVariant http_code = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
 

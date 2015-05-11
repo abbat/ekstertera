@@ -3,13 +3,7 @@
 
 FormSettingsUI::FormSettingsUI(QWidget* parent) : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
 {
-    QIcon icon;
-    icon.addFile(":/icons/settings16.png",  QSize(16, 16));
-    icon.addFile(":/icons/settings32.png",  QSize(32, 32));
-    icon.addFile(":/icons/settings48.png",  QSize(48, 48));
-    icon.addFile(":/icons/settings64.png",  QSize(64, 64));
-    icon.addFile(":/icons/settings128.png", QSize(128, 128));
-    setWindowIcon(QIcon::fromTheme("preferences-system", icon));
+    setWindowIcon(QIcon::fromTheme("preferences-system", QIcon(":/icons/tango/preferences-system.svg")));
 
     resize(520, 150);
     setFixedSize(width(), height());
@@ -54,7 +48,7 @@ FormSettingsUI::FormSettingsUI(QWidget* parent) : QDialog(parent, Qt::WindowTitl
     m_layout_token->addWidget(m_text_token);
 
     m_button_token = new QPushButton(this);
-    m_button_token->setIcon(QIcon(":/icons/oauth16.png"));
+    m_button_token->setIcon(QIcon(":/icons/gnome/dialog-password16.png"));
     m_button_token->setMaximumSize(m_text_token->height(), m_text_token->height());
     m_layout_token->addWidget(m_button_token);
 

@@ -1,10 +1,5 @@
 <RCC>
     <qresource prefix="">
-        <file>icons/exit16.png</file>
-
-        <!-- http://www.iconsearch.ru/detailed/4682/ (c) Everaldo Coelho, Creative Commons -->
-        <file>icons/oauth16.png</file>
-
         <!-- http://www.iconsearch.ru/detailed/26087/ (c) Everaldo Coelho, GPL -->
         <file>icons/main16.png</file>
         <file>icons/main32.png</file>
@@ -12,30 +7,39 @@
         <file>icons/main64.png</file>
         <file>icons/main128.png</file>
 
-        <!-- http://www.iconsearch.ru/detailed/19538/ (c) Oxygen Team, GPL -->
-        <file>icons/settings16.png</file>
-        <file>icons/settings32.png</file>
-        <file>icons/settings48.png</file>
-        <file>icons/settings64.png</file>
-        <file>icons/settings128.png</file>
-
-        <!-- http://www.iconsearch.ru/detailed/19722/ (c) Oxygen Team, GPL -->
-        <file>icons/info16.png</file>
-        <file>icons/info32.png</file>
-        <file>icons/info48.png</file>
-        <file>icons/info64.png</file>
-        <file>icons/info128.png</file>
-
         <!-- http://www.iconsearch.ru/detailed/21400/3/ (c) MidTone Design, ??? -->
         <file>icons/upload32.png</file>
 
         <!-- http://www.iconsearch.ru/detailed/649/3/ (c) Everaldo Coelho, LGPL -->
         <file>icons/download32.png</file>
 
-        <file>icons/red16.png</file>
+        <!-- https://packages.debian.org/ru/jessie/tango-icon-theme, Public Domain -->
+        <file>icons/tango/application-exit.svg</file>
+        <file>icons/tango/document-properties.svg</file>
+        <file>icons/tango/edit-copy.svg</file>
+        <file>icons/tango/edit-cut.svg</file>
+        <file>icons/tango/edit-delete.svg</file>
+        <file>icons/tango/edit-paste.svg</file>
+        <file>icons/tango/emblem-symbolic-link.svg</file>
+        <file>icons/tango/folder-new.svg</file>
+        <file>icons/tango/folder-open.svg</file>
+        <file>icons/tango/folder.svg</file>
+        <file>icons/tango/preferences-system.svg</file>
+        <file>icons/tango/text-x-generic.svg</file>
+
+        <!-- https://packages.debian.org/ru/jessie/gnome-colors-common, GPL-2 -->
+        <file>icons/gnome/help-about.svg</file>
+
+        <!-- https://packages.debian.org/ru/jessie/gnome-icon-theme, GPL-3 -->
+        <file>icons/gnome/dialog-password16.png</file>
+        <file>icons/gnome/document-revert16.png</file>
+        <file>icons/gnome/emblem-shared16.png</file>
+
+        <!-- ??? -->
         <file>icons/yellow16.png</file>
         <file>icons/green16.png</file>
 
+        <!-- переводы -->
         <file>translations/ekstertera_en.qm</file>
     </qresource>
 </RCC>

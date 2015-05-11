@@ -1,6 +1,7 @@
 #include "widget_disk.h"
 //----------------------------------------------------------------------------------------------
 #include "tasks/all.h"
+#include "utils/pool.h"
 #include "utils/settings.h"
 #include "utils/clipboard.h"
 //----------------------------------------------------------------------------------------------
@@ -27,22 +28,22 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 
     // контекстное меню
     m_menu        = new QMenu(m_explorer);
-    m_menu_open   = m_menu->addAction(QIcon::fromTheme("folder-open"), "");
+    m_menu_open   = m_menu->addAction(QIcon::fromTheme("folder-open", QIcon(":/icons/tango/folder-open.svg")), "");
     m_menu->addSeparator();
-    m_menu_new    = m_menu->addAction(QIcon::fromTheme("folder-new"),  "");
+    m_menu_new    = m_menu->addAction(QIcon::fromTheme("folder-new", QIcon(":/icons/tango/folder-new.svg")), "");
     m_menu->addSeparator();
-    m_menu_cut    = m_menu->addAction(QIcon::fromTheme("edit-cut"),    "");
-    m_menu_copy   = m_menu->addAction(QIcon::fromTheme("edit-copy"),   "");
-    m_menu_paste  = m_menu->addAction(QIcon::fromTheme("edit-paste"),  "");
+    m_menu_cut    = m_menu->addAction(QIcon::fromTheme("edit-cut",   QIcon(":/icons/tango/edit-cut.svg")),   "");
+    m_menu_copy   = m_menu->addAction(QIcon::fromTheme("edit-copy",  QIcon(":/icons/tango/edit-copy.svg")),  "");
+    m_menu_paste  = m_menu->addAction(QIcon::fromTheme("edit-paste", QIcon(":/icons/tango/edit-paste.svg")), "");
     m_menu->addSeparator();
-    m_menu_delete = m_menu->addAction(QIcon::fromTheme("edit-delete"), "");
+    m_menu_delete = m_menu->addAction(QIcon::fromTheme("edit-delete", QIcon(":/icons/tango/edit-delete.svg")), "");
     m_menu->addSeparator();
     m_menu_rename = m_menu->addAction("");
     m_menu->addSeparator();
-    m_menu_share = m_menu->addAction(QIcon::fromTheme("emblem-shared"), "");
-    m_menu_revoke = m_menu->addAction(QIcon::fromTheme("document-revert"), "");
+    m_menu_share = m_menu->addAction(QIcon::fromTheme("emblem-shared",    QIcon(":/icons/gnome/emblem-shared16.png")),   "");
+    m_menu_revoke = m_menu->addAction(QIcon::fromTheme("document-revert", QIcon(":/icons/gnome/document-revert16.png")), "");
     m_menu->addSeparator();
-    m_menu_info   = m_menu->addAction(QIcon::fromTheme("document-properties", QIcon(":/icons/info16.png")), "");
+    m_menu_info   = m_menu->addAction(QIcon::fromTheme("document-properties", QIcon(":/icons/tango/document-properties.svg")), "");
 
     connect(m_menu_open,   SIGNAL(triggered()), this, SLOT(menu_open_triggered()));
     connect(m_menu_new,    SIGNAL(triggered()), this, SLOT(menu_new_triggered()));
@@ -217,7 +218,7 @@ void WidgetDisk::changePath(const QString& path)
     connect(ls, SIGNAL(onSuccess(quint64, const EteraItemList&, const QVariantMap&)), this, SLOT(task_on_ls_success(quint64, const EteraItemList&, const QVariantMap&)));
     connect(ls, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_ls_error(quint64, int, const QString&, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(ls);
+    EteraThreadPool::globalInstance()->start(ls);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -343,7 +344,7 @@ void WidgetDisk::menu_new_triggered()
     connect(mkdir, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_mkdir_success(quint64, const EteraItem&, const QVariantMap&)));
     connect(mkdir, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_mkdir_error(quint64, int, const QString&, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(mkdir);
+    EteraThreadPool::globalInstance()->start(mkdir);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -446,7 +447,7 @@ void WidgetDisk::menu_paste_triggered()
             connect(cp, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_copy_paste_success(quint64, const EteraItem&, const QVariantMap&)));
             connect(cp, SIGNAL(onError(quint64, int, const QString&, bool, const QVariantMap&)), this, SLOT(task_on_copy_paste_error(quint64, int, const QString&, bool, const QVariantMap&)));
 
-            QThreadPool::globalInstance()->start(cp);
+            EteraThreadPool::globalInstance()->start(cp);
         } else {
             EteraTaskMV* mv = new EteraTaskMV(src.path(), dst, false);
 
@@ -454,7 +455,7 @@ void WidgetDisk::menu_paste_triggered()
             connect(mv, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_cut_paste_success(quint64, const EteraItem&, const QVariantMap&)));
             connect(mv, SIGNAL(onError(quint64, int, const QString&, bool, const QVariantMap&)), this, SLOT(task_on_cut_paste_error(quint64, int, const QString&, bool, const QVariantMap&)));
 
-            QThreadPool::globalInstance()->start(mv);
+            EteraThreadPool::globalInstance()->start(mv);
         }
     }
 }
@@ -514,7 +515,7 @@ void WidgetDisk::menu_delete_triggered()
         connect(rm, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_rm_success(quint64, const QVariantMap&)));
         connect(rm, SIGNAL(onError(quint64, int, const QString&, bool, const QVariantMap&)), this, SLOT(task_on_rm_error(quint64, int, const QString&, bool, const QVariantMap&)));
 
-        QThreadPool::globalInstance()->start(rm);
+        EteraThreadPool::globalInstance()->start(rm);
     }
 }
 //----------------------------------------------------------------------------------------------
@@ -608,7 +609,7 @@ void WidgetDisk::item_end_edit(QWidget* editor, QAbstractItemDelegate::EndEditHi
     connect(mv, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_rename_success(quint64, const EteraItem&, const QVariantMap&)));
     connect(mv, SIGNAL(onError(quint64, int, const QString&, bool, const QVariantMap&)), this, SLOT(task_on_rename_error(quint64, int, const QString&, bool, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(mv);
+    EteraThreadPool::globalInstance()->start(mv);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -790,7 +791,7 @@ void WidgetDisk::task_on_put_ensure_success(quint64 id, const EteraItem& item, c
                     connect(rm, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_put_rm_success(quint64, const QVariantMap&)));
                     connect(rm, SIGNAL(onError(quint64, int, const QString&, bool, const QVariantMap&)), this, SLOT(task_on_put_rm_error(quint64, int, const QString&, bool, const QVariantMap&)));
 
-                    QThreadPool::globalInstance()->start(rm);
+                    EteraThreadPool::globalInstance()->start(rm);
                 }
             }
         }
@@ -832,7 +833,7 @@ void WidgetDisk::task_on_put_ensure_success(quint64 id, const EteraItem& item, c
                     connect(rm, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_put_rm_success(quint64, const QVariantMap&)));
                     connect(rm, SIGNAL(onError(quint64, int, const QString&, bool, const QVariantMap&)), this, SLOT(task_on_put_rm_error(quint64, int, const QString&, bool, const QVariantMap&)));
 
-                    QThreadPool::globalInstance()->start(rm);
+                    EteraThreadPool::globalInstance()->start(rm);
                 }
             }
         }
@@ -879,7 +880,7 @@ void WidgetDisk::task_on_put_file_error(quint64 id, int code, const QString& err
             connect(stat, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_put_ensure_success(quint64, const EteraItem&, const QVariantMap&)), Qt::BlockingQueuedConnection);
             connect(stat, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_put_ensure_error(quint64, int, const QString&, const QVariantMap&)));
 
-            QThreadPool::globalInstance()->start(stat);
+            EteraThreadPool::globalInstance()->start(stat);
         }
     } else
         QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(source).arg(target).arg(error));
@@ -916,7 +917,7 @@ void WidgetDisk::putLocalFile(const QString& source, const QString& target, bool
     connect(put, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_put_file_success(quint64, const EteraItem&, const QVariantMap&)));
     connect(put, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_put_file_error(quint64, int, const QString&, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(put);
+    EteraThreadPool::globalInstance()->start(put);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -945,7 +946,7 @@ void WidgetDisk::task_on_put_dir_error(quint64 id, int code, const QString& erro
         connect(stat, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_put_ensure_success(quint64, const EteraItem&, const QVariantMap&)), Qt::BlockingQueuedConnection);
         connect(stat, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_put_ensure_error(quint64, int, const QString&, const QVariantMap&)));
 
-        QThreadPool::globalInstance()->start(stat);
+        EteraThreadPool::globalInstance()->start(stat);
     } else
         QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(target).arg(error));
 
@@ -986,7 +987,7 @@ void WidgetDisk::putLocalDir(const QString& source, const QString& target, bool 
     connect(mkdir, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_put_dir_success(quint64, const EteraItem&, const QVariantMap&)));
     connect(mkdir, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_put_dir_error(quint64, int, const QString&, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(mkdir);
+    EteraThreadPool::globalInstance()->start(mkdir);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1118,7 +1119,7 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
     connect(get, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_get_file_success(quint64, const QVariantMap&)));
     connect(get, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_get_file_error(quint64, int, const QString&, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(get);
+    EteraThreadPool::globalInstance()->start(get);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1202,7 +1203,7 @@ void WidgetDisk::getRemoteDir(const QString& source, const QString& target, quin
     connect(ls, SIGNAL(onSuccess(quint64, const EteraItemList&, const QVariantMap&)), this, SLOT(task_on_get_dir_success(quint64, const EteraItemList&, const QVariantMap&)), Qt::BlockingQueuedConnection);
     connect(ls, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_get_dir_error(quint64, int, const QString&, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(ls);
+    EteraThreadPool::globalInstance()->start(ls);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1298,7 +1299,7 @@ void WidgetDisk::shareObjects(bool share)
             connect(publish, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_revoke_success(quint64, const EteraItem&, const QVariantMap&)));
             connect(publish, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_revoke_error(quint64, int, const QString&, const QVariantMap&)));
 
-            QThreadPool::globalInstance()->start(publish);
+            EteraThreadPool::globalInstance()->start(publish);
         } else {
             EteraTaskUNPUBLISH* unpublish = new EteraTaskUNPUBLISH(eitem->path());
 
@@ -1306,7 +1307,7 @@ void WidgetDisk::shareObjects(bool share)
             connect(unpublish, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_revoke_success(quint64, const EteraItem&, const QVariantMap&)));
             connect(unpublish, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_revoke_error(quint64, int, const QString&, const QVariantMap&)));
 
-            QThreadPool::globalInstance()->start(unpublish);
+            EteraThreadPool::globalInstance()->start(unpublish);
         }
     }
 }

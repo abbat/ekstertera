@@ -1,5 +1,6 @@
 #include "form_main.h"
 //----------------------------------------------------------------------------------------------
+#include "utils/pool.h"
 #include "utils/settings.h"
 #include "tasks/task_info.h"
 //----------------------------------------------------------------------------------------------
@@ -108,7 +109,7 @@ void FormMain::updateInfoStatus()
     connect(info, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_info_error(quint64, int, const QString&, const QVariantMap&)));
     connect(info, SIGNAL(onSuccess(quint64, const EteraInfo&, const QVariantMap&)), this, SLOT(task_on_info_success(quint64, const EteraInfo&, const QVariantMap&)));
 
-    QThreadPool::globalInstance()->start(info);
+    EteraThreadPool::globalInstance()->start(info);
 }
 //----------------------------------------------------------------------------------------------
 

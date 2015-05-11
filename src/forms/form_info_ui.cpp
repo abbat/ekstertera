@@ -3,13 +3,7 @@
 
 FormInfoUI::FormInfoUI(QWidget* parent) : QDialog(parent, Qt::WindowTitleHint | Qt::WindowSystemMenuHint | Qt::WindowCloseButtonHint)
 {
-    QIcon icon;
-    icon.addFile(":/icons/info16.png",  QSize(16, 16));
-    icon.addFile(":/icons/info32.png",  QSize(32, 32));
-    icon.addFile(":/icons/info48.png",  QSize(48, 48));
-    icon.addFile(":/icons/info64.png",  QSize(64, 64));
-    icon.addFile(":/icons/info128.png", QSize(128, 128));
-    setWindowIcon(QIcon::fromTheme("document-properties", icon));
+    setWindowIcon(QIcon::fromTheme("document-properties", QIcon(":/icons/tango/document-properties.svg")));
 
     setMinimumSize(360, 240);
 

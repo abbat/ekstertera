@@ -4,6 +4,7 @@
  */
 //----------------------------------------------------------------------------------------------
 #include "utils/icon.h"
+#include "utils/pool.h"
 #include "utils/settings.h"
 #include "utils/clipboard.h"
 #include "utils/translator.h"
@@ -38,8 +39,8 @@ int main (int argc, char* argv[])
     EteraTranslator::init();
     // инициализация буфера обмена
     EteraClipboard::init();
-    // инициализация api
-    EteraAPI::init();
+    // инициализация пула асинхронных задач и api
+    EteraThreadPool::init();
     // инициализация провайдера иконок
     EteraIconProvider::init();
 
@@ -53,8 +54,8 @@ int main (int argc, char* argv[])
 
     // очистка ресурсов провайдера иконок
     EteraIconProvider::cleanup();
-    // очистка ресурсов api
-    EteraAPI::cleanup();
+    // очистка ресурсов пула асинхронных задач и api
+    EteraThreadPool::cleanup();
     // очистка ресурсов буфера обмена
     EteraClipboard::cleanup();
     // очистка ресурсов локализации

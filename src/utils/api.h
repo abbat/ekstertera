@@ -461,8 +461,8 @@ class EteraAPI : public QObject
 
         QNetworkAccessManager m_http;   /*!< \brief Транспорт HTTPS */
 
-        QNetworkReply* m_temp_reply;   /*!< \brief Переменная для временного хранения текущего ответа */
-        QIODevice*     m_temp_io;      /*!< \brief Переменная для временного хранения текущей цели    */
+        QNetworkReply* m_reply;   /*!< \brief Переменная для временного хранения текущего ответа */
+        QIODevice*     m_io;      /*!< \brief Переменная для временного хранения текущей цели    */
 
         /*!
          * \brief Сообщение OK
@@ -582,10 +582,15 @@ class EteraAPI : public QObject
         // события HTTPS обработчика
         //
 
-        void onDownloadProgress(qint64 done, qint64 total);   /*!< \brief Прогресс чтения данных     */
-        void onUploadProgress(qint64 done, qint64 total);     /*!< \brief Прогресс отправки данных   */
-        void onSSLErrors(const QList<QSslError> &errors);     /*!< \brief Ошибка SSL                 */
-        void onReadyRead();                                   /*!< \brief Готовность к приему данных */
+        void on_download_progress(qint64 done, qint64 total);   /*!< \brief Прогресс чтения данных     */
+        void on_upload_progress(qint64 done, qint64 total);     /*!< \brief Прогресс отправки данных   */
+        void on_ssl_errors(const QList<QSslError> &errors);     /*!< \brief Ошибка SSL                 */
+        void on_ready_read();                                   /*!< \brief Готовность к приему данных */
+
+        /*!
+         * \brief Обработка сигнала выхода из приложения
+         */
+        void on_about_to_quit();
 
     signals:
 

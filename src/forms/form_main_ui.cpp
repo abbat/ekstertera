@@ -28,19 +28,19 @@ FormMainUI::FormMainUI() : QMainWindow()
     //
 
     // Файл / Настройки
-    m_menu_file_settings = m_menu_file->addAction(QIcon::fromTheme("preferences-system", QIcon(":/icons/settings16.png")), "");
+    m_menu_file_settings = m_menu_file->addAction(QIcon::fromTheme("preferences-system", QIcon(":/icons/tango/preferences-system.svg")), "");
 
     m_menu_file->addSeparator();
 
     // Файл / Выход
-    m_menu_file_exit = m_menu_file->addAction(QIcon::fromTheme("application-exit", QIcon(":/icons/exit16.png")), "");
+    m_menu_file_exit = m_menu_file->addAction(QIcon::fromTheme("application-exit", QIcon(":/icons/tango/application-exit.svg")), "");
     m_menu_file_exit->setMenuRole(QAction::QuitRole);
 
     //
     // меню "?"
     //
 
-    m_menu_about = m_menu_help->addAction(QIcon::fromTheme("help-about"), "");
+    m_menu_about = m_menu_help->addAction(QIcon::fromTheme("help-about", QIcon(":/icons/gnome/help-about.svg")), "");
     m_menu_about_qt = m_menu_help->addAction("");
 
     setMenuBar(m_menubar);

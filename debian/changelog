@@ -1,3 +1,10 @@
+ekstertera (0.0.3) unstable; urgency=low
+
+  * Исправление зависания во время выхода из программы при активной операции;
+  * Иконки по умолчанию из стандартных тем Tango / Gnome.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Mon, 11 May 2015 16:53:00 +0300
+
 ekstertera (0.0.2) unstable; urgency=low
 
   * Асинхронные операции с API.

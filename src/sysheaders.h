@@ -18,6 +18,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QDialog>
+#include <QPainter>
 #include <QMenuBar>
 #include <QToolBar>
 #include <QComboBox>
@@ -80,7 +81,7 @@
 
 #define ETERA_VERSION_MAJOR 0
 #define ETERA_VERSION_MINOR 0
-#define ETERA_VERSION_PATCH 2
+#define ETERA_VERSION_PATCH 3
 #define ETERA_VERSION_NUM   ((ETERA_VERSION_MAJOR << 16) | (ETERA_VERSION_MINOR << 8) | (ETERA_VERSION_PATCH))
 #define ETERA_VERSION       ETERA_STR(ETERA_VERSION_MAJOR) "." ETERA_STR(ETERA_VERSION_MINOR) "." ETERA_STR(ETERA_VERSION_PATCH)
 
