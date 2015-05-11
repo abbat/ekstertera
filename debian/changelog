@@ -1,3 +1,9 @@
+ekstertera (0.0.4) unstable; urgency=low
+
+  * Обновление переводов.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Mon, 11 May 2015 23:05:00 +0300
+
 ekstertera (0.0.3) unstable; urgency=low
 
   * Исправление зависания во время выхода из программы при активной операции;

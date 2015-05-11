@@ -412,68 +412,68 @@
     <message>
         <location filename="../widgets/widget_disk.cpp" line="80"/>
         <source>Открыть</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="81"/>
         <source>Создать</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="82"/>
         <source>Вырезать</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="83"/>
         <source>Копировать</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="84"/>
         <source>Вставить</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="85"/>
         <source>Удалить</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="86"/>
         <source>Переименовать</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="87"/>
         <source>Открыть доступ</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="88"/>
         <source>Закрыть доступ</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="89"/>
         <source>Свойства</source>
-        <translation type="unfinished">Properties</translation>
+        <translation>Properties</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="91"/>
         <source>Проводник</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="92"/>
         <location filename="../widgets/widget_disk.cpp" line="159"/>
         <source>Задачи</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="156"/>
         <source>Задачи (%1)</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="179"/>
@@ -498,14 +498,14 @@
         <location filename="../widgets/widget_disk.cpp" line="1244"/>
         <location filename="../widgets/widget_disk.cpp" line="1265"/>
         <source>Ошибка!</source>
-        <translation type="unfinished">Error!</translation>
+        <translation>Error!</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="179"/>
         <location filename="../widgets/widget_disk.cpp" line="1130"/>
         <source>Ошибка чтения %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="312"/>
@@ -515,110 +515,110 @@
         <location filename="../widgets/widget_disk.cpp" line="594"/>
         <location filename="../widgets/widget_disk.cpp" line="600"/>
         <source>Внимание!</source>
-        <translation type="unfinished">Attention!</translation>
+        <translation>Attention!</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="312"/>
         <source>Директория %1 уже существует</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="314"/>
         <location filename="../widgets/widget_disk.cpp" line="951"/>
         <source>Ошибка создания %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="335"/>
         <source>Создать директорию</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="335"/>
         <source>Введите имя новой директории</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="335"/>
         <source>Новая папка</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="370"/>
         <source>Ошибка копирования %1:
 %2 уже существует</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="372"/>
         <source>Ошибка копирования %1 в %2:
 %3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="402"/>
         <source>Ошибка перемещения %1:
 %2 уже существует</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="404"/>
         <source>Ошибка перемещения %1 в %2:
 %3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="439"/>
         <source>Источник и приемник совпадают</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="470"/>
         <location filename="../widgets/widget_disk.cpp" line="712"/>
         <source>Ошибка удаления %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="546"/>
         <source>Ошибка переименования %1 в %2:
 Приемник уже существует</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="548"/>
         <source>Ошибка переименования %1 в %2:
 %3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="594"/>
         <source>Недопустимый символ &quot;%1&quot; в имени</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="600"/>
         <source>Недопустимое имя</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="679"/>
         <source>Загрузка на Диск</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="739"/>
         <source>Ошибка чтения информации о %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="755"/>
         <location filename="../widgets/widget_disk.cpp" line="967"/>
         <location filename="../widgets/widget_disk.cpp" line="1142"/>
         <source>Обработка %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="769"/>
@@ -626,7 +626,7 @@
         <location filename="../widgets/widget_disk.cpp" line="1086"/>
         <location filename="../widgets/widget_disk.cpp" line="1174"/>
         <source>Файл уже существует!</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="769"/>
@@ -634,19 +634,19 @@
         <location filename="../widgets/widget_disk.cpp" line="1086"/>
         <location filename="../widgets/widget_disk.cpp" line="1174"/>
         <source>Файл %1 уже существует, перезаписать?</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="886"/>
         <location filename="../widgets/widget_disk.cpp" line="1058"/>
         <source>Ошибка загрузки %1 в %2:
 %3</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="1032"/>
         <source>Сохранение с Диска</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="1102"/>
@@ -654,29 +654,29 @@
         <location filename="../widgets/widget_disk.cpp" line="1222"/>
         <location filename="../widgets/widget_disk.cpp" line="1232"/>
         <source>Ошибка удаления %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="1106"/>
         <source>Неизвестный объект %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="1160"/>
         <source>Ошибка создания %1</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="1244"/>
         <source>Ошибка открытия доступа к %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="1265"/>
         <source>Ошибка закрытия доступа к %1:
 %2</source>
-        <translation type="unfinished"></translation>
+        <translation></translation>
     </message>
 </context>
 </TS>
