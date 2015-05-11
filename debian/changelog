@@ -1,3 +1,9 @@
+ekstertera (0.0.6) unstable; urgency=low
+
+  * Hotfix - разрешаем загрузку в облако всегда.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Tue, 12 May 2015 01:40:00 +0300
+
 ekstertera (0.0.5) unstable; urgency=low
 
   * Обновление переводов.

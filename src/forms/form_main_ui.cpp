@@ -53,7 +53,6 @@ FormMainUI::FormMainUI() : QMainWindow()
     m_toolbar->setFloatable(false);
 
     m_action_upload = m_toolbar->addAction(QIcon(":/icons/upload32.png"), "");
-    m_action_upload->setEnabled(false);
 
     m_action_download = m_toolbar->addAction(QIcon(":/icons/download32.png"), "");
     m_action_download->setEnabled(false);
