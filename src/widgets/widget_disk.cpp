@@ -179,6 +179,8 @@ void WidgetDisk::task_on_ls_error(quint64 id, int /*code*/, const QString& error
     QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(path).arg(error));
 
     m_tasks->removeSimpleTask(id);
+
+    m_explorer->setCursor(Qt::ArrowCursor);
 }
 //----------------------------------------------------------------------------------------------
 

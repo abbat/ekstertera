@@ -55,8 +55,10 @@ void FormMain::changeEvent(QEvent* event)
 void FormMain::menu_file_settings_triggered()
 {
     FormSettings form(this);
-    if (form.exec() == QDialog::Accepted)
+    if (form.exec() == QDialog::Accepted) {
         updateInfoStatus();
+        m_widget_disk->changePath("disk:/");
+    }
 }
 //----------------------------------------------------------------------------------------------
 

@@ -443,7 +443,7 @@ void EteraAPI::setDefaultHeaders(QNetworkRequest& request, quint64 length, bool 
         request.setRawHeader("Accept", "*/*");
 
     if (auth == true)
-        request.setRawHeader("Authorization", m_token.toUtf8());
+        request.setRawHeader("Authorization", QString("OAuth %1").arg(m_token).toUtf8());
 
     if (length != 0)
         request.setHeader(QNetworkRequest::ContentLengthHeader, QString::number(length).toUtf8());
