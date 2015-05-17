@@ -86,6 +86,16 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     setStatusBar(m_status_bar);
 
+    // меню трея
+    m_tray_menu = new QMenu(this);
+    m_tray_menu->addAction(m_menu_file_exit);
+
+    // иконка трея
+    m_tray_icon = new QSystemTrayIcon(this);
+    m_tray_icon->setContextMenu(m_tray_menu);
+    m_tray_icon->setIcon(icon);
+    m_tray_icon->setVisible(true);
+
     // локализация
     retranslateUi();
 
@@ -94,9 +104,16 @@ FormMainUI::FormMainUI() : QMainWindow()
 }
 //----------------------------------------------------------------------------------------------
 
-void FormMainUI::closeEvent(QCloseEvent* /*event*/)
+void FormMainUI::closeEvent(QCloseEvent* event)
 {
-    save();
+    // сохранение layout
+    if (m_tray_icon->isVisible() == true) {
+        hide();
+        event->ignore();
+    } else {
+        save();
+        event->accept();
+    }
 }
 //----------------------------------------------------------------------------------------------
 

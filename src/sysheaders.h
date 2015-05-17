@@ -56,6 +56,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QListWidgetItem>
+#include <QSystemTrayIcon>
 #include <QDesktopServices>
 #include <QSslConfiguration>
 #include <QNetworkAccessManager>

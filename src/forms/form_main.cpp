@@ -17,6 +17,9 @@ FormMain::FormMain() : FormMainUI()
     connect(m_menu_about,    SIGNAL(triggered()), this, SLOT(menu_help_about_triggered()));
     connect(m_menu_about_qt, SIGNAL(triggered()), this, SLOT(menu_help_about_qt_triggered()));
 
+    // иконка трея
+    connect(m_tray_icon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(tray_icon_activated(QSystemTrayIcon::ActivationReason)));
+
     // тулбар
     connect(m_action_upload,   SIGNAL(triggered()), this, SLOT(action_upload_triggered()));
     connect(m_action_download, SIGNAL(triggered()), this, SLOT(action_download_triggered()));
@@ -64,6 +67,7 @@ void FormMain::menu_file_settings_triggered()
 
 void FormMain::menu_file_exit_triggered()
 {
+    m_tray_icon->setVisible(false);
     close();
 }
 //----------------------------------------------------------------------------------------------
@@ -81,6 +85,13 @@ void FormMain::menu_help_about_triggered()
 void FormMain::menu_help_about_qt_triggered()
 {
     QMessageBox::aboutQt(this, trUtf8("О Qt"));
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::tray_icon_activated(QSystemTrayIcon::ActivationReason reason)
+{
+    if (reason == QSystemTrayIcon::Trigger)
+        setVisible(!isVisible());
 }
 //----------------------------------------------------------------------------------------------
 

@@ -68,6 +68,16 @@ class FormMainUI : public QMainWindow
           QLabel*   m_label_total;   /*!< \brief Общий размер диска                */
 
         /*!
+         * \brief Иконка в трее
+         */
+        QSystemTrayIcon* m_tray_icon;
+
+        /*!
+         * \brief Меню в трее
+         */
+        QMenu* m_tray_menu;
+
+        /*!
          * \brief Функция перевода надписей на элементах управления
          */
         void retranslateUi();

@@ -59,6 +59,12 @@ class FormMain : public FormMainUI
         void menu_help_about_qt_triggered();   /*!< \brief ? / О Qt        */
 
         //
+        // обработчики иконки трея
+        //
+
+        void tray_icon_activated(QSystemTrayIcon::ActivationReason reason);
+
+        //
         // тулбар
         //
 
