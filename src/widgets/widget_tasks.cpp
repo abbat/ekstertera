@@ -198,7 +198,7 @@ void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
 
         int idx = source.lastIndexOf("/");
 #ifdef Q_WS_WIN
-        if (idx == -1 && titem.Args.contains("overwrite") == true /* put */)
+        if (idx == -1 && titem->Args.contains("overwrite") == true /* put */)
             idx = source.lastIndexOf("\\");
 #endif
 
