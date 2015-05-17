@@ -648,7 +648,7 @@ bool EteraAPI::parseLink(const QString& link, QUrl& url, EteraRequestMethod& met
 
     QString _url = json["href"].toString();
 
-    url = QUrl::fromEncoded(_url.toUtf8(), QUrl::StrictMode);
+    url = QUrl::fromEncoded(_url.toUtf8());
 
     if (checkYandexDomain(url) == false)
         return setLastError(1, MALFORMED_LINK_URL);
@@ -1010,7 +1010,7 @@ bool EteraAPI::get(const QString& source, const QString& target)
             return setLastError(0);
 
         if (code == 301 || code == 302) {
-            QUrl _url = QUrl::fromEncoded(body.toUtf8(), QUrl::StrictMode);
+            QUrl _url = QUrl::fromEncoded(body.toUtf8());
             if (checkYandexDomain(_url) == false)
                 return setLastError(1, MALFORMED_LINK_URL);
 

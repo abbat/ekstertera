@@ -845,8 +845,9 @@ void WidgetDisk::task_on_put_ensure_success(quint64 id, const EteraItem& item, c
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_put_file_progress(quint64 /*id*/, qint64 /*done*/, qint64 /*total*/)
+void WidgetDisk::task_on_put_file_progress(quint64 id, qint64 done, qint64 total)
 {
+    m_tasks->setProgress(id, done, total);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1047,8 +1048,9 @@ void WidgetDisk::getRemoteObjects(const QString& path)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_get_file_progress(quint64 /*id*/, qint64 /*done*/, qint64 /*total*/)
+void WidgetDisk::task_on_get_file_progress(quint64 id, qint64 done, qint64 total)
 {
+    m_tasks->setProgress(id, done, total);
 }
 //----------------------------------------------------------------------------------------------
 

@@ -1,3 +1,10 @@
+ekstertera (0.0.8) unstable; urgency=low
+
+  * Добавление отображения прогресса загрузки / отправки;
+  * Перевод обработки объектов Link в tolerant mode.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Sun, 17 May 2015 18:00:00 +0300
+
 ekstertera (0.0.7) unstable; urgency=low
 
   * Hotfix - Исправление заголовка авторизации по OAuth.

@@ -87,6 +87,22 @@ class WidgetTasks : public QTreeWidget
          */
         void setArgs(quint64 id, const QVariantMap& args);
 
+        /*!
+         * \brief Обновление прогресса задачи
+         * \param id ID задачи
+         * \param done Завершено
+         * \param total Всего
+         */
+        void setProgress(quint64 id, qint64 done, qint64 total);
+
+    protected:
+
+        /*!
+         * \brief QWidget::resizeEvent
+         * Масштабирование колонок
+         */
+        void resizeEvent(QResizeEvent* event);
+
     private:
 
         /*!
@@ -94,6 +110,7 @@ class WidgetTasks : public QTreeWidget
          */
         typedef struct {
             WidgetTasksItem* Item;    /*!< \brief Графический элемент         */
+            QProgressBar*    Bar;     /*!< \brief Виджет прогресса            */
             QVariantMap      Args;    /*!< \brief Аргументы задачи            */
             quint64          Wait;    /*!< \brief Количество задач в ожидании */
         } TasksItem;

@@ -5,6 +5,8 @@ WidgetTasks::WidgetTasks(QWidget* parent) : QTreeWidget(parent)
 {
     setHeaderHidden(true);
     setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    setColumnCount(2);
+    setUniformRowHeights(true);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -12,6 +14,17 @@ WidgetTasks::~WidgetTasks()
 {
     foreach(TasksItem* titem, m_tasks)
         delete titem;
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::resizeEvent(QResizeEvent* event)
+{
+    QSize size = event->size();
+
+    setColumnWidth(0, size.width() * 70 / 100);
+    setColumnWidth(1, size.width() * 30 / 100);
+
+    QTreeWidget::resizeEvent(event);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -27,6 +40,7 @@ void WidgetTasks::addSimpleTask(quint64 id, const QString& text, const QVariantM
         titem->Item = new WidgetTasksItem(this);
         titem->Item->setText(0, text);
 
+        titem->Bar  = NULL;
         titem->Wait = 0;
 
         m_tasks[id] = titem;
@@ -95,6 +109,7 @@ void WidgetTasks::addChildTask(quint64 parent, quint64 id, const QString& text, 
 
         titem->Item->setText(0, text);
 
+        titem->Bar  = NULL;
         titem->Wait = 0;
 
         m_tasks[id] = titem;
@@ -164,5 +179,34 @@ void WidgetTasks::setArgs(quint64 id, const QVariantMap& args)
         return;
 
     titem->Args = args;
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
+{
+    TasksItem* titem = m_tasks.value(id, NULL);
+    if (titem == NULL)
+        return;
+
+    if (titem->Bar == NULL) {
+        titem->Bar = new QProgressBar();
+        titem->Bar->setMinimum(0);
+
+        setItemWidget(titem->Item, 1, titem->Bar);
+
+        QString source = titem->Args.value("source", "").toString();
+
+        int idx = source.lastIndexOf("/");
+#ifdef Q_WS_WIN
+        if (idx == -1 && titem.Args.contains("overwrite") == true /* put */)
+            idx = source.lastIndexOf("\\");
+#endif
+
+        if (idx != -1)
+            titem->Item->setText(0, source.right(source.length() - idx - 1));
+    }
+
+    titem->Bar->setMaximum(total);
+    titem->Bar->setValue(done);
 }
 //----------------------------------------------------------------------------------------------

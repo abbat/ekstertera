@@ -31,6 +31,7 @@ void EteraTaskProgress::cleanup()
 
 void EteraTaskProgress::api_on_progress(qint64 done, qint64 total)
 {
-    emit onProgress(m_id, done, total);
+    if (m_api != NULL) /* Fix ASSERT: "staticMetaObject.cast(_o)" */
+        emit onProgress(m_id, done, total);
 }
 //----------------------------------------------------------------------------------------------
