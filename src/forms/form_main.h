@@ -30,16 +30,6 @@ class FormMain : public FormMainUI
     private:
 
         /*!
-         * \brief Статус операции
-         */
-        typedef enum
-        {
-            opGreen,    /*!< \brief Зеленый (нет ошибки, готов) */
-            opYellow,   /*!< \brief Желтый (получение данных)   */
-            opRed       /*!< \brief Красный (ошибка)            */
-        } OperationStatus;
-
-        /*!
          * \brief Обновление статуса в статус-баре
          */
         void updateInfoStatus();

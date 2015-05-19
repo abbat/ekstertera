@@ -73,8 +73,7 @@ class EteraInfo
 /*!
  * \brief Тип объекта на диске
  */
-typedef enum
-{
+typedef enum {
     eitUnknown,   /*!< \brief Объект неизвестного типа    */
     eitFile,      /*!< \brief Объект является файлом      */
     eitDir        /*!< \brief Объект является директорией */
@@ -83,8 +82,7 @@ typedef enum
 /*!
  * \brief Тип медиа для объекта на диске
  */
-typedef enum
-{
+typedef enum {
     eimtAudio,         /*!< \brief Аудио-файлы                                                                            */
     eimtBackup,        /*!< \brief Файлы резервных и временных копий                                                      */
     eimtBook,          /*!< \brief Электронные книги                                                                      */
@@ -523,8 +521,7 @@ class EteraAPI : public QObject
         /*!
          * \brief Тип запроса к api
          */
-        typedef enum
-        {
+        typedef enum {
             ermGET,     /*!< \brief GET    */
             ermPOST,    /*!< \brief POST   */
             ermPUT,     /*!< \brief PUT    */

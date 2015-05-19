@@ -44,33 +44,30 @@ class EteraIconProvider
         ~EteraIconProvider();
 
         /*!
-         * \brief Провайдер стандартных иконок
-         */
-        QCommonStyle m_style;
-
-        /*!
-         * \brief Получение иконки стандартной иконки, аналог QStyle::standardIcon
-         * Необходим для Windows, где нет тем и могут подставляться иконки малого размера
-         * \param pixmap Имя стандартной иконки
-         * \return Иконка
-         */
-        QIcon standardIcon(QStyle::StandardPixmap pixmap);
-
-#ifdef Q_WS_WIN
-        /*!
-         * \brief Получение иконки стандартной иконки из темы Tango
-         * \param pixmap Имя стандартной иконки
-         * \return Иконка
-         */
-        QIcon tangoIcon(QStyle::StandardPixmap pixmap);
-
-        /*!
          * \brief Добавление к стандартной иконке символа симлинка
-         * \param base Имя стандартной иконки в ресурсах
-         * \return Иконка
+         * \param base_icon Иконка для наложения символа
+         * \return Результирующая иконка
          */
-        QIcon tangoAddLink(const QString& base);
-#endif
+        QIcon addLinkIcon(QIcon base_icon);
+
+        /*!
+         * \brief Получение иконки по медиа типу
+         * \param icon Иконка
+         * \param type Тип медиа
+         * \param shared Флаг публичного доступа
+         * \return true, если иконка найдена
+         */
+        bool mediaIcon(QIcon& icon, EteraItemMediaType type, bool shared);
+
+    private:
+
+        QIcon m_dir;         /*!< \brief Стандартная иконка директории           */
+        QIcon m_dir_link;    /*!< \brief Стандартная иконка публичной директории */
+        QIcon m_file;        /*!< \brief Стандартная иконка файла                */
+        QIcon m_file_link;   /*!< \brief Стандартная иконка публичного файла     */
+
+        QMap<EteraItemMediaType, QIcon> m_media_icon;        /*!< \brief Карта иконок по медиа типу           */
+        QMap<EteraItemMediaType, QIcon> m_media_icon_link;   /*!< \brief Карта публичных иконок по медиа типу */
 };
 
 #endif   // _ekstertera_icon_h_

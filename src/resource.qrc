@@ -15,6 +15,7 @@
 
         <!-- https://packages.debian.org/ru/jessie/tango-icon-theme, Public Domain -->
         <file>icons/tango/application-exit.svg</file>
+        <file>icons/tango/application-x-executable.svg</file>
         <file>icons/tango/document-properties.svg</file>
         <file>icons/tango/edit-copy.svg</file>
         <file>icons/tango/edit-cut.svg</file>
@@ -24,8 +25,17 @@
         <file>icons/tango/folder-new.svg</file>
         <file>icons/tango/folder-open.svg</file>
         <file>icons/tango/folder.svg</file>
+        <file>icons/tango/font-x-generic.svg</file>
+        <file>icons/tango/image-x-generic.svg</file>
+        <file>icons/tango/package-x-generic.svg</file>
         <file>icons/tango/preferences-system.svg</file>
+        <file>icons/tango/text-html.svg</file>
         <file>icons/tango/text-x-generic.svg</file>
+        <file>icons/tango/audio-x-generic.svg</file>
+        <file>icons/tango/text-x-script.svg</file>
+        <file>icons/tango/video-x-generic.svg</file>
+        <file>icons/tango/x-office-document.svg</file>
+        <file>icons/tango/x-office-spreadsheet.svg</file>
 
         <!-- https://packages.debian.org/ru/jessie/gnome-colors-common, GPL-2 -->
         <file>icons/gnome/help-about.svg</file>
