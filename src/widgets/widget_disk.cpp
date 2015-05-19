@@ -15,9 +15,12 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     m_explorer->setWrapping(true);
     m_explorer->setResizeMode(QListView::Adjust);
     m_explorer->setContextMenuPolicy(Qt::CustomContextMenu);
-    m_explorer->setIconSize(QSize(48, 48));
     m_explorer->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_explorer->setSortingEnabled(true);
+
+    // размеры более 48 под windows работать не будут
+    // подробнее см. EteraIconProvider::addLinkIcon
+    m_explorer->setIconSize(QSize(48, 48));
 
     m_tasks = new WidgetTasks(this);
 

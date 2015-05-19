@@ -98,6 +98,10 @@ QIcon EteraIconProvider::addLinkIcon(QIcon base_icon)
     QIcon link_icon = QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg"));
 
     QList<int> sizes;
+
+    // размеры более 48 под windows работать не будут
+    // в силу SHIL_EXTRALARGE при вызове SHGetImageList
+    // подробнее см. EteraIconProvider::extensionIcon
     sizes << 16 << 32 << 48;
 
     for (int i = 0; i < sizes.size(); i++) {
@@ -137,12 +141,12 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
         return false;
 
     IImageList* ilist;
-    HRESULT result = SHGetImageList(SHIL_EXTRALARGE, ETERA_IID_IImageList, (void**)&ilist);
+    HRESULT result = SHGetImageList(SHIL_EXTRALARGE /* 48x48 */, ETERA_IID_IImageList, (void**)&ilist);
     if (result != S_OK)
         return false;
 
     HICON hicon;
-    result = ilist->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hicon); 
+    result = ilist->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hicon);
     ilist->Release();
 
     if (result != S_OK)
