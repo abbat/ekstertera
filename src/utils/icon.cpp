@@ -117,6 +117,26 @@ QIcon EteraIconProvider::addLinkIcon(QIcon base_icon)
 }
 //----------------------------------------------------------------------------------------------
 
+bool EteraIconProvider::extensionIcon(QIcon& /*icon*/, const QString& /*ext*/, bool /*shared*/)
+{
+#ifdef Q_WS_WIN
+    return false;
+#else
+    return false;
+#endif
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraIconProvider::mimeIcon(QIcon& /*icon*/, const QString& /*mime*/, bool /*shared*/)
+{
+#ifdef Q_WS_WIN
+    return false;
+#else
+    return false;
+#endif
+}
+//----------------------------------------------------------------------------------------------
+
 bool EteraIconProvider::mediaIcon(QIcon& icon, EteraItemMediaType type, bool shared)
 {
     if (shared == true) {
@@ -144,7 +164,11 @@ QIcon EteraIconProvider::icon(const EteraItem& item)
     else if (item.isFile() == true) {
         QIcon result;
 
-        if (mediaIcon(result, item.mediaType(), item.isPublic()) == true)
+        if (extensionIcon(result, item.extension(), item.isPublic()) == true)
+            return result;
+        else if (mimeIcon(result, item.mimeType(), item.isPublic()) == true)
+            return result;
+        else if (mediaIcon(result, item.mediaType(), item.isPublic()) == true)
             return result;
 
         return (item.isPublic() == true ? m_file_link : m_file);

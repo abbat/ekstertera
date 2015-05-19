@@ -158,6 +158,18 @@ bool EteraItem::parse(const QtJson::JsonObject& json)
 }
 //----------------------------------------------------------------------------------------------
 
+QString EteraItem::extension() const
+{
+    if (isFile() == true) {
+        int idx = m_name.lastIndexOf(".");
+        if (idx != -1)
+            return m_name.right(m_name.length() - idx - 1).toLower();
+    }
+
+    return "";
+}
+//----------------------------------------------------------------------------------------------
+
 QString EteraItem::basePath() const
 {
     if (isDir() == true)

@@ -51,6 +51,24 @@ class EteraIconProvider
         QIcon addLinkIcon(QIcon base_icon);
 
         /*!
+         * \brief Получение иконки по расширению
+         * \param icon Иконка
+         * \param ext Расширение
+         * \param shared Флаг публичного доступа
+         * \return true, если иконка найдена
+         */
+        bool extensionIcon(QIcon& icon, const QString& ext, bool shared);
+
+        /*!
+         * \brief Получение иконки по MIME типу
+         * \param icon Иконка
+         * \param mime MIME тип
+         * \param shared Флаг публичного доступа
+         * \return true, если иконка найдена
+         */
+        bool mimeIcon(QIcon& icon, const QString& mime, bool shared);
+
+        /*!
          * \brief Получение иконки по медиа типу
          * \param icon Иконка
          * \param type Тип медиа

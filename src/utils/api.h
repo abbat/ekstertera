@@ -152,6 +152,12 @@ class EteraItem
         QString name() const { return m_name; }
 
         /*!
+         * \brief Расширение файла
+         * \return Расширение файла
+         */
+        QString extension() const;
+
+        /*!
          * \brief Путь объекта
          * \return Путь объекта
          */

@@ -50,7 +50,6 @@
 #include <QFileDialog>
 #include <QInputDialog>
 #include <QProgressBar>
-#include <QCommonStyle>
 #include <QApplication>
 #include <QLibraryInfo>
 #include <QNetworkReply>
