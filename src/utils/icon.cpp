@@ -117,10 +117,44 @@ QIcon EteraIconProvider::addLinkIcon(QIcon base_icon)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraIconProvider::extensionIcon(QIcon& /*icon*/, const QString& /*ext*/, bool /*shared*/)
+bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shared)
 {
 #ifdef Q_WS_WIN
-    return false;
+    if (shared == true) {
+        if (m_ext_icon_link.contains(ext) == true) {
+            icon = m_ext_icon_link(ext);
+            return true;
+        }
+    } else {
+        if (m_ext_icon.contains(ext) == true) {
+            icon = m_ext_icon(ext);
+            return true;
+        }
+    }
+
+    SHFILEINFO file_info;
+    DWORD_PTR val = SHGetFileInfo(("." + ext).utf16(), FILE_ATTRIBUTE_NORMAL, &file_info, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES);
+
+    if (val == NULL || file_info.hIcon == INVALID_HANDLE_VALUE)
+        return false;
+
+    QPixmap pixmap = QPixmap::fromWinHICON(file_info.hIcon);
+    if (pixmap.isNull() == true) {
+        DestroyIcon(file_info.hIcon);
+        return false;
+    }
+
+    QIcon base_icon = QIcon(pixmap);
+    QIcon link_icon = addLinkIcon(base_icon);
+
+    DestroyIcon(file_info.hIcon);
+
+    m_ext_icon[ext]      = base_icon;
+    m_ext_icon_link[ext] = link_icon;
+
+    icon = (shared == true ? link_icon : base_icon);
+
+    return true;
 #else
     return false;
 #endif
