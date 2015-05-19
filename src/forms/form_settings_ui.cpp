@@ -8,58 +8,37 @@ FormSettingsUI::FormSettingsUI(QWidget* parent) : QDialog(parent, Qt::WindowTitl
     resize(520, 150);
     setFixedSize(width(), height());
 
-    //
-    // layout
-    //
-
-    m_layout_spacer = new QVBoxLayout(this);
-
-    m_layout = new QHBoxLayout();
-    m_layout_spacer->addLayout(m_layout);
+    m_layout = new QHBoxLayout(this);
 
     //
-    // подписи
+    // форма
     //
 
-    m_layout_label = new QVBoxLayout();
-    m_layout->addLayout(m_layout_label);
+    m_layout_settings = new QFormLayout();
 
     m_label_language = new QLabel(this);
-    m_layout_label->addWidget(m_label_language);
-
-    m_label_token = new QLabel(this);
-    m_layout_label->addWidget(m_label_token);
-
-    //
-    // контролы
-    //
-
-    m_layout_control = new QVBoxLayout();
-    m_layout->addLayout(m_layout_control);
-
     m_combo_language = new QComboBox(this);
     m_combo_language->addItem(QString::fromUtf8("Русский"), "ru");
     m_combo_language->addItem(QString::fromUtf8("English"), "en");
-    m_layout_control->addWidget(m_combo_language);
+    m_layout_settings->addRow(m_label_language, m_combo_language);
 
     m_layout_token = new QHBoxLayout();
-
-    m_text_token = new QLineEdit(this);
-    m_layout_token->addWidget(m_text_token);
-
+    m_label_token  = new QLabel(this);
+    m_text_token   = new QLineEdit(this);
     m_button_token = new QPushButton(this);
     m_button_token->setIcon(QIcon(":/icons/gnome/dialog-password16.png"));
     m_button_token->setMaximumSize(m_text_token->height(), m_text_token->height());
+    m_layout_token->addWidget(m_text_token);
     m_layout_token->addWidget(m_button_token);
+    m_layout_settings->addRow(m_label_token, m_layout_token);
 
-    m_layout_control->addLayout(m_layout_token);
+    m_layout->addLayout(m_layout_settings);
 
     //
     // кнопки
     //
 
     m_layout_button = new QVBoxLayout();
-    m_layout->addLayout(m_layout_button);
 
     m_button_ok = new QPushButton(this);
     m_button_ok->setShortcut(QKeySequence("Return"));
@@ -73,12 +52,7 @@ FormSettingsUI::FormSettingsUI(QWidget* parent) : QDialog(parent, Qt::WindowTitl
     m_spacer_button = new QSpacerItem(1, 1, QSizePolicy::Maximum, QSizePolicy::Expanding);
     m_layout_button->addItem(m_spacer_button);
 
-    //
-    // выравнивание
-    //
-
-    m_spacer_layout = new QSpacerItem(1, 1, QSizePolicy::Maximum, QSizePolicy::Expanding);
-    m_layout_spacer->addItem(m_spacer_layout);
+    m_layout->addLayout(m_layout_button);
 
     // локализация
     retranslateUi();

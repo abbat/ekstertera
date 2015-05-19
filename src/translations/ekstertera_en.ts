@@ -377,32 +377,32 @@
 <context>
     <name>FormSettingsUI</name>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="113"/>
+        <location filename="../forms/form_settings_ui.cpp" line="87"/>
         <source>Настройки</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="115"/>
+        <location filename="../forms/form_settings_ui.cpp" line="89"/>
         <source>Язык</source>
         <translation>Language</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="116"/>
+        <location filename="../forms/form_settings_ui.cpp" line="90"/>
         <source>OAuth токен</source>
         <translation>OAuth token</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="118"/>
+        <location filename="../forms/form_settings_ui.cpp" line="92"/>
         <source>Получить OAuth токен</source>
         <translation>Get OAuth token</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="120"/>
+        <location filename="../forms/form_settings_ui.cpp" line="94"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="121"/>
+        <location filename="../forms/form_settings_ui.cpp" line="95"/>
         <source>Отмена</source>
         <translation>Cancel</translation>
     </message>
