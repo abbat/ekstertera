@@ -88,8 +88,8 @@ class EteraIconProvider
         QMap<EteraItemMediaType, QIcon> m_media_icon_link;   /*!< \brief Карта публичных иконок по медиа типу */
 
 #ifdef Q_WS_WIN
-        QMap<EteraItemMediaType, QIcon> m_ext_icon;        /*!< \brief Карта иконок по расширению           */
-        QMap<EteraItemMediaType, QIcon> m_ext_icon_link;   /*!< \brief Карта публичных иконок по расширению */
+        QMap<QString, QIcon> m_ext_icon;        /*!< \brief Карта иконок по расширению           */
+        QMap<QString, QIcon> m_ext_icon_link;   /*!< \brief Карта публичных иконок по расширению */
 #endif
 };
 

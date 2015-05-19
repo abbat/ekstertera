@@ -98,7 +98,7 @@ QIcon EteraIconProvider::addLinkIcon(QIcon base_icon)
     QIcon link_icon = QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg"));
 
     QList<int> sizes;
-    sizes << 16 << 32 << 48 << 64;
+    sizes << 16 << 32 << 48;
 
     for (int i = 0; i < sizes.size(); i++) {
         int size = sizes[i];
@@ -122,32 +122,41 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
 #ifdef Q_WS_WIN
     if (shared == true) {
         if (m_ext_icon_link.contains(ext) == true) {
-            icon = m_ext_icon_link(ext);
+            icon = m_ext_icon_link[ext];
             return true;
         }
     } else {
         if (m_ext_icon.contains(ext) == true) {
-            icon = m_ext_icon(ext);
+            icon = m_ext_icon[ext];
             return true;
         }
     }
 
-    SHFILEINFO file_info;
-    DWORD_PTR val = SHGetFileInfo(("." + ext).utf16(), FILE_ATTRIBUTE_NORMAL, &file_info, sizeof(SHFILEINFO), SHGFI_ICON | SHGFI_LARGEICON | SHGFI_USEFILEATTRIBUTES);
-
-    if (val == NULL || file_info.hIcon == INVALID_HANDLE_VALUE)
+    SHFILEINFO sfi;
+    if (SHGetFileInfo((LPCTSTR)("." + ext).utf16(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES) == 0 || sfi.iIcon == 0)
         return false;
 
-    QPixmap pixmap = QPixmap::fromWinHICON(file_info.hIcon);
-    if (pixmap.isNull() == true) {
-        DestroyIcon(file_info.hIcon);
+    IImageList* ilist;
+    HRESULT result = SHGetImageList(SHIL_EXTRALARGE, ETERA_IID_IImageList, (void**)&ilist);
+    if (result != S_OK)
         return false;
-    }
+
+    HICON hicon;
+    result = ilist->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hicon); 
+    ilist->Release();
+
+    if (result != S_OK)
+        return false;
+
+    QPixmap pixmap = QPixmap::fromWinHICON(hicon);
+
+    DestroyIcon(hicon);
+
+    if (pixmap.isNull() == true)
+        return false;
 
     QIcon base_icon = QIcon(pixmap);
     QIcon link_icon = addLinkIcon(base_icon);
-
-    DestroyIcon(file_info.hIcon);
 
     m_ext_icon[ext]      = base_icon;
     m_ext_icon_link[ext] = link_icon;

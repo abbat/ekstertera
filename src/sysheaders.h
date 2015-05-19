@@ -65,6 +65,17 @@
     #include <QUrlQuery>
 #endif
 
+#ifdef Q_WS_WIN
+    #include <windows.h>
+    #include <shellapi.h>
+    #include <commctrl.h>
+    #include <commoncontrols.h>
+
+    #include <QUuid>
+
+    #define ETERA_IID_IImageList (QUuid(0x46eb5926, 0x582e, 0x4017, 0x9f, 0xdf, 0xe8, 0x99, 0x8d, 0xaa, 0x9, 0x50))
+#endif
+
 //
 // сторонние библиотеки
 //
