@@ -5,8 +5,8 @@ Summary:       Yandex.Disk GUI client
 Group:         Applications/Internet
 License:       BSD-2-clause
 URL:           https://github.com/abbat/ekstertera
-Requires:      libqt4 >= 4.4
-BuildRequires: libqt4-devel >= 4.4
+Requires:      libqt4 >= 4.6
+BuildRequires: libqt4-devel >= 4.6
 
 %define qmake qmake
 %define lrelease lrelease

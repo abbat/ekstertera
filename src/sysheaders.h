@@ -56,7 +56,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QListWidgetItem>
-#include <QSystemTrayIcon>
+#include <QSystemTrayIcon> // TODO: Проверить работу на Qt 5.x https://bugreports.qt.io/browse/QTBUG-31762
 #include <QDesktopServices>
 #include <QSslConfiguration>
 #include <QNetworkAccessManager>

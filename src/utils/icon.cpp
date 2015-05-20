@@ -97,14 +97,19 @@ QIcon EteraIconProvider::addLinkIcon(const QIcon& base_icon)
     QIcon result;
     QIcon link_icon = QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg"));
 
-    QList<int> sizes;
+    QList<int>   sizes;
+    QList<QSize> available = base_icon.availableSizes();
 
-    // размеры более 48 под windows работать не будут
-    // в силу SHIL_EXTRALARGE при вызове SHGetImageList
-    // подробнее см. EteraIconProvider::extensionIcon
-    sizes << 16 << 32 << 48;
+    if (available.isEmpty() == false) {
+        for (int i = 0; i < available.count(); i++)
+            sizes << available[i].width();
+    } else
+        // размеры более 48 под windows работать не будут
+        // в силу SHIL_EXTRALARGE при вызове SHGetImageList
+        // подробнее см. EteraIconProvider::extensionIcon
+        sizes << 16 << 32 << 48;
 
-    for (int i = 0; i < sizes.size(); i++) {
+    for (int i = 0; i < sizes.count(); i++) {
         int size = sizes[i];
 
         QPixmap base_pixmap = base_icon.pixmap(size);
@@ -238,13 +243,14 @@ bool EteraIconProvider::mimeIcon(QIcon& icon, const QString& mime, bool shared)
         return false;
     }
 
-    QIcon base_icon = QIcon::fromTheme(mime_type.iconName());
-    if (base_icon.isNull() == true) {
+    QIcon base_icon;
+    if (QIcon::hasThemeIcon(mime_type.iconName()) == true)
+        base_icon = QIcon::fromTheme(mime_type.iconName());
+    else if (QIcon::hasThemeIcon(mime_type.genericIconName()) == true)
         base_icon = QIcon::fromTheme(mime_type.genericIconName());
-        if (base_icon.isNull() == true) {
-            m_cache_icon_miss.insert(mime);
-            return false;
-        }
+    else {
+        m_cache_icon_miss.insert(mime);
+        return false;
     }
 
     return cacheIcon(icon, base_icon, mime, shared);
