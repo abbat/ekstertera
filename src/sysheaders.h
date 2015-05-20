@@ -61,9 +61,13 @@
 #include <QSslConfiguration>
 #include <QNetworkAccessManager>
 
-// в Qt > 5 часть методов QUrl типа addQueryItem признаны obsolete
 #if QT_VERSION >= 0x050000
+    // в Qt 5.x часть методов QUrl типа addQueryItem признаны obsolete
     #include <QUrlQuery>
+
+    // Qt 5.x specific
+    #include <QMimeType>
+    #include <QMimeDatabase>
 #endif
 
 //
@@ -91,10 +95,28 @@
 // общие определения для проекта
 //
 
+// В Qt 5.x более нет макроса Q_WS_X11, который использовался для определения *nix подобных систем, определяем свои
+#ifdef Q_WS_WIN
+    #define ETERA_WS_WIN
+#endif
+
+#ifdef Q_WS_MAC
+    #define ETERA_WS_MAC
+#endif
+
+#if defined(Q_OS_LINUX) || defined(Q_OS_UNIX)
+    #define ETERA_WS_X11
+#endif
+
+#if defined(ETERA_WS_X11) || defined(ETERA_WS_WIN)
+    #define ETERA_WS_X11_OR_WIN
+#endif
+
+// конкатенация строк для макроса версии
 #define ETERA_STR_EXPAND(token) #token
 #define ETERA_STR(token)        ETERA_STR_EXPAND(token)
 
-// 0.0.8
+// версия (0.0.8)
 #define ETERA_VERSION_MAJOR 0
 #define ETERA_VERSION_MINOR 0
 #define ETERA_VERSION_PATCH 8

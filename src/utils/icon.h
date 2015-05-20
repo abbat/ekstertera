@@ -48,8 +48,30 @@ class EteraIconProvider
          * \param base_icon Иконка для наложения символа
          * \return Результирующая иконка
          */
-        QIcon addLinkIcon(QIcon base_icon);
+        QIcon addLinkIcon(const QIcon& base_icon);
 
+#ifdef ETERA_WS_X11_OR_WIN
+        /*!
+         * \brief Получение иконки из кэша
+         * \param icon Иконка
+         * \param key Ключ кэша
+         * \param shared Флаг публичного доступа
+         * \return true, если иконка найдена
+         */
+        bool cachedIcon(QIcon& icon, const QString& key, bool shared);
+
+        /*!
+         * \brief Добавление иконки в кэш
+         * \param icon Результирующая иконка
+         * \param base_icon Базовая иконка для кэширования
+         * \param key Ключ кэша
+         * \param shared Флаг публичного доступа
+         * \return Всегда true
+         */
+        bool cacheIcon(QIcon& icon, const QIcon& base_icon, const QString& key, bool shared);
+#endif
+
+#ifdef ETERA_WS_WIN
         /*!
          * \brief Получение иконки по расширению
          * \param icon Иконка
@@ -58,7 +80,9 @@ class EteraIconProvider
          * \return true, если иконка найдена
          */
         bool extensionIcon(QIcon& icon, const QString& ext, bool shared);
+#endif
 
+#ifdef ETERA_WS_X11
         /*!
          * \brief Получение иконки по MIME типу
          * \param icon Иконка
@@ -67,6 +91,7 @@ class EteraIconProvider
          * \return true, если иконка найдена
          */
         bool mimeIcon(QIcon& icon, const QString& mime, bool shared);
+#endif
 
         /*!
          * \brief Получение иконки по медиа типу
@@ -87,9 +112,10 @@ class EteraIconProvider
         QMap<EteraItemMediaType, QIcon> m_media_icon;        /*!< \brief Карта иконок по медиа типу           */
         QMap<EteraItemMediaType, QIcon> m_media_icon_link;   /*!< \brief Карта публичных иконок по медиа типу */
 
-#ifdef Q_WS_WIN
-        QMap<QString, QIcon> m_ext_icon;        /*!< \brief Карта иконок по расширению           */
-        QMap<QString, QIcon> m_ext_icon_link;   /*!< \brief Карта публичных иконок по расширению */
+#ifdef ETERA_WS_X11_OR_WIN
+        QMap<QString, QIcon> m_cache_icon;        /*!< \brief Карта иконок             */
+        QMap<QString, QIcon> m_cache_icon_link;   /*!< \brief Карта публичных иконок   */
+        QSet<QString>        m_cache_icon_miss;   /*!< \brief Кэш отсутствующих иконок */
 #endif
 };
 

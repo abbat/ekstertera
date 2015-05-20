@@ -92,7 +92,7 @@ EteraIconProvider::~EteraIconProvider()
 }
 //----------------------------------------------------------------------------------------------
 
-QIcon EteraIconProvider::addLinkIcon(QIcon base_icon)
+QIcon EteraIconProvider::addLinkIcon(const QIcon& base_icon)
 {
     QIcon result;
     QIcon link_icon = QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg"));
@@ -120,68 +120,137 @@ QIcon EteraIconProvider::addLinkIcon(QIcon base_icon)
     return result;
 }
 //----------------------------------------------------------------------------------------------
-
-bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shared)
+#ifdef ETERA_WS_X11_OR_WIN
+bool EteraIconProvider::cachedIcon(QIcon& icon, const QString& key, bool shared)
 {
-#ifdef Q_WS_WIN
+    if (m_cache_icon_miss.contains(key) == true)
+        return false;
+
     if (shared == true) {
-        if (m_ext_icon_link.contains(ext) == true) {
-            icon = m_ext_icon_link[ext];
+        if (m_cache_icon_link.contains(key) == true) {
+            icon = m_cache_icon_link[key];
             return true;
         }
-    } else {
-        if (m_ext_icon.contains(ext) == true) {
-            icon = m_ext_icon[ext];
+
+        // непубличная иконка могла уже быть закэширована
+        if (m_cache_icon.contains(key) == true) {
+            QIcon link_icon = addLinkIcon(m_cache_icon[key]);
+            m_cache_icon_link[key] = link_icon;
+            icon = link_icon;
             return true;
+        }
+
+        return false;
+    }
+
+    if (m_cache_icon.contains(key) == true) {
+        icon = m_cache_icon[key];
+        return true;
+    }
+
+    return false;
+}
+#endif
+//----------------------------------------------------------------------------------------------
+#ifdef ETERA_WS_X11_OR_WIN
+bool EteraIconProvider::cacheIcon(QIcon& icon, const QIcon& base_icon, const QString& key, bool shared)
+{
+    if (shared == true) {
+        QIcon link_icon = addLinkIcon(base_icon);
+        m_cache_icon_link[key] = link_icon;
+        icon = link_icon;
+    } else {
+        m_cache_icon[key] = base_icon;
+        icon = base_icon;
+    }
+
+    return true;
+}
+#endif
+//----------------------------------------------------------------------------------------------
+#ifdef ETERA_WS_WIN
+bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shared)
+{
+    if (cachedIcon(icon, ext, shared) == true)
+        return true;
+
+    // получение индекса иконки по расширению
+    SHFILEINFO sfi;
+    if (SHGetFileInfo((LPCTSTR)("." + ext).utf16(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES) == 0)
+        return false;
+
+    if (sfi.iIcon == 0) {
+        m_cache_icon_miss.insert(ext);
+        return false;
+    }
+
+    // генерация иконки по размерам
+    QIcon base_icon;
+
+    QList<int> sizes;
+    sizes << SHIL_SMALL << SHIL_LARGE << SHIL_EXTRALARGE;
+
+    for (int i = 0; i < sizes.size(); i++) {
+        int size = sizes[i];
+
+        IImageList* ilist;
+        HRESULT result = SHGetImageList(SHIL_EXTRALARGE /* 48x48 */, ETERA_IID_IImageList, (void**)&ilist);
+        if (result != S_OK)
+            return false;
+
+        HICON hicon;
+        result = ilist->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hicon);
+        ilist->Release();
+
+        if (result != S_OK)
+            return false;
+
+        QPixmap pixmap = QPixmap::fromWinHICON(hicon);
+
+        DestroyIcon(hicon);
+
+        if (pixmap.isNull() == true)
+            return false;
+
+        base_icon.addPixmap(pixmap);
+    }
+
+    return cacheIcon(icon, base_icon, ext, shared);
+}
+#endif
+//----------------------------------------------------------------------------------------------
+#ifdef ETERA_WS_X11
+bool EteraIconProvider::mimeIcon(QIcon& icon, const QString& mime, bool shared)
+{
+    if (cachedIcon(icon, mime, shared) == true)
+        return true;
+
+#if QT_VERSION < 0x050000
+    // Для Qt4 можно попробовать портировать https://qt.gitorious.org/qtplayground/mimetypes
+    // или написать свою реализацию по спецификации (а стоит ли оно того?)
+    // http://standards.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html
+    return false;
+#else
+    QMimeType mime_type = QMimeDatabase().mimeTypeForName(mime);
+
+    if (mime_type.isValid() == false || mime_type.isDefault() == true) {
+        m_cache_icon_miss.insert(mime);
+        return false;
+    }
+
+    QIcon base_icon = QIcon::fromTheme(mime_type.iconName());
+    if (base_icon.isNull() == true) {
+        base_icon = QIcon::fromTheme(mime_type.genericIconName());
+        if (base_icon.isNull() == true) {
+            m_cache_icon_miss.insert(mime);
+            return false;
         }
     }
 
-    SHFILEINFO sfi;
-    if (SHGetFileInfo((LPCTSTR)("." + ext).utf16(), FILE_ATTRIBUTE_NORMAL, &sfi, sizeof(SHFILEINFO), SHGFI_SYSICONINDEX | SHGFI_USEFILEATTRIBUTES) == 0 || sfi.iIcon == 0)
-        return false;
-
-    IImageList* ilist;
-    HRESULT result = SHGetImageList(SHIL_EXTRALARGE /* 48x48 */, ETERA_IID_IImageList, (void**)&ilist);
-    if (result != S_OK)
-        return false;
-
-    HICON hicon;
-    result = ilist->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hicon);
-    ilist->Release();
-
-    if (result != S_OK)
-        return false;
-
-    QPixmap pixmap = QPixmap::fromWinHICON(hicon);
-
-    DestroyIcon(hicon);
-
-    if (pixmap.isNull() == true)
-        return false;
-
-    QIcon base_icon = QIcon(pixmap);
-    QIcon link_icon = addLinkIcon(base_icon);
-
-    m_ext_icon[ext]      = base_icon;
-    m_ext_icon_link[ext] = link_icon;
-
-    icon = (shared == true ? link_icon : base_icon);
-
-    return true;
-#else
-    return false;
+    return cacheIcon(icon, base_icon, mime, shared);
 #endif
 }
-//----------------------------------------------------------------------------------------------
-
-bool EteraIconProvider::mimeIcon(QIcon& /*icon*/, const QString& /*mime*/, bool /*shared*/)
-{
-#ifdef Q_WS_WIN
-    return false;
-#else
-    return false;
 #endif
-}
 //----------------------------------------------------------------------------------------------
 
 bool EteraIconProvider::mediaIcon(QIcon& icon, EteraItemMediaType type, bool shared)
@@ -211,11 +280,17 @@ QIcon EteraIconProvider::icon(const EteraItem& item)
     else if (item.isFile() == true) {
         QIcon result;
 
+#ifdef ETERA_WS_WIN
         if (extensionIcon(result, item.extension(), item.isPublic()) == true)
             return result;
-        else if (mimeIcon(result, item.mimeType(), item.isPublic()) == true)
+#endif
+
+#ifdef ETERA_WS_X11
+        if (mimeIcon(result, item.mimeType(), item.isPublic()) == true)
             return result;
-        else if (mediaIcon(result, item.mediaType(), item.isPublic()) == true)
+#endif
+
+        if (mediaIcon(result, item.mediaType(), item.isPublic()) == true)
             return result;
 
         return (item.isPublic() == true ? m_file_link : m_file);
