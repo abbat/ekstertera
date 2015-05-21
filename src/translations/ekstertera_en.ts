@@ -408,6 +408,14 @@
     </message>
 </context>
 <context>
+    <name>QStandardPaths</name>
+    <message>
+        <location filename="../../3dparty/qt5/standardpaths/qstandardpaths_mac.cpp" line="157"/>
+        <source>Home</source>
+        <translation>Home</translation>
+    </message>
+</context>
+<context>
     <name>WidgetDisk</name>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="83"/>

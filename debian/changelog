@@ -1,3 +1,9 @@
+ekstertera (0.0.9) unstable; urgency=low
+
+  * Получение иконок по mime-типу.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Thu, 21 May 2015 03:05:00 +0300
+
 ekstertera (0.0.8) unstable; urgency=low
 
   * Добавление иконки в трей;

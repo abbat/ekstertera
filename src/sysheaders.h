@@ -56,7 +56,7 @@
 #include <QNetworkReply>
 #include <QNetworkRequest>
 #include <QListWidgetItem>
-#include <QSystemTrayIcon> // TODO: Проверить работу на Qt 5.x https://bugreports.qt.io/browse/QTBUG-31762
+#include <QSystemTrayIcon>
 #include <QDesktopServices>
 #include <QSslConfiguration>
 #include <QNetworkAccessManager>
@@ -89,7 +89,14 @@
 //
 
 // https://github.com/gaudecker/qt-json
-#include "3dparty/json.h"
+#include "3dparty/json/json.h"
+
+// бэкпорты из Qt 5.x
+#if QT_VERSION < 0x050000
+    // https://qt.gitorious.org/qtplayground/mimetypes
+    #include "3dparty/qt5/mimetypes/qmimetype.h"
+    #include "3dparty/qt5/mimetypes/qmimedatabase.h"
+#endif
 
 //
 // общие определения для проекта
@@ -116,10 +123,10 @@
 #define ETERA_STR_EXPAND(token) #token
 #define ETERA_STR(token)        ETERA_STR_EXPAND(token)
 
-// версия (0.0.8)
+// версия (0.0.9)
 #define ETERA_VERSION_MAJOR 0
 #define ETERA_VERSION_MINOR 0
-#define ETERA_VERSION_PATCH 8
+#define ETERA_VERSION_PATCH 9
 #define ETERA_VERSION_NUM   ((ETERA_VERSION_MAJOR << 16) | (ETERA_VERSION_MINOR << 8) | (ETERA_VERSION_PATCH))
 #define ETERA_VERSION       ETERA_STR(ETERA_VERSION_MAJOR) "." ETERA_STR(ETERA_VERSION_MINOR) "." ETERA_STR(ETERA_VERSION_PATCH)
 

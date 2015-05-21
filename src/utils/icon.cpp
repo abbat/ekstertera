@@ -230,12 +230,6 @@ bool EteraIconProvider::mimeIcon(QIcon& icon, const QString& mime, bool shared)
     if (cachedIcon(icon, mime, shared) == true)
         return true;
 
-#if QT_VERSION < 0x050000
-    // Для Qt4 можно попробовать портировать https://qt.gitorious.org/qtplayground/mimetypes
-    // или написать свою реализацию по спецификации (а стоит ли оно того?)
-    // http://standards.freedesktop.org/shared-mime-info-spec/shared-mime-info-spec-latest.html
-    return false;
-#else
     QMimeType mime_type = QMimeDatabase().mimeTypeForName(mime);
 
     if (mime_type.isValid() == false || mime_type.isDefault() == true) {
@@ -254,7 +248,6 @@ bool EteraIconProvider::mimeIcon(QIcon& icon, const QString& mime, bool shared)
     }
 
     return cacheIcon(icon, base_icon, mime, shared);
-#endif
 }
 #endif
 //----------------------------------------------------------------------------------------------
