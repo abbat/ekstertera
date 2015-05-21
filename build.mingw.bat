@@ -24,7 +24,7 @@ REM *******************************
     "INCLUDEPATH += src" ^
     "TRANSLATIONS += src/translations/ekstertera_en.ts" ^
     "RC_FILE += src/resource.rc" ^
-    src 3dparty/json 3dparty/qt5
+    src 3dparty/json
 
 %QT_LRELEASE% -compress -removeidentical %PROJECT_FILE%
 
