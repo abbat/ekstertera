@@ -93,8 +93,10 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     m_toolbar->addAction(m_menu_view_refresh);
 
-    m_action_upload   = m_toolbar->addAction(QIcon(":/icons/upload32.png"),   "");
+    m_action_upload = m_toolbar->addAction(QIcon(":/icons/upload32.png"), "");
+
     m_action_download = m_toolbar->addAction(QIcon(":/icons/download32.png"), "");
+    m_action_download->setEnabled(false);
 
     m_toolbar->addAction(m_menu_view_zoom_in);
     m_toolbar->addAction(m_menu_view_zoom_out);
