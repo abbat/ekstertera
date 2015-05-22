@@ -50,6 +50,30 @@ class WidgetDisk : public QTabWidget
         void getRemoteObjects(const QString& path);
 
         /*!
+         * Увеличить рамер
+         * \return Флаг возможности дальнейшего увеличения
+         */
+        bool zoomIn();
+
+        /*!
+         * Уменьшить рамер
+         * \return Флаг возможности дальнейшего уменьшения
+         */
+        bool zoomOut();
+
+        /*!
+         * \brief Текущий размер иконок
+         * \return Текущий размер иконок
+         */
+        int zoomFactor() { return m_icon_size_index; }
+
+        /*!
+         * \brief Установить текущий размер иконок
+         * \factor Индекс размера
+         */
+        void setZoomFactor(int factor);
+
+        /*!
          * \brief Функция перевода надписей на элементах управления
          */
         void retranslateUi();
@@ -77,6 +101,13 @@ class WidgetDisk : public QTabWidget
          * \brief Текущий путь
          */
         QString m_path;
+
+        /*!
+         * \brief Возможные размеры иконок
+         */
+        QList<int> m_icon_sizes;
+        int        m_icon_size_index;           /*!< \brief Текущий индекс размера      */
+        int        m_default_icon_size_index;   /*!< \brief Индекс размера по умолчанию */
 
         /*!
          * Виджет списка файлов и директорий

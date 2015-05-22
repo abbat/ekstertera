@@ -44,6 +44,11 @@ class FormMain : public FormMainUI
         void menu_file_settings_triggered();   /*!< \brief Файл / Настройки */
         void menu_file_exit_triggered();       /*!< \brief Файл / Выход     */
 
+        // Вид
+        void menu_view_refresh_triggered();    /*!< \brief Обновить  */
+        void menu_view_zoom_in_triggered();    /*!< \brief Увеличить */
+        void menu_view_zoom_out_triggered();   /*!< \brief Уменьшить */
+
         // ?
         void menu_help_about_triggered();      /*!< \brief ? / О программе */
         void menu_help_about_qt_triggered();   /*!< \brief ? / О Qt        */

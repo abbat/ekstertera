@@ -34,6 +34,7 @@
         <file>icons/tango/audio-x-generic.svg</file>
         <file>icons/tango/text-x-script.svg</file>
         <file>icons/tango/video-x-generic.svg</file>
+        <file>icons/tango/view-refresh.svg</file>
         <file>icons/tango/x-office-document.svg</file>
         <file>icons/tango/x-office-spreadsheet.svg</file>
 
@@ -44,6 +45,8 @@
         <file>icons/gnome/dialog-password16.png</file>
         <file>icons/gnome/document-revert16.png</file>
         <file>icons/gnome/emblem-shared16.png</file>
+        <file>icons/gnome/zoom-in32.png</file>
+        <file>icons/gnome/zoom-out32.png</file>
 
         <!-- ??? -->
         <file>icons/yellow16.png</file>

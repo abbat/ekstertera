@@ -21,6 +21,7 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     // верхний ряд меню
     m_menu_file = m_menubar->addMenu("");
+    m_menu_view = m_menubar->addMenu("");
     m_menu_help = m_menubar->addMenu("");
 
     //
@@ -29,12 +30,29 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     // Файл / Настройки
     m_menu_file_settings = m_menu_file->addAction(QIcon::fromTheme("preferences-system", QIcon(":/icons/tango/preferences-system.svg")), "");
+    m_menu_file_settings->setShortcut(QKeySequence(QKeySequence::Preferences));
 
     m_menu_file->addSeparator();
 
     // Файл / Выход
     m_menu_file_exit = m_menu_file->addAction(QIcon::fromTheme("application-exit", QIcon(":/icons/tango/application-exit.svg")), "");
+    m_menu_file_exit->setShortcut(QKeySequence(QKeySequence::Quit));
     m_menu_file_exit->setMenuRole(QAction::QuitRole);
+
+    //
+    // Меню "Вид"
+    //
+
+    m_menu_view_refresh = m_menu_view->addAction(QIcon::fromTheme("view-refresh", QIcon(":/icons/tango/view-refresh.svg")), "");
+    m_menu_view_refresh->setShortcut(QKeySequence(QKeySequence::Refresh));
+
+    m_menu_view->addSeparator();
+
+    m_menu_view_zoom_in  = m_menu_view->addAction(QIcon::fromTheme("zoom-in", QIcon(":/icons/gnome/zoom-in32.png")), "");
+    m_menu_view_zoom_in->setShortcut(QKeySequence(QKeySequence::ZoomIn));
+
+    m_menu_view_zoom_out = m_menu_view->addAction(QIcon::fromTheme("zoom-out", QIcon(":/icons/gnome/zoom-out32.png")), "");
+    m_menu_view_zoom_out->setShortcut(QKeySequence(QKeySequence::ZoomOut));
 
     //
     // меню "?"
@@ -52,10 +70,15 @@ FormMainUI::FormMainUI() : QMainWindow()
     m_toolbar = addToolBar("");
     m_toolbar->setFloatable(false);
 
+    m_toolbar->addAction(m_menu_view_refresh);
+
     m_action_upload = m_toolbar->addAction(QIcon(":/icons/upload32.png"), "");
 
     m_action_download = m_toolbar->addAction(QIcon(":/icons/download32.png"), "");
     m_action_download->setEnabled(false);
+
+    m_toolbar->addAction(m_menu_view_zoom_in);
+    m_toolbar->addAction(m_menu_view_zoom_out);
 
     //
     // центральный виджет
@@ -135,6 +158,12 @@ void FormMainUI::retranslateUi()
     m_menu_file_settings->setText(trUtf8("Настройки"));
     m_menu_file_exit->setText(trUtf8("Выход"));
 
+    m_menu_view->setTitle(trUtf8("&Вид"));
+
+    m_menu_view_refresh->setText(trUtf8("Обновить"));
+    m_menu_view_zoom_in->setText(trUtf8("Увеличить"));
+    m_menu_view_zoom_out->setText(trUtf8("Уменьшить"));
+
     m_menu_help->setTitle(trUtf8("&?"));
 
     m_menu_about->setText(trUtf8("О программе"));
@@ -154,6 +183,7 @@ void FormMainUI::save()
 {
     QSettings settings;
     settings.setValue("layout/main", this->saveGeometry());
+    settings.setValue("layout/zoom", m_widget_disk->zoomFactor());
 }
 //----------------------------------------------------------------------------------------------
 
@@ -161,5 +191,7 @@ void FormMainUI::restore()
 {
     QSettings settings;
     restoreGeometry(settings.value("layout/main").toByteArray());
+
+    m_widget_disk->setZoomFactor(settings.value("layout/zoom", -1).toInt());
 }
 //----------------------------------------------------------------------------------------------

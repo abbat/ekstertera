@@ -20,7 +20,9 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 
     // размеры более 48 под windows работать не будут
     // подробнее см. EteraIconProvider::addLinkIcon
-    m_explorer->setIconSize(QSize(48, 48));
+    m_icon_sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128;
+    m_default_icon_size_index = 3;
+    setZoomFactor(m_default_icon_size_index);
 
     m_tasks = new WidgetTasks(this);
 
@@ -30,16 +32,31 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     addTab(m_tasks, QIcon(":icons/green16.png"), "");
 
     // контекстное меню
-    m_menu        = new QMenu(m_explorer);
-    m_menu_open   = m_menu->addAction(QIcon::fromTheme("folder-open", QIcon(":/icons/tango/folder-open.svg")), "");
+    m_menu = new QMenu(m_explorer);
+
+    m_menu_open = m_menu->addAction(QIcon::fromTheme("folder-open", QIcon(":/icons/tango/folder-open.svg")), "");
+
     m_menu->addSeparator();
-    m_menu_new    = m_menu->addAction(QIcon::fromTheme("folder-new", QIcon(":/icons/tango/folder-new.svg")), "");
+
+    m_menu_new = m_menu->addAction(QIcon::fromTheme("folder-new", QIcon(":/icons/tango/folder-new.svg")), "");
+    //m_menu_new->setShortcut(QKeySequence(QKeySequence::New));
+
     m_menu->addSeparator();
-    m_menu_cut    = m_menu->addAction(QIcon::fromTheme("edit-cut",   QIcon(":/icons/tango/edit-cut.svg")),   "");
-    m_menu_copy   = m_menu->addAction(QIcon::fromTheme("edit-copy",  QIcon(":/icons/tango/edit-copy.svg")),  "");
-    m_menu_paste  = m_menu->addAction(QIcon::fromTheme("edit-paste", QIcon(":/icons/tango/edit-paste.svg")), "");
+
+    m_menu_cut = m_menu->addAction(QIcon::fromTheme("edit-cut",   QIcon(":/icons/tango/edit-cut.svg")),   "");
+    //m_menu_cut->setShortcut(QKeySequence(QKeySequence::Cut));
+
+    m_menu_copy = m_menu->addAction(QIcon::fromTheme("edit-copy",  QIcon(":/icons/tango/edit-copy.svg")),  "");
+    //m_menu_copy->setShortcut(QKeySequence(QKeySequence::Copy));
+
+    m_menu_paste = m_menu->addAction(QIcon::fromTheme("edit-paste", QIcon(":/icons/tango/edit-paste.svg")), "");
+    //m_menu_paste->setShortcut(QKeySequence(QKeySequence::Paste));
+
     m_menu->addSeparator();
+
     m_menu_delete = m_menu->addAction(QIcon::fromTheme("edit-delete", QIcon(":/icons/tango/edit-delete.svg")), "");
+    //m_menu_delete->setShortcut(QKeySequence(QKeySequence::Delete));
+
     m_menu->addSeparator();
     m_menu_rename = m_menu->addAction("");
     m_menu->addSeparator();
@@ -509,6 +526,12 @@ void WidgetDisk::task_on_rm_success(quint64 id, const QVariantMap& args)
 void WidgetDisk::menu_delete_triggered()
 {
     QList<QListWidgetItem*> selected = m_explorer->selectedItems();
+
+    if (selected.count() == 0)
+        return;
+
+    if (QMessageBox::question(this, trUtf8("Внимание!"), trUtf8("Вы уверены, что хотите удалить выбранные файлы?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+        return;
 
     for (int i = 0; i < selected.count(); i++) {
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
@@ -1317,5 +1340,38 @@ void WidgetDisk::shareObjects(bool share)
             EteraThreadPool::globalInstance()->start(unpublish);
         }
     }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::setZoomFactor(int factor)
+{
+    if (factor < 0 || factor >= m_icon_sizes.count() - 1)
+        factor = m_default_icon_size_index;
+
+    m_icon_size_index = factor;
+
+    int size = m_icon_sizes[m_icon_size_index];
+
+    m_explorer->setIconSize(QSize(size, size));
+}
+//----------------------------------------------------------------------------------------------
+
+bool WidgetDisk::zoomIn()
+{
+    m_icon_size_index++;
+    int size = m_icon_sizes[m_icon_size_index];
+    m_explorer->setIconSize(QSize(size, size));
+
+    return (m_icon_size_index == m_icon_sizes.count() - 1 ? false : true);
+}
+//----------------------------------------------------------------------------------------------
+
+bool WidgetDisk::zoomOut()
+{
+    m_icon_size_index--;
+    int size = m_icon_sizes[m_icon_size_index];
+    m_explorer->setIconSize(QSize(size, size));
+
+    return (m_icon_size_index == 0 ? false : true);
 }
 //----------------------------------------------------------------------------------------------

@@ -13,6 +13,11 @@ FormMain::FormMain() : FormMainUI()
     connect(m_menu_file_settings, SIGNAL(triggered()), this, SLOT(menu_file_settings_triggered()));
     connect(m_menu_file_exit,     SIGNAL(triggered()), this, SLOT(menu_file_exit_triggered()));
 
+    // меню "Вид"
+    connect(m_menu_view_refresh,  SIGNAL(triggered()), this, SLOT(menu_view_refresh_triggered()));
+    connect(m_menu_view_zoom_in,  SIGNAL(triggered()), this, SLOT(menu_view_zoom_in_triggered()));
+    connect(m_menu_view_zoom_out, SIGNAL(triggered()), this, SLOT(menu_view_zoom_out_triggered()));
+
     // меню "?"
     connect(m_menu_about,    SIGNAL(triggered()), this, SLOT(menu_help_about_triggered()));
     connect(m_menu_about_qt, SIGNAL(triggered()), this, SLOT(menu_help_about_qt_triggered()));
@@ -69,6 +74,34 @@ void FormMain::menu_file_exit_triggered()
 {
     m_tray_icon->setVisible(false);
     close();
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::menu_view_refresh_triggered()
+{
+    m_widget_disk->changePath(m_widget_disk->path());
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::menu_view_zoom_in_triggered()
+{
+    bool result = m_widget_disk->zoomIn();
+
+    if (result == false)
+        m_menu_view_zoom_in->setEnabled(false);
+
+    m_menu_view_zoom_out->setEnabled(true);
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::menu_view_zoom_out_triggered()
+{
+    bool result = m_widget_disk->zoomOut();
+
+    if (result == false)
+        m_menu_view_zoom_out->setEnabled(false);
+
+    m_menu_view_zoom_in->setEnabled(true);
 }
 //----------------------------------------------------------------------------------------------
 
