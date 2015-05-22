@@ -67,120 +67,32 @@
                             <File Id="QTWCODECS4.DLL" Name="qtwcodecs4.dll" Source="codecs\qtwcodecs4.dll" />
                         </Component>
                     </Directory>
-                    <Directory Id="FILE" Name="File">
-                        <Component Id="EKSTERTERA.EXE_1" DiskId="1" Guid="EAB8D92F-9959-4A12-98C6-0E11135EAB26">
-                            <File Id="EKSTERTERA.EXE_1" Name="EKSTERTERA.EXE" Source="File\EKSTERTERA.EXE" />
-                        </Component>
-                        <Component Id="LIBEAY32.DLL_1" DiskId="1" Guid="58EB31A8-EB33-4F8A-9D4E-418370D057A9">
-                            <File Id="LIBEAY32.DLL_1" Name="LIBEAY32.DLL" Source="File\LIBEAY32.DLL" />
-                        </Component>
-                        <Component Id="LIBGCC_S_DW2_1.DLL_1" DiskId="1" Guid="8F4B514A-70B6-4107-82B1-13AE49BD1E0E">
-                            <File Id="LIBGCC_S_DW2_1.DLL_1" Name="LIBGCC_S_DW2_1.DLL" Source="File\LIBGCC_S_DW2_1.DLL" />
-                        </Component>
-                        <Component Id="LIBSSL32.DLL_1" DiskId="1" Guid="3F7248B6-8891-4FCB-BDCB-4469E8CAC88C">
-                            <File Id="LIBSSL32.DLL_1" Name="LIBSSL32.DLL" Source="File\LIBSSL32.DLL" />
-                        </Component>
-                        <Component Id="LIBSTDC___6.DLL_1" DiskId="1" Guid="6E68FB8D-BB34-41E1-8BCA-48E225F6F775">
-                            <File Id="LIBSTDC___6.DLL_1" Name="LIBSTDC___6.DLL" Source="File\LIBSTDC___6.DLL" />
-                        </Component>
-                        <Component Id="LIBWINPTHREAD_1.DLL_1" DiskId="1" Guid="B7F5DFB8-E0A2-4C20-8D35-C43339B2F144">
-                            <File Id="LIBWINPTHREAD_1.DLL_1" Name="LIBWINPTHREAD_1.DLL" Source="File\LIBWINPTHREAD_1.DLL" />
-                        </Component>
-                        <Component Id="QCNCODECS4.DLL_1" DiskId="1" Guid="5770A473-1350-4367-84B2-C8365ACFE0D3">
-                            <File Id="QCNCODECS4.DLL_1" Name="QCNCODECS4.DLL" Source="File\QCNCODECS4.DLL" />
-                        </Component>
-                        <Component Id="QGENERICBEARER4.DLL_1" DiskId="1" Guid="9C4F9036-9868-4116-8218-C759F68A2D91">
-                            <File Id="QGENERICBEARER4.DLL_1" Name="QGENERICBEARER4.DLL" Source="File\QGENERICBEARER4.DLL" />
-                        </Component>
-                        <Component Id="QGIF4.DLL" DiskId="1" Guid="C785461C-28A9-49DB-A53A-66FB40E0410A">
-                            <File Id="QGIF4.DLL" Name="QGIF4.DLL" Source="File\QGIF4.DLL" />
-                        </Component>
-                        <Component Id="QICO4.DLL" DiskId="1" Guid="52C47D1B-BDB1-4A46-98BF-650026F7D6AE">
-                            <File Id="QICO4.DLL" Name="QICO4.DLL" Source="File\QICO4.DLL" />
-                        </Component>
-                        <Component Id="QJPCODECS4.DLL_1" DiskId="1" Guid="CF2F86CD-5097-4BBF-AD88-6EC87E9B062C">
-                            <File Id="QJPCODECS4.DLL_1" Name="QJPCODECS4.DLL" Source="File\QJPCODECS4.DLL" />
-                        </Component>
-                        <Component Id="QJPEG4.DLL" DiskId="1" Guid="FEA2E039-2DD6-4D76-A6F1-7BC01348B353">
-                            <File Id="QJPEG4.DLL" Name="QJPEG4.DLL" Source="File\QJPEG4.DLL" />
-                        </Component>
-                        <Component Id="QKRCODECS4.DLL_1" DiskId="1" Guid="3D26E90D-1950-4E30-BC60-434254A9E5C2">
-                            <File Id="QKRCODECS4.DLL_1" Name="QKRCODECS4.DLL" Source="File\QKRCODECS4.DLL" />
-                        </Component>
-                        <Component Id="QMNG4.DLL" DiskId="1" Guid="FCC91D58-1779-41A2-9CA1-6DA26A1EC1AB">
-                            <File Id="QMNG4.DLL" Name="QMNG4.DLL" Source="File\QMNG4.DLL" />
-                        </Component>
-                        <Component Id="QNATIVEWIFIBEARER4.DLL_1" DiskId="1" Guid="66168BB0-2214-4A3A-8282-A15E24B49D5C">
-                            <File Id="QNATIVEWIFIBEARER4.DLL_1" Name="QNATIVEWIFIBEARER4.DLL" Source="File\QNATIVEWIFIBEARER4.DLL" />
-                        </Component>
-                        <Component Id="QSVG4.DLL" DiskId="1" Guid="B41CA3B3-A615-4F82-8EA4-33473B7FE9AF">
-                            <File Id="QSVG4.DLL" Name="QSVG4.DLL" Source="File\QSVG4.DLL" />
-                        </Component>
-                        <Component Id="QSVGICON4.DLL" DiskId="1" Guid="B4615A25-5314-4589-9E2B-E348433FB139">
-                            <File Id="QSVGICON4.DLL" Name="QSVGICON4.DLL" Source="File\QSVGICON4.DLL" />
-                        </Component>
-                        <Component Id="QTCORE4.DLL_1" DiskId="1" Guid="3C9A20C1-AD56-4015-855A-F68738817B8D">
-                            <File Id="QTCORE4.DLL_1" Name="QTCORE4.DLL" Source="File\QTCORE4.DLL" />
-                        </Component>
-                        <Component Id="QTGA4.DLL" DiskId="1" Guid="C161D9C7-FB9C-46EA-903F-D6F832CBE55B">
-                            <File Id="QTGA4.DLL" Name="QTGA4.DLL" Source="File\QTGA4.DLL" />
-                        </Component>
-                        <Component Id="QTGUI4.DLL_1" DiskId="1" Guid="C8F8CC04-88AD-4FFA-B422-9E3EC511946E">
-                            <File Id="QTGUI4.DLL_1" Name="QTGUI4.DLL" Source="File\QTGUI4.DLL" />
-                        </Component>
-                        <Component Id="QTIFF4.DLL" DiskId="1" Guid="A93E0476-5AD1-4CED-82BD-232E3DC330DF">
-                            <File Id="QTIFF4.DLL" Name="QTIFF4.DLL" Source="File\QTIFF4.DLL" />
-                        </Component>
-                        <Component Id="QTNETWORK4.DLL_1" DiskId="1" Guid="15BF9EF3-E00C-422A-B6F2-9F4CC53AC793">
-                            <File Id="QTNETWORK4.DLL_1" Name="QTNETWORK4.DLL" Source="File\QTNETWORK4.DLL" />
-                        </Component>
-                        <Component Id="QTSVG4.DLL_1" DiskId="1" Guid="01C23D9B-091A-4D99-B364-BE8DE3DDD5A4">
-                            <File Id="QTSVG4.DLL_1" Name="QTSVG4.DLL" Source="File\QTSVG4.DLL" />
-                        </Component>
-                        <Component Id="QTWCODECS4.DLL_1" DiskId="1" Guid="3D57D9C0-4531-4C5F-A801-8BC1963DAEA8">
-                            <File Id="QTWCODECS4.DLL_1" Name="QTWCODECS4.DLL" Source="File\QTWCODECS4.DLL" />
-                        </Component>
-                        <Component Id="QTXML4.DLL_1" DiskId="1" Guid="361B9E80-5DED-4D4F-A10B-A12586B37CE7">
-                            <File Id="QTXML4.DLL_1" Name="QTXML4.DLL" Source="File\QTXML4.DLL" />
-                        </Component>
-                        <Component Id="SSLEAY32.DLL_1" DiskId="1" Guid="0886BA07-6DFF-4C9B-ABA0-54B415C70BFA">
-                            <File Id="SSLEAY32.DLL_1" Name="SSLEAY32.DLL" Source="File\SSLEAY32.DLL" />
-                        </Component>
-                    </Directory>
-                    <Directory Id="ICON" Name="Icon">
-                        <Component Id="DESKTOPICON.EXE" DiskId="1" Guid="FD9ADF34-72E5-4740-B558-D64EF8281681">
-                            <File Id="DESKTOPICON.EXE" Name="DesktopIcon.exe" Source="Icon\DesktopIcon.exe" />
-                        </Component>
-                        <Component Id="STARTMENUICON.EXE" DiskId="1" Guid="3F33702B-1591-46E2-B171-5CB46CCA5D05">
-                            <File Id="STARTMENUICON.EXE" Name="StartMenuIcon.exe" Source="Icon\StartMenuIcon.exe" />
-                        </Component>
-                    </Directory>
                     <Directory Id="ICONENGINES" Name="iconengines">
-                        <Component Id="QSVGICON4.DLL_1" DiskId="1" Guid="5EE9583E-347A-4236-8E74-C39F7F0727E7">
+                        <Component Id="QSVGICON4.DLL" DiskId="1" Guid="5EE9583E-347A-4236-8E74-C39F7F0727E7">
                             <File Id="QSVGICON4.DLL_1" Name="qsvgicon4.dll" Source="iconengines\qsvgicon4.dll" />
                         </Component>
                     </Directory>
                     <Directory Id="IMAGEFORMATS" Name="imageformats">
-                        <Component Id="QGIF4.DLL_1" DiskId="1" Guid="EA5CA857-60B9-4A15-A354-D4AF17D67C0F">
-                            <File Id="QGIF4.DLL_1" Name="qgif4.dll" Source="imageformats\qgif4.dll" />
+                        <Component Id="QGIF4.DLL" DiskId="1" Guid="EA5CA857-60B9-4A15-A354-D4AF17D67C0F">
+                            <File Id="QGIF4.DLL" Name="qgif4.dll" Source="imageformats\qgif4.dll" />
                         </Component>
-                        <Component Id="QICO4.DLL_1" DiskId="1" Guid="7227FAB8-D83B-4387-B5FE-B55AEE157309">
-                            <File Id="QICO4.DLL_1" Name="qico4.dll" Source="imageformats\qico4.dll" />
+                        <Component Id="QICO4.DLL" DiskId="1" Guid="7227FAB8-D83B-4387-B5FE-B55AEE157309">
+                            <File Id="QICO4.DLL" Name="qico4.dll" Source="imageformats\qico4.dll" />
                         </Component>
-                        <Component Id="QJPEG4.DLL_1" DiskId="1" Guid="734B1A66-237C-44FB-82B0-EE2EDA0B430A">
-                            <File Id="QJPEG4.DLL_1" Name="qjpeg4.dll" Source="imageformats\qjpeg4.dll" />
+                        <Component Id="QJPEG4.DLL" DiskId="1" Guid="734B1A66-237C-44FB-82B0-EE2EDA0B430A">
+                            <File Id="QJPEG4.DLL" Name="qjpeg4.dll" Source="imageformats\qjpeg4.dll" />
                         </Component>
-                        <Component Id="QMNG4.DLL_1" DiskId="1" Guid="C56EA14C-E174-4FFB-8BCC-02B073222203">
-                            <File Id="QMNG4.DLL_1" Name="qmng4.dll" Source="imageformats\qmng4.dll" />
+                        <Component Id="QMNG4.DLL" DiskId="1" Guid="C56EA14C-E174-4FFB-8BCC-02B073222203">
+                            <File Id="QMNG4.DLL" Name="qmng4.dll" Source="imageformats\qmng4.dll" />
                         </Component>
-                        <Component Id="QSVG4.DLL_1" DiskId="1" Guid="F4C995C2-7B1B-4587-92CF-C1A945480C79">
-                            <File Id="QSVG4.DLL_1" Name="qsvg4.dll" Source="imageformats\qsvg4.dll" />
+                        <Component Id="QSVG4.DLL" DiskId="1" Guid="F4C995C2-7B1B-4587-92CF-C1A945480C79">
+                            <File Id="QSVG4.DLL" Name="qsvg4.dll" Source="imageformats\qsvg4.dll" />
                         </Component>
-                        <Component Id="QTGA4.DLL_1" DiskId="1" Guid="56FCFCF5-1B1F-4A63-9043-F0B9FA1D7EB4">
-                            <File Id="QTGA4.DLL_1" Name="qtga4.dll" Source="imageformats\qtga4.dll" />
+                        <Component Id="QTGA4.DLL" DiskId="1" Guid="56FCFCF5-1B1F-4A63-9043-F0B9FA1D7EB4">
+                            <File Id="QTGA4.DLL" Name="qtga4.dll" Source="imageformats\qtga4.dll" />
                         </Component>
-                        <Component Id="QTIFF4.DLL_1" DiskId="1" Guid="D0FB1350-FD18-4BF3-B3A8-1DF7BB181385">
-                            <File Id="QTIFF4.DLL_1" Name="qtiff4.dll" Source="imageformats\qtiff4.dll" />
+                        <Component Id="QTIFF4.DLL" DiskId="1" Guid="D0FB1350-FD18-4BF3-B3A8-1DF7BB181385">
+                            <File Id="QTIFF4.DLL" Name="qtiff4.dll" Source="imageformats\qtiff4.dll" />
                         </Component>
                     </Directory>
                 </Directory>
@@ -215,42 +127,14 @@
             <ComponentRef Id="QJPCODECS4.DLL" />
             <ComponentRef Id="QKRCODECS4.DLL" />
             <ComponentRef Id="QTWCODECS4.DLL" />
-            <ComponentRef Id="EKSTERTERA.EXE_1" />
-            <ComponentRef Id="LIBEAY32.DLL_1" />
-            <ComponentRef Id="LIBGCC_S_DW2_1.DLL_1" />
-            <ComponentRef Id="LIBSSL32.DLL_1" />
-            <ComponentRef Id="LIBSTDC___6.DLL_1" />
-            <ComponentRef Id="LIBWINPTHREAD_1.DLL_1" />
-            <ComponentRef Id="QCNCODECS4.DLL_1" />
-            <ComponentRef Id="QGENERICBEARER4.DLL_1" />
+            <ComponentRef Id="QSVGICON4.DLL" />
             <ComponentRef Id="QGIF4.DLL" />
             <ComponentRef Id="QICO4.DLL" />
-            <ComponentRef Id="QJPCODECS4.DLL_1" />
             <ComponentRef Id="QJPEG4.DLL" />
-            <ComponentRef Id="QKRCODECS4.DLL_1" />
             <ComponentRef Id="QMNG4.DLL" />
-            <ComponentRef Id="QNATIVEWIFIBEARER4.DLL_1" />
             <ComponentRef Id="QSVG4.DLL" />
-            <ComponentRef Id="QSVGICON4.DLL" />
-            <ComponentRef Id="QTCORE4.DLL_1" />
             <ComponentRef Id="QTGA4.DLL" />
-            <ComponentRef Id="QTGUI4.DLL_1" />
             <ComponentRef Id="QTIFF4.DLL" />
-            <ComponentRef Id="QTNETWORK4.DLL_1" />
-            <ComponentRef Id="QTSVG4.DLL_1" />
-            <ComponentRef Id="QTWCODECS4.DLL_1" />
-            <ComponentRef Id="QTXML4.DLL_1" />
-            <ComponentRef Id="SSLEAY32.DLL_1" />
-            <ComponentRef Id="DESKTOPICON.EXE" />
-            <ComponentRef Id="STARTMENUICON.EXE" />
-            <ComponentRef Id="QSVGICON4.DLL_1" />
-            <ComponentRef Id="QGIF4.DLL_1" />
-            <ComponentRef Id="QICO4.DLL_1" />
-            <ComponentRef Id="QJPEG4.DLL_1" />
-            <ComponentRef Id="QMNG4.DLL_1" />
-            <ComponentRef Id="QSVG4.DLL_1" />
-            <ComponentRef Id="QTGA4.DLL_1" />
-            <ComponentRef Id="QTIFF4.DLL_1" />
             <ComponentRef Id="StartMenuShortcuts" />
         </Feature>
         <UI />
