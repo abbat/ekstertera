@@ -14,6 +14,21 @@ FormMainUI::FormMainUI() : QMainWindow()
     setMinimumSize(280, 280);
 
     //
+    // центральный виджет
+    //
+
+    m_widget_central = new QWidget(this);
+    m_layout_central = new QVBoxLayout(m_widget_central);
+
+    m_widget_path = new WidgetDiskPath(m_widget_central);
+    m_layout_central->addWidget(m_widget_path);
+
+    m_widget_disk = new WidgetDisk(m_widget_central);
+    m_layout_central->addWidget(m_widget_disk);
+
+    setCentralWidget(m_widget_central);
+
+    //
     // меню
     //
 
@@ -37,6 +52,10 @@ FormMainUI::FormMainUI() : QMainWindow()
     //
     // Меню "Правка"
     //
+
+    m_menu_edit->addActions(m_widget_disk->contextMenuActions());
+
+    m_menu_edit->addSeparator();
 
     m_menu_edit_settings = m_menu_edit->addAction(QIcon::fromTheme("preferences-system", QIcon(":/icons/tango/preferences-system.svg")), "");
     m_menu_edit_settings->setShortcut(QKeySequence(QKeySequence::Preferences));
@@ -74,28 +93,11 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     m_toolbar->addAction(m_menu_view_refresh);
 
-    m_action_upload = m_toolbar->addAction(QIcon(":/icons/upload32.png"), "");
-
+    m_action_upload   = m_toolbar->addAction(QIcon(":/icons/upload32.png"),   "");
     m_action_download = m_toolbar->addAction(QIcon(":/icons/download32.png"), "");
-    m_action_download->setEnabled(false);
 
     m_toolbar->addAction(m_menu_view_zoom_in);
     m_toolbar->addAction(m_menu_view_zoom_out);
-
-    //
-    // центральный виджет
-    //
-
-    m_widget_central = new QWidget(this);
-    m_layout_central = new QVBoxLayout(m_widget_central);
-
-    m_widget_path = new WidgetDiskPath(m_widget_central);
-    m_layout_central->addWidget(m_widget_path);
-
-    m_widget_disk = new WidgetDisk(m_widget_central);
-    m_layout_central->addWidget(m_widget_disk);
-
-    setCentralWidget(m_widget_central);
 
     //
     // статусбар

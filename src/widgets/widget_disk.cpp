@@ -40,31 +40,37 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     m_menu->addSeparator();
 
     m_menu_new = m_menu->addAction(QIcon::fromTheme("folder-new", QIcon(":/icons/tango/folder-new.svg")), "");
-    //m_menu_new->setShortcut(QKeySequence(QKeySequence::New));
+    m_menu_new->setShortcut(QKeySequence(QKeySequence::New));
 
     m_menu->addSeparator();
 
     m_menu_cut = m_menu->addAction(QIcon::fromTheme("edit-cut",   QIcon(":/icons/tango/edit-cut.svg")),   "");
-    //m_menu_cut->setShortcut(QKeySequence(QKeySequence::Cut));
+    m_menu_cut->setShortcut(QKeySequence(QKeySequence::Cut));
 
     m_menu_copy = m_menu->addAction(QIcon::fromTheme("edit-copy",  QIcon(":/icons/tango/edit-copy.svg")),  "");
-    //m_menu_copy->setShortcut(QKeySequence(QKeySequence::Copy));
+    m_menu_copy->setShortcut(QKeySequence(QKeySequence::Copy));
 
     m_menu_paste = m_menu->addAction(QIcon::fromTheme("edit-paste", QIcon(":/icons/tango/edit-paste.svg")), "");
-    //m_menu_paste->setShortcut(QKeySequence(QKeySequence::Paste));
+    m_menu_paste->setShortcut(QKeySequence(QKeySequence::Paste));
 
     m_menu->addSeparator();
 
     m_menu_delete = m_menu->addAction(QIcon::fromTheme("edit-delete", QIcon(":/icons/tango/edit-delete.svg")), "");
-    //m_menu_delete->setShortcut(QKeySequence(QKeySequence::Delete));
+    m_menu_delete->setShortcut(QKeySequence(QKeySequence::Delete));
 
     m_menu->addSeparator();
+
     m_menu_rename = m_menu->addAction("");
+    m_menu_rename->setShortcut(QKeySequence("F2"));
+
     m_menu->addSeparator();
+
     m_menu_share = m_menu->addAction(QIcon::fromTheme("emblem-shared",    QIcon(":/icons/gnome/emblem-shared16.png")),   "");
     m_menu_revoke = m_menu->addAction(QIcon::fromTheme("document-revert", QIcon(":/icons/gnome/document-revert16.png")), "");
+
     m_menu->addSeparator();
-    m_menu_info   = m_menu->addAction(QIcon::fromTheme("document-properties", QIcon(":/icons/tango/document-properties.svg")), "");
+
+    m_menu_info = m_menu->addAction(QIcon::fromTheme("document-properties", QIcon(":/icons/tango/document-properties.svg")), "");
 
     connect(m_menu_open,   SIGNAL(triggered()), this, SLOT(menu_open_triggered()));
     connect(m_menu_new,    SIGNAL(triggered()), this, SLOT(menu_new_triggered()));
@@ -88,6 +94,9 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 
     // локализация
     retranslateUi();
+
+    // включение / выключение пунктов контекстного меню
+    on_item_selection_changed();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -263,51 +272,6 @@ void WidgetDisk::custom_context_menu_requested(const QPoint& pos)
 {
     if (m_path.isEmpty() == true)
         return;
-
-    QList<QListWidgetItem*> selected = m_explorer->selectedItems();
-
-    bool e = (selected.isEmpty() == false);
-    m_menu_cut->setEnabled(e);
-    m_menu_copy->setEnabled(e);
-    m_menu_delete->setEnabled(e);
-
-    if (selected.count() == 1) {
-        WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[0]);
-        const EteraItem* eitem = witem->item();
-        if (eitem->isDir() == true)
-            m_menu_open->setEnabled(true);
-        else
-            m_menu_open->setEnabled(false);
-
-        m_menu_rename->setEnabled(true);
-        m_menu_info->setEnabled(true);
-    } else {
-        m_menu_open->setEnabled(false);
-        m_menu_rename->setEnabled(false);
-        m_menu_info->setEnabled(false);
-    }
-
-    bool can_share  = false;
-    bool can_revoke = false;
-    for (int i = 0; i < selected.count(); i++) {
-        WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
-        const EteraItem* eitem = witem->item();
-
-        if (eitem->isPublic() == true)
-            can_revoke = true;
-        else
-            can_share = true;
-
-        if (can_share == true && can_revoke == true)
-            break;
-    }
-
-    m_menu_share->setEnabled(can_share);
-    m_menu_revoke->setEnabled(can_revoke);
-
-    EteraClipboard* clipboard = EteraClipboard::instance();
-
-    m_menu_paste->setEnabled(clipboard->isEmpty() == false);
 
     m_menu->exec(m_explorer->viewport()->mapToGlobal(pos));
 }
@@ -1042,6 +1006,51 @@ void WidgetDisk::on_item_selection_changed()
         emit onChangePossibleActions(false);
     else
         emit onChangePossibleActions(true);
+
+    QList<QListWidgetItem*> selected = m_explorer->selectedItems();
+
+    bool e = (selected.isEmpty() == false);
+    m_menu_cut->setEnabled(e);
+    m_menu_copy->setEnabled(e);
+    m_menu_delete->setEnabled(e);
+
+    if (selected.count() == 1) {
+        WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[0]);
+        const EteraItem* eitem = witem->item();
+        if (eitem->isDir() == true)
+            m_menu_open->setEnabled(true);
+        else
+            m_menu_open->setEnabled(false);
+
+        m_menu_rename->setEnabled(true);
+        m_menu_info->setEnabled(true);
+    } else {
+        m_menu_open->setEnabled(false);
+        m_menu_rename->setEnabled(false);
+        m_menu_info->setEnabled(false);
+    }
+
+    bool can_share  = false;
+    bool can_revoke = false;
+    for (int i = 0; i < selected.count(); i++) {
+        WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
+        const EteraItem* eitem = witem->item();
+
+        if (eitem->isPublic() == true)
+            can_revoke = true;
+        else
+            can_share = true;
+
+        if (can_share == true && can_revoke == true)
+            break;
+    }
+
+    m_menu_share->setEnabled(can_share);
+    m_menu_revoke->setEnabled(can_revoke);
+
+    EteraClipboard* clipboard = EteraClipboard::instance();
+
+    m_menu_paste->setEnabled(clipboard->isEmpty() == false);
 }
 //----------------------------------------------------------------------------------------------
 

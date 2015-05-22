@@ -74,6 +74,12 @@ class WidgetDisk : public QTabWidget
         void setZoomFactor(int factor);
 
         /*!
+         * \brief Пункты контекстного меню
+         * \return Список пунктов
+         */
+        QList<QAction*> contextMenuActions() { return m_menu->actions(); }
+
+        /*!
          * \brief Функция перевода надписей на элементах управления
          */
         void retranslateUi();
