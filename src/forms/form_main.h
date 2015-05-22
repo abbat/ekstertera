@@ -41,8 +41,10 @@ class FormMain : public FormMainUI
         //
 
         // Файл
-        void menu_file_settings_triggered();   /*!< \brief Файл / Настройки */
-        void menu_file_exit_triggered();       /*!< \brief Файл / Выход     */
+        void menu_file_exit_triggered();   /*!< \brief Файл / Выход */
+
+        // Параметры
+        void menu_edit_settings_triggered();   /*!< \brief Параметры / Настройки */
 
         // Вид
         void menu_view_refresh_triggered();    /*!< \brief Обновить  */

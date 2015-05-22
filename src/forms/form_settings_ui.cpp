@@ -84,7 +84,7 @@ void FormSettingsUI::changeEvent(QEvent* event)
 
 void FormSettingsUI::retranslateUi()
 {
-    setWindowTitle(trUtf8("Настройки"));
+    setWindowTitle(trUtf8("Параметры"));
 
     m_label_language->setText(trUtf8("Язык"));
     m_label_token->setText(trUtf8("OAuth токен"));

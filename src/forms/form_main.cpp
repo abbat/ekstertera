@@ -10,8 +10,10 @@
 FormMain::FormMain() : FormMainUI()
 {
     // меню "Файл"
-    connect(m_menu_file_settings, SIGNAL(triggered()), this, SLOT(menu_file_settings_triggered()));
-    connect(m_menu_file_exit,     SIGNAL(triggered()), this, SLOT(menu_file_exit_triggered()));
+    connect(m_menu_file_exit, SIGNAL(triggered()), this, SLOT(menu_file_exit_triggered()));
+
+    // меню "Параметры"
+    connect(m_menu_edit_settings, SIGNAL(triggered()), this, SLOT(menu_edit_settings_triggered()));
 
     // меню "Вид"
     connect(m_menu_view_refresh,  SIGNAL(triggered()), this, SLOT(menu_view_refresh_triggered()));
@@ -60,20 +62,20 @@ void FormMain::changeEvent(QEvent* event)
 }
 //----------------------------------------------------------------------------------------------
 
-void FormMain::menu_file_settings_triggered()
+void FormMain::menu_file_exit_triggered()
+{
+    m_tray_icon->setVisible(false);
+    close();
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::menu_edit_settings_triggered()
 {
     FormSettings form(this);
     if (form.exec() == QDialog::Accepted) {
         updateInfoStatus();
         m_widget_disk->changePath("disk:/");
     }
-}
-//----------------------------------------------------------------------------------------------
-
-void FormMain::menu_file_exit_triggered()
-{
-    m_tray_icon->setVisible(false);
-    close();
 }
 //----------------------------------------------------------------------------------------------
 

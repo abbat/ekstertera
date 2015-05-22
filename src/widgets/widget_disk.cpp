@@ -35,6 +35,7 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     m_menu = new QMenu(m_explorer);
 
     m_menu_open = m_menu->addAction(QIcon::fromTheme("folder-open", QIcon(":/icons/tango/folder-open.svg")), "");
+    m_menu_open->setShortcut(QKeySequence("Enter"));
 
     m_menu->addSeparator();
 

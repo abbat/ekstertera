@@ -38,16 +38,17 @@ class FormMainUI : public QMainWindow
          * \brief Главное меню
          */
         QMenuBar*    m_menubar;
-          QMenu*     m_menu_file;            /*!< \brief Файл / ...       */
-            QAction* m_menu_file_settings;   /*!< \brief Файл / Настройки */
-            QAction* m_menu_file_exit;       /*!< \brief Файл / Выход     */
-          QMenu*     m_menu_view;            /*!< \brief Вид              */
-            QAction* m_menu_view_refresh;    /*!< \brief Вид / Обновить   */
-            QAction* m_menu_view_zoom_in;    /*!< \brief Вид / Увеличить  */
-            QAction* m_menu_view_zoom_out;   /*!< \brief Вид / Уменьшить  */
-          QMenu*     m_menu_help;            /*!< \brief ? / ...          */
-            QAction* m_menu_about;           /*!< \brief ? / О программе  */
-            QAction* m_menu_about_qt;        /*!< \brief ? / О Qt         */
+          QMenu*     m_menu_file;            /*!< \brief Файл / ...         */
+            QAction* m_menu_file_exit;       /*!< \brief Файл / Выход       */
+          QMenu*     m_menu_edit;            /*!< \brief Правка / ...       */
+            QAction* m_menu_edit_settings;   /*!< \brief Правка / Параметры */
+          QMenu*     m_menu_view;            /*!< \brief Вид / ...          */
+            QAction* m_menu_view_refresh;    /*!< \brief Вид / Обновить     */
+            QAction* m_menu_view_zoom_in;    /*!< \brief Вид / Увеличить    */
+            QAction* m_menu_view_zoom_out;   /*!< \brief Вид / Уменьшить    */
+          QMenu*     m_menu_help;            /*!< \brief ? / ...            */
+            QAction* m_menu_about;           /*!< \brief ? / О программе    */
+            QAction* m_menu_about_qt;        /*!< \brief ? / О Qt           */
 
         /*!
          * \brief Тулбар

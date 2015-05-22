@@ -21,6 +21,7 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     // верхний ряд меню
     m_menu_file = m_menubar->addMenu("");
+    m_menu_edit = m_menubar->addMenu("");
     m_menu_view = m_menubar->addMenu("");
     m_menu_help = m_menubar->addMenu("");
 
@@ -28,16 +29,17 @@ FormMainUI::FormMainUI() : QMainWindow()
     // меню "Файл"
     //
 
-    // Файл / Настройки
-    m_menu_file_settings = m_menu_file->addAction(QIcon::fromTheme("preferences-system", QIcon(":/icons/tango/preferences-system.svg")), "");
-    m_menu_file_settings->setShortcut(QKeySequence(QKeySequence::Preferences));
-
-    m_menu_file->addSeparator();
-
     // Файл / Выход
     m_menu_file_exit = m_menu_file->addAction(QIcon::fromTheme("application-exit", QIcon(":/icons/tango/application-exit.svg")), "");
     m_menu_file_exit->setShortcut(QKeySequence(QKeySequence::Quit));
     m_menu_file_exit->setMenuRole(QAction::QuitRole);
+
+    //
+    // Меню "Правка"
+    //
+
+    m_menu_edit_settings = m_menu_edit->addAction(QIcon::fromTheme("preferences-system", QIcon(":/icons/tango/preferences-system.svg")), "");
+    m_menu_edit_settings->setShortcut(QKeySequence(QKeySequence::Preferences));
 
     //
     // Меню "Вид"
@@ -155,8 +157,11 @@ void FormMainUI::retranslateUi()
 
     m_menu_file->setTitle(trUtf8("&Файл"));
 
-    m_menu_file_settings->setText(trUtf8("Настройки"));
     m_menu_file_exit->setText(trUtf8("Выход"));
+
+    m_menu_edit->setTitle(trUtf8("&Правка"));
+
+    m_menu_edit_settings->setText(trUtf8("Параметры"));
 
     m_menu_view->setTitle(trUtf8("&Вид"));
 
