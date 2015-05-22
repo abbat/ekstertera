@@ -286,87 +286,87 @@
 <context>
     <name>FormMainUI</name>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="158"/>
+        <location filename="../forms/form_main_ui.cpp" line="160"/>
         <source>Ekstertera</source>
         <translation>Ekstertera</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="160"/>
+        <location filename="../forms/form_main_ui.cpp" line="162"/>
         <source>&amp;Файл</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="162"/>
+        <location filename="../forms/form_main_ui.cpp" line="164"/>
         <source>Выход</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="164"/>
+        <location filename="../forms/form_main_ui.cpp" line="166"/>
         <source>&amp;Правка</source>
         <translation>&amp;Edit</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="166"/>
+        <location filename="../forms/form_main_ui.cpp" line="168"/>
         <source>Параметры</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="168"/>
+        <location filename="../forms/form_main_ui.cpp" line="170"/>
         <source>&amp;Вид</source>
         <translation>&amp;View</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="170"/>
+        <location filename="../forms/form_main_ui.cpp" line="172"/>
         <source>Обновить</source>
         <translation>Refresh</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="171"/>
+        <location filename="../forms/form_main_ui.cpp" line="173"/>
         <source>Увеличить</source>
         <translation>Zoom in</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="172"/>
+        <location filename="../forms/form_main_ui.cpp" line="174"/>
         <source>Уменьшить</source>
         <translation>Zoom out</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="174"/>
+        <location filename="../forms/form_main_ui.cpp" line="176"/>
         <source>&amp;?</source>
         <translation>&amp;?</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="176"/>
+        <location filename="../forms/form_main_ui.cpp" line="178"/>
         <source>О программе</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="177"/>
+        <location filename="../forms/form_main_ui.cpp" line="179"/>
         <source>О Qt</source>
         <translation>About Qt</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="179"/>
+        <location filename="../forms/form_main_ui.cpp" line="181"/>
         <source>Панель инструментов</source>
         <translation>Toolbar</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="181"/>
+        <location filename="../forms/form_main_ui.cpp" line="183"/>
         <source>Загрузить на Яндекс.Диск</source>
         <translation>Upload to Yandex.Disk</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="182"/>
+        <location filename="../forms/form_main_ui.cpp" line="184"/>
         <source>Загрузить с Яндекс.Диска</source>
         <translation>Download from Yandex.Disk</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="184"/>
+        <location filename="../forms/form_main_ui.cpp" line="186"/>
         <source>Используется</source>
         <translation>Used</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="185"/>
+        <location filename="../forms/form_main_ui.cpp" line="187"/>
         <source>Всего</source>
         <translation>Total</translation>
     </message>

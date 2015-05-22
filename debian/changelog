@@ -1,3 +1,10 @@
+ekstertera (0.0.10) unstable; urgency=low
+
+  * Увеличение / уменьшение иконок;
+  * Контекстное меню в главном меню (горячие клавиши).
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Fri, 22 May 2015 20:00:00 +0300
+
 ekstertera (0.0.9) unstable; urgency=low
 
   * Получение иконок по mime-типу.
