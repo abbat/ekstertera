@@ -1368,7 +1368,8 @@ void WidgetDisk::setZoomFactor(int factor)
 
 bool WidgetDisk::zoomIn()
 {
-    m_icon_size_index++;
+    if (m_icon_size_index < m_icon_sizes.count() - 1)
+        m_icon_size_index++;
     int size = m_icon_sizes[m_icon_size_index];
     m_explorer->setIconSize(QSize(size, size));
 
@@ -1378,7 +1379,8 @@ bool WidgetDisk::zoomIn()
 
 bool WidgetDisk::zoomOut()
 {
-    m_icon_size_index--;
+    if (m_icon_size_index != 0)
+        m_icon_size_index--;
     int size = m_icon_sizes[m_icon_size_index];
     m_explorer->setIconSize(QSize(size, size));
 

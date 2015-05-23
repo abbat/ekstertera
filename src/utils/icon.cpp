@@ -97,27 +97,24 @@ QIcon EteraIconProvider::addLinkIcon(const QIcon& base_icon)
     QIcon result;
     QIcon link_icon = QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg"));
 
-    QList<int>   sizes;
-    QList<QSize> available = base_icon.availableSizes();
-
-    if (available.isEmpty() == false) {
-        for (int i = 0; i < available.count(); i++)
-            sizes << available[i].width();
-    } else
-        // размеры более 48 под windows работать не будут
-        // в силу SHIL_EXTRALARGE при вызове SHGetImageList
-        // подробнее см. EteraIconProvider::extensionIcon
-        sizes << 16 << 32 << 48;
+    QList<int> sizes;
+    sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128;
 
     for (int i = 0; i < sizes.count(); i++) {
         int size = sizes[i];
+        int link_size = size / 2;
 
         QPixmap base_pixmap = base_icon.pixmap(size);
-        QPixmap link_pixmap = link_icon.pixmap(size / 2);
+        if (base_pixmap.width() < size)
+            base_pixmap = base_pixmap.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        QPixmap link_pixmap = link_icon.pixmap(link_size);
+        if (link_pixmap.width() < link_size)
+            link_pixmap = link_pixmap.scaled(link_size, link_size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
 
         QPainter painter(&base_pixmap);
 
-        painter.drawPixmap(size / 2, size / 2, link_pixmap);
+        painter.drawPixmap(link_size, link_size, link_pixmap);
 
         result.addPixmap(base_pixmap);
     }
