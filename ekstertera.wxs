@@ -12,6 +12,9 @@
                             <Shortcut Id="ExeShortcut" Directory="ProgramMenuDir" Name="Ekstertera" Advertise="yes" Icon="StartMenuIcon.exe" IconIndex="0" />
                         </File>
                     </Component>
+                    <Component Id="README.TXT" DiskId="1" Guid="5C18984C-0150-11E5-A322-1697F925EC7B">
+                        <File Id="README.TXT" Name="readme.txt" Source="readme.txt" />
+                    </Component>
                     <Component Id="LIBEAY32.DLL" DiskId="1" Guid="D98A49CA-E4FD-46C0-8DC9-14C8FE2CDDBC">
                         <File Id="LIBEAY32.DLL" Name="libeay32.dll" Source="libeay32.dll" />
                     </Component>
@@ -110,6 +113,7 @@
         </Directory>
         <Feature Id="DefaultFeature" Title="Main Feature" Level="1">
             <ComponentRef Id="EKSTERTERA.EXE" />
+            <ComponentRef Id="README.TXT" />
             <ComponentRef Id="LIBEAY32.DLL" />
             <ComponentRef Id="LIBGCC_S_DW2_1.DLL" />
             <ComponentRef Id="LIBSSL32.DLL" />
