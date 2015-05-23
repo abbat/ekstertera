@@ -71,10 +71,14 @@ void FormMain::menu_file_exit_triggered()
 
 void FormMain::menu_edit_settings_triggered()
 {
+    QString token = EteraSettings::instance()->token();
+
     FormSettings form(this);
     if (form.exec() == QDialog::Accepted) {
-        updateInfoStatus();
-        m_widget_disk->changePath("disk:/");
+        if (token != EteraSettings::instance()->token()) {
+            updateInfoStatus();
+            m_widget_disk->changePath("disk:/");
+        }
     }
 }
 //----------------------------------------------------------------------------------------------

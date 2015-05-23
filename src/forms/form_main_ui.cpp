@@ -1,5 +1,7 @@
 #include "form_main_ui.h"
 //----------------------------------------------------------------------------------------------
+#include "utils/settings.h"
+//----------------------------------------------------------------------------------------------
 
 FormMainUI::FormMainUI() : QMainWindow()
 {
@@ -136,7 +138,7 @@ FormMainUI::FormMainUI() : QMainWindow()
 void FormMainUI::closeEvent(QCloseEvent* event)
 {
     // сохранение layout
-    if (m_tray_icon->isVisible() == true) {
+    if (m_tray_icon->isVisible() == true && EteraSettings::instance()->closeToTray() == true) {
         hide();
         event->ignore();
     } else {

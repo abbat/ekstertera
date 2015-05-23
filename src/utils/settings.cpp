@@ -36,7 +36,8 @@ void EteraSettings::reload()
 {
     QSettings settings;
 
-    m_language = settings.value("app/language", "").toString();
-    m_token    = settings.value("api/token",    "").toString();
+    m_language      = settings.value("app/language", "").toString();
+    m_token         = settings.value("api/token",    "").toString();
+    m_close_to_tray = settings.value("app/tray",      1).toBool();
 }
 //----------------------------------------------------------------------------------------------

@@ -32,6 +32,9 @@ FormSettingsUI::FormSettingsUI(QWidget* parent) : QDialog(parent, Qt::WindowTitl
     m_layout_token->addWidget(m_button_token);
     m_layout_settings->addRow(m_label_token, m_layout_token);
 
+    m_close_to_tray = new QCheckBox(this);
+    m_layout_settings->addRow("", m_close_to_tray);
+
     m_layout->addLayout(m_layout_settings);
 
     //
@@ -91,6 +94,9 @@ void FormSettingsUI::retranslateUi()
 
     m_button_token->setToolTip(trUtf8("Получить OAuth токен"));
 
+    m_close_to_tray->setText(trUtf8("Скрывать в трее"));
+    m_close_to_tray->setToolTip(trUtf8("Скрывать в значок в области уведомления вместо закрытия при нажатии на кнопку закрытия окна"));
+
     m_button_ok->setText(trUtf8("OK"));
     m_button_cancel->setText(trUtf8("Отмена"));
 }
@@ -99,7 +105,6 @@ void FormSettingsUI::retranslateUi()
 void FormSettingsUI::save()
 {
     QSettings settings;
-
     settings.setValue("layout/settings", this->saveGeometry());
 }
 //----------------------------------------------------------------------------------------------
@@ -107,7 +112,6 @@ void FormSettingsUI::save()
 void FormSettingsUI::restore()
 {
     QSettings settings;
-
     this->restoreGeometry(settings.value("layout/settings").toByteArray());
 }
 //----------------------------------------------------------------------------------------------

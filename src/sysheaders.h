@@ -22,6 +22,7 @@
 #include <QPainter>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
 #include <QSettings>

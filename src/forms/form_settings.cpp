@@ -17,6 +17,8 @@ FormSettings::FormSettings(QWidget* parent) : FormSettingsUI(parent)
     if (index != -1)
         m_combo_language->setCurrentIndex(index);
 
+    m_close_to_tray->setChecked(settings->closeToTray());
+
     connect(m_button_cancel, SIGNAL(clicked()), this, SLOT(button_cancel_clicked()));
     connect(m_button_ok,     SIGNAL(clicked()), this, SLOT(button_ok_clicked()));
 
@@ -61,7 +63,8 @@ void FormSettings::button_ok_clicked ()
     QSettings settings;
 
     settings.setValue("app/language", m_combo_language->itemData(m_combo_language->currentIndex()).toString());
-    settings.setValue("api/token", m_text_token->text());
+    settings.setValue("api/token",    m_text_token->text());
+    settings.setValue("app/tray",     m_close_to_tray->isChecked() == true ? 1 : 0);
 
     EteraSettings::instance()->reload();
 

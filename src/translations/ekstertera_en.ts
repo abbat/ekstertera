@@ -263,22 +263,22 @@
 <context>
     <name>FormMain</name>
     <message>
-        <location filename="../forms/form_main.cpp" line="116"/>
+        <location filename="../forms/form_main.cpp" line="120"/>
         <source>О программе</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="122"/>
+        <location filename="../forms/form_main.cpp" line="126"/>
         <source>О Qt</source>
         <translation>About Qt</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="183"/>
+        <location filename="../forms/form_main.cpp" line="187"/>
         <source>Загрузка файлов на Яндекс.Диск</source>
         <translation>Upload files to Yandex.Disk</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="190"/>
+        <location filename="../forms/form_main.cpp" line="194"/>
         <source>Загрузка файлов с Яндекс.Диска</source>
         <translation>Download files from Yandex.Disk</translation>
     </message>
@@ -286,87 +286,87 @@
 <context>
     <name>FormMainUI</name>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="160"/>
+        <location filename="../forms/form_main_ui.cpp" line="162"/>
         <source>Ekstertera</source>
         <translation>Ekstertera</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="162"/>
+        <location filename="../forms/form_main_ui.cpp" line="164"/>
         <source>&amp;Файл</source>
         <translation>&amp;File</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="164"/>
+        <location filename="../forms/form_main_ui.cpp" line="166"/>
         <source>Выход</source>
         <translation>Exit</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="166"/>
+        <location filename="../forms/form_main_ui.cpp" line="168"/>
         <source>&amp;Правка</source>
         <translation>&amp;Edit</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="168"/>
+        <location filename="../forms/form_main_ui.cpp" line="170"/>
         <source>Параметры</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="170"/>
+        <location filename="../forms/form_main_ui.cpp" line="172"/>
         <source>&amp;Вид</source>
         <translation>&amp;View</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="172"/>
+        <location filename="../forms/form_main_ui.cpp" line="174"/>
         <source>Обновить</source>
         <translation>Refresh</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="173"/>
+        <location filename="../forms/form_main_ui.cpp" line="175"/>
         <source>Увеличить</source>
         <translation>Zoom in</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="174"/>
+        <location filename="../forms/form_main_ui.cpp" line="176"/>
         <source>Уменьшить</source>
         <translation>Zoom out</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="176"/>
+        <location filename="../forms/form_main_ui.cpp" line="178"/>
         <source>&amp;?</source>
         <translation>&amp;?</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="178"/>
+        <location filename="../forms/form_main_ui.cpp" line="180"/>
         <source>О программе</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="179"/>
+        <location filename="../forms/form_main_ui.cpp" line="181"/>
         <source>О Qt</source>
         <translation>About Qt</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="181"/>
+        <location filename="../forms/form_main_ui.cpp" line="183"/>
         <source>Панель инструментов</source>
         <translation>Toolbar</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="183"/>
+        <location filename="../forms/form_main_ui.cpp" line="185"/>
         <source>Загрузить на Яндекс.Диск</source>
         <translation>Upload to Yandex.Disk</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="184"/>
+        <location filename="../forms/form_main_ui.cpp" line="186"/>
         <source>Загрузить с Яндекс.Диска</source>
         <translation>Download from Yandex.Disk</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="186"/>
+        <location filename="../forms/form_main_ui.cpp" line="188"/>
         <source>Используется</source>
         <translation>Used</translation>
     </message>
     <message>
-        <location filename="../forms/form_main_ui.cpp" line="187"/>
+        <location filename="../forms/form_main_ui.cpp" line="189"/>
         <source>Всего</source>
         <translation>Total</translation>
     </message>
@@ -374,27 +374,27 @@
 <context>
     <name>FormSettings</name>
     <message>
-        <location filename="../forms/form_settings.cpp" line="79"/>
+        <location filename="../forms/form_settings.cpp" line="82"/>
         <source>Получение OAuth токена</source>
         <translation>Get OAuth token</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings.cpp" line="79"/>
+        <location filename="../forms/form_settings.cpp" line="82"/>
         <source>Введите код подтверждения</source>
         <translation>Enter authentication code</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings.cpp" line="81"/>
+        <location filename="../forms/form_settings.cpp" line="84"/>
         <source>Внимание!</source>
         <translation>Attention!</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings.cpp" line="81"/>
+        <location filename="../forms/form_settings.cpp" line="84"/>
         <source>Необходимо ввести код подтверждения!</source>
         <translation>Authentication code required!</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings.cpp" line="87"/>
+        <location filename="../forms/form_settings.cpp" line="90"/>
         <source>Ошибка!</source>
         <translation>Error!</translation>
     </message>
@@ -402,32 +402,42 @@
 <context>
     <name>FormSettingsUI</name>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="87"/>
+        <location filename="../forms/form_settings_ui.cpp" line="90"/>
         <source>Параметры</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="89"/>
+        <location filename="../forms/form_settings_ui.cpp" line="92"/>
         <source>Язык</source>
         <translation>Language</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="90"/>
+        <location filename="../forms/form_settings_ui.cpp" line="93"/>
         <source>OAuth токен</source>
         <translation>OAuth token</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="92"/>
+        <location filename="../forms/form_settings_ui.cpp" line="95"/>
         <source>Получить OAuth токен</source>
         <translation>Get OAuth token</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="94"/>
+        <location filename="../forms/form_settings_ui.cpp" line="97"/>
+        <source>Скрывать в трее</source>
+        <translation>Close to tray</translation>
+    </message>
+    <message>
+        <location filename="../forms/form_settings_ui.cpp" line="98"/>
+        <source>Скрывать в значок в области уведомления вместо закрытия при нажатии на кнопку закрытия окна</source>
+        <translation>Hide using the tray icon instead of closing when the window close button is clicked</translation>
+    </message>
+    <message>
+        <location filename="../forms/form_settings_ui.cpp" line="100"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="95"/>
+        <location filename="../forms/form_settings_ui.cpp" line="101"/>
         <source>Отмена</source>
         <translation>Cancel</translation>
     </message>

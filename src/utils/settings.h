@@ -48,13 +48,20 @@ class EteraSettings
          */
         QString token() const { return m_token; }
 
+        /*!
+         * \brief Флаг сворачивания в трей вместо закрытия
+         * \return Флаг сворачивания в трей вместо закрытия
+         */
+        bool closeToTray() const { return m_close_to_tray; }
+
     private:
 
         EteraSettings();
         ~EteraSettings();
 
-        QString m_language;   /*!< \brief Текущий язык */
-        QString m_token;      /*!< \brief OAuth токен  */
+        QString m_language;        /*!< \brief Текущий язык                              */
+        QString m_token;           /*!< \brief OAuth токен                               */
+        bool    m_close_to_tray;   /*!< \brief Флаг сворачивания в трей вместо закрытия  */
 };
 
 #endif   // _ekstertera_settings_h_

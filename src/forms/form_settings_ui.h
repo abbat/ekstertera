@@ -62,6 +62,7 @@ class FormSettingsUI : public QDialog
             QHBoxLayout*   m_layout_token;      /*!< \brief Layout для поля токена    */
               QLineEdit*   m_text_token;        /*!< \brief Поле OAuth токена         */
               QPushButton* m_button_token;      /*!< \brief Получение OAuth токена    */
+            QCheckBox*     m_close_to_tray;     /*!< \brief Сворачивание в трей       */
 
           QVBoxLayout*     m_layout_button;     /*!< \brief Layout для кнопок         */
             QPushButton*   m_button_ok;         /*!< \brief Кнопка OK                 */
