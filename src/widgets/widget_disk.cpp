@@ -2,6 +2,7 @@
 //----------------------------------------------------------------------------------------------
 #include "tasks/all.h"
 #include "utils/pool.h"
+#include "utils/icon.h"
 #include "utils/settings.h"
 #include "utils/clipboard.h"
 //----------------------------------------------------------------------------------------------
@@ -18,11 +19,7 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     m_explorer->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_explorer->setSortingEnabled(true);
 
-    // размеры более 48 под windows работать не будут
-    // подробнее см. EteraIconProvider::addLinkIcon
-    m_icon_sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128;
-    m_default_icon_size_index = 3;
-    setZoomFactor(m_default_icon_size_index);
+    setZoomFactor(EteraIconProvider::instance()->defaultIconSizeIndex());
 
     m_tasks = new WidgetTasks(this);
 
@@ -1355,12 +1352,14 @@ void WidgetDisk::shareObjects(bool share)
 
 void WidgetDisk::setZoomFactor(int factor)
 {
-    if (factor < 0 || factor >= m_icon_sizes.count() - 1)
-        factor = m_default_icon_size_index;
+    const QList<int>* sizes = EteraIconProvider::instance()->iconSizes();
+
+    if (factor < 0 || factor >= sizes->count())
+        factor = EteraIconProvider::instance()->defaultIconSizeIndex();
 
     m_icon_size_index = factor;
 
-    int size = m_icon_sizes[m_icon_size_index];
+    int size = sizes->at(m_icon_size_index);
 
     m_explorer->setIconSize(QSize(size, size));
 }
@@ -1368,20 +1367,28 @@ void WidgetDisk::setZoomFactor(int factor)
 
 bool WidgetDisk::zoomIn()
 {
-    if (m_icon_size_index < m_icon_sizes.count() - 1)
+    const QList<int>* sizes = EteraIconProvider::instance()->iconSizes();
+
+    if (m_icon_size_index < sizes->count() - 1)
         m_icon_size_index++;
-    int size = m_icon_sizes[m_icon_size_index];
+
+    int size = sizes->at(m_icon_size_index);
+
     m_explorer->setIconSize(QSize(size, size));
 
-    return (m_icon_size_index == m_icon_sizes.count() - 1 ? false : true);
+    return (m_icon_size_index == sizes->count() - 1 ? false : true);
 }
 //----------------------------------------------------------------------------------------------
 
 bool WidgetDisk::zoomOut()
 {
+    const QList<int>* sizes = EteraIconProvider::instance()->iconSizes();
+
     if (m_icon_size_index != 0)
         m_icon_size_index--;
-    int size = m_icon_sizes[m_icon_size_index];
+
+    int size = sizes->at(m_icon_size_index);
+
     m_explorer->setIconSize(QSize(size, size));
 
     return (m_icon_size_index == 0 ? false : true);

@@ -23,12 +23,18 @@ EteraIconProvider* EteraIconProvider::instance()
 
 EteraIconProvider::EteraIconProvider()
 {
+    m_icon_sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128 << 256;
+    m_default_icon_size_index = 3 /* 48 */;
+
+    // публичность
+    m_link = prepareIcon(QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg")), 2);
+
     // директория
-    m_dir      = QIcon::fromTheme("folder", QIcon(":/icons/tango/folder.svg"));
+    m_dir      = prepareIcon(QIcon::fromTheme("folder", QIcon(":/icons/tango/folder.svg")));
     m_dir_link = addLinkIcon(m_dir);
 
     // файл
-    m_file      = QIcon::fromTheme("text-x-generic", QIcon(":/icons/tango/text-x-generic.svg"));
+    m_file      = prepareIcon(QIcon::fromTheme("text-x-generic", QIcon(":/icons/tango/text-x-generic.svg")));
     m_file_link = addLinkIcon(m_file);
 
     /*!
@@ -76,6 +82,8 @@ EteraIconProvider::EteraIconProvider()
             else
                 icon_base = QIcon(map->ResourceIcon);
 
+            icon_base = prepareIcon(icon_base);
+
             QIcon icon_link = addLinkIcon(icon_base);
 
             m_media_icon[map->Type]      = icon_base;
@@ -92,25 +100,34 @@ EteraIconProvider::~EteraIconProvider()
 }
 //----------------------------------------------------------------------------------------------
 
+QIcon EteraIconProvider::prepareIcon(const QIcon& icon, int scale)
+{
+    QIcon result;
+
+    for (int i = 0; i < m_icon_sizes.count(); i++) {
+        int size = m_icon_sizes[i] / scale;
+
+        QPixmap pixmap = icon.pixmap(size);
+        if (pixmap.width() < size)
+            pixmap = pixmap.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+
+        result.addPixmap(pixmap);
+    }
+
+    return result;
+}
+//----------------------------------------------------------------------------------------------
+
 QIcon EteraIconProvider::addLinkIcon(const QIcon& base_icon)
 {
     QIcon result;
-    QIcon link_icon = QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg"));
 
-    QList<int> sizes;
-    sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128;
-
-    for (int i = 0; i < sizes.count(); i++) {
-        int size = sizes[i];
+    for (int i = 0; i < m_icon_sizes.count(); i++) {
+        int size = m_icon_sizes[i];
         int link_size = size / 2;
 
         QPixmap base_pixmap = base_icon.pixmap(size);
-        if (base_pixmap.width() < size)
-            base_pixmap = base_pixmap.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-
-        QPixmap link_pixmap = link_icon.pixmap(link_size);
-        if (link_pixmap.width() < link_size)
-            link_pixmap = link_pixmap.scaled(link_size, link_size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        QPixmap link_pixmap = m_link.pixmap(link_size);
 
         QPainter painter(&base_pixmap);
 
@@ -157,14 +174,14 @@ bool EteraIconProvider::cachedIcon(QIcon& icon, const QString& key, bool shared)
 #ifdef ETERA_WS_X11_OR_WIN
 bool EteraIconProvider::cacheIcon(QIcon& icon, const QIcon& base_icon, const QString& key, bool shared)
 {
+    m_cache_icon[key] = base_icon;
+
     if (shared == true) {
         QIcon link_icon = addLinkIcon(base_icon);
         m_cache_icon_link[key] = link_icon;
         icon = link_icon;
-    } else {
-        m_cache_icon[key] = base_icon;
+    } else
         icon = base_icon;
-    }
 
     return true;
 }
@@ -217,7 +234,7 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
         base_icon.addPixmap(pixmap);
     }
 
-    return cacheIcon(icon, base_icon, ext, shared);
+    return cacheIcon(icon, prepareIcon(base_icon), ext, shared);
 }
 #endif
 //----------------------------------------------------------------------------------------------
@@ -244,7 +261,7 @@ bool EteraIconProvider::mimeIcon(QIcon& icon, const QString& mime, bool shared)
         return false;
     }
 
-    return cacheIcon(icon, base_icon, mime, shared);
+    return cacheIcon(icon, prepareIcon(base_icon), mime, shared);
 }
 #endif
 //----------------------------------------------------------------------------------------------

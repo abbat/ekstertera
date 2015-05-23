@@ -109,11 +109,9 @@ class WidgetDisk : public QTabWidget
         QString m_path;
 
         /*!
-         * \brief Возможные размеры иконок
+         * \brief Текущий индекс размера иконок
          */
-        QList<int> m_icon_sizes;
-        int        m_icon_size_index;           /*!< \brief Текущий индекс размера      */
-        int        m_default_icon_size_index;   /*!< \brief Индекс размера по умолчанию */
+        int m_icon_size_index;
 
         /*!
          * Виджет списка файлов и директорий

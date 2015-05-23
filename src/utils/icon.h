@@ -38,14 +38,35 @@ class EteraIconProvider
          */
         QIcon icon(const EteraItem& item);
 
+        /*!
+         * \brief Получение списка поддерживаемых размеров иконок
+         * \return Список размеров
+         */
+        const QList<int>* iconSizes() const { return &m_icon_sizes; }
+
+        /*!
+         * \brief Получение индекса размера по умолчанию
+         * \return Индекс в списке размеров
+         */
+        int defaultIconSizeIndex() const { return m_default_icon_size_index; }
+
     private:
 
         EteraIconProvider();
         ~EteraIconProvider();
 
         /*!
+         * \brief Подготовка иконки поддерживаемых размеров
+         * \param icon Базовая иконка
+         * \param scale Фактор уменьшения
+         * \return Результирующая иконка
+         */
+        QIcon prepareIcon(const QIcon& icon, int scale = 1);
+
+        /*!
          * \brief Добавление к стандартной иконке символа симлинка
          * \param base_icon Иконка для наложения символа
+         * Иконка должна содержать все поддерживаемые размеры (см. prepareIcon)
          * \return Результирующая иконка
          */
         QIcon addLinkIcon(const QIcon& base_icon);
@@ -64,6 +85,7 @@ class EteraIconProvider
          * \brief Добавление иконки в кэш
          * \param icon Результирующая иконка
          * \param base_icon Базовая иконка для кэширования
+         * Иконка должна содержать все поддерживаемые размеры (см. prepareIcon)
          * \param key Ключ кэша
          * \param shared Флаг публичного доступа
          * \return Всегда true
@@ -104,6 +126,13 @@ class EteraIconProvider
 
     private:
 
+        /*!
+         * \brief Поддерживаемые размеры иконок
+         */
+        QList<int> m_icon_sizes;
+        int        m_default_icon_size_index;   /*!< \brief Индекс размера иконки по умолчанию */
+
+        QIcon m_link;        /*!< \brief Стандартная иконка публичности          */
         QIcon m_dir;         /*!< \brief Стандартная иконка директории           */
         QIcon m_dir_link;    /*!< \brief Стандартная иконка публичной директории */
         QIcon m_file;        /*!< \brief Стандартная иконка файла                */
