@@ -76,13 +76,33 @@
 //
 
 #ifdef Q_WS_WIN
+    // стандартные определения для Windows 7
+    #ifndef _WIN32_WINNT_WIN7
+        #define _WIN32_WINNT_WIN7 0x0601
+    #endif
+    #ifndef WINVER
+        #define WINVER _WIN32_WINNT_WIN7
+    #endif
+    #ifndef _WIN32_WINNT
+        #define _WIN32_WINNT WINVER
+    #endif
+    #ifndef NTDDI_WIN7
+        #define NTDDI_WIN7 0x06010000
+    #endif
+    #ifndef NTDDI_VERSION
+        #define NTDDI_VERSION NTDDI_WIN7
+    #endif
+    #ifndef _WIN32_IE_IE80
+        #define _WIN32_IE_IE80 0x0800
+    #endif
+    #ifndef _WIN32_IE
+        #define _WIN32_IE _WIN32_IE_IE80
+    #endif
+
     #include <windows.h>
     #include <shellapi.h>
     #include <commctrl.h>
     #include <commoncontrols.h>
-
-    // IID_IImageList не определен в CommonControls.h для MinGW
-    #define ETERA_IID_IImageList (QUuid(0x46eb5926, 0x582e, 0x4017, 0x9f, 0xdf, 0xe8, 0x99, 0x8d, 0xaa, 0x9, 0x50))
 #endif
 
 //

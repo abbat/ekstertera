@@ -207,18 +207,18 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
     QIcon base_icon;
 
     QList<int> sizes;
-    sizes << SHIL_SMALL << SHIL_LARGE << SHIL_EXTRALARGE;
+    sizes << SHIL_SMALL << SHIL_LARGE << SHIL_EXTRALARGE << SHIL_JUMBO;
 
     for (int i = 0; i < sizes.size(); i++) {
         int size = sizes[i];
 
         IImageList* ilist;
-        HRESULT result = SHGetImageList(size, ETERA_IID_IImageList, (void**)&ilist);
-        if (result != S_OK)
+        if (FAILED(SHGetImageList(size, IID_IImageList, (void**)&ilist)))
             return false;
 
-        HICON hicon;
-        result = ilist->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hicon);
+        HICON   hicon;
+        HRESULT result = ilist->GetIcon(sfi.iIcon, ILD_TRANSPARENT, &hicon);
+
         ilist->Release();
 
         if (result != S_OK)

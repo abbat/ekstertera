@@ -13,6 +13,14 @@ SET QT_BIN=c:\projects\qt\bin
 SET QT_QMAKE=%QT_BIN%\qmake.exe
 SET QT_LRELEASE=%QT_BIN%\lrelease.exe
 
+REM *****************
+REM * Microsoft SDK *
+REM *****************
+
+SET MS_SDK=%ProgramFiles%\Microsoft SDKs\Windows\v7.1
+SET MS_SDK_INC=%MS_SDK%\Include
+SET MS_SDK_LIB=%MS_SDK%\Lib
+
 REM *******************************
 REM * создание проекта и makefile *
 REM *******************************
@@ -22,6 +30,7 @@ REM *******************************
     "CONFIG += release" ^
     "QT += network" ^
     "INCLUDEPATH += src" ^
+    "LIBS += -L$$quote(%MS_SDK_LIB%) -luuid" ^
     "TRANSLATIONS += src/translations/ekstertera_en.ts" ^
     "RC_FILE += src/resource.rc" ^
     src 3dparty/json
