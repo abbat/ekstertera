@@ -257,7 +257,7 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
         base_icon.addPixmap(pixmap);
     }
 
-    return cacheIcon(icon, prepareIcon(base_icon), ext, shared, center);
+    return cacheIcon(icon, prepareIcon(base_icon, 1, center), ext, shared);
 }
 #endif
 //----------------------------------------------------------------------------------------------
