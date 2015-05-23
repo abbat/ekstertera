@@ -194,7 +194,7 @@ void FormMainUI::save()
 {
     QSettings settings;
     settings.setValue("layout/main", this->saveGeometry());
-    settings.setValue("layout/zoom", m_widget_disk->zoomFactor());
+    settings.setValue("app/zoom", m_widget_disk->zoomFactor());
 }
 //----------------------------------------------------------------------------------------------
 
@@ -202,7 +202,6 @@ void FormMainUI::restore()
 {
     QSettings settings;
     restoreGeometry(settings.value("layout/main").toByteArray());
-
-    m_widget_disk->setZoomFactor(settings.value("layout/zoom", -1).toInt());
+    m_widget_disk->setZoomFactor(settings.value("app/zoom", -1).toInt());
 }
 //----------------------------------------------------------------------------------------------
