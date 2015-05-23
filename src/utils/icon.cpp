@@ -26,6 +26,11 @@ EteraIconProvider::EteraIconProvider()
     m_icon_sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128 << 256;
     m_default_icon_size_index = 3 /* 48 */;
 
+#ifdef ETERA_WS_WIN
+    // данные типы файлов не имеют больших иконок под windows
+    m_jumbo_workaround << "cer" << "chm" << "css" << "js" << "msi" << "prf" << "py" << "sh" << "wsf";
+#endif
+
     // публичность
     m_link = prepareIcon(QIcon::fromTheme("emblem-symbolic-link", QIcon(":/icons/tango/emblem-symbolic-link.svg")), 2);
 
@@ -100,7 +105,7 @@ EteraIconProvider::~EteraIconProvider()
 }
 //----------------------------------------------------------------------------------------------
 
-QIcon EteraIconProvider::prepareIcon(const QIcon& icon, int scale)
+QIcon EteraIconProvider::prepareIcon(const QIcon& icon, int scale, bool center)
 {
     QIcon result;
 
@@ -108,8 +113,22 @@ QIcon EteraIconProvider::prepareIcon(const QIcon& icon, int scale)
         int size = m_icon_sizes[i] / scale;
 
         QPixmap pixmap = icon.pixmap(size);
-        if (pixmap.width() < size)
-            pixmap = pixmap.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+        if (pixmap.width() < size) {
+            if (center == false)
+                pixmap = pixmap.scaled(size, size, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
+            else {
+                int dx = (size - pixmap.width()) / 2;
+
+                QPixmap base_pixmap(size, size);
+                base_pixmap.fill(Qt::transparent);
+
+                QPainter painter(&base_pixmap);
+
+                painter.drawPixmap(dx, dx, pixmap.width(), pixmap.width(), pixmap);
+
+                pixmap = base_pixmap;
+            }
+        }
 
         result.addPixmap(pixmap);
     }
@@ -207,7 +226,11 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
     QIcon base_icon;
 
     QList<int> sizes;
-    sizes << SHIL_SMALL << SHIL_LARGE << SHIL_EXTRALARGE << SHIL_JUMBO;
+    sizes << SHIL_SMALL << SHIL_LARGE << SHIL_EXTRALARGE;
+
+    bool center = m_jumbo_workaround.contains(ext);
+    if (center == false)
+        sizes << SHIL_JUMBO;
 
     for (int i = 0; i < sizes.size(); i++) {
         int size = sizes[i];
@@ -234,7 +257,7 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
         base_icon.addPixmap(pixmap);
     }
 
-    return cacheIcon(icon, prepareIcon(base_icon), ext, shared);
+    return cacheIcon(icon, prepareIcon(base_icon), ext, shared, center);
 }
 #endif
 //----------------------------------------------------------------------------------------------

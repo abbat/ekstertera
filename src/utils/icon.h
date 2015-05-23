@@ -59,9 +59,10 @@ class EteraIconProvider
          * \brief Подготовка иконки поддерживаемых размеров
          * \param icon Базовая иконка
          * \param scale Фактор уменьшения
+         * \param center Центрировать меньшее изображение вместо масштабирования
          * \return Результирующая иконка
          */
-        QIcon prepareIcon(const QIcon& icon, int scale = 1);
+        QIcon prepareIcon(const QIcon& icon, int scale = 1, bool center = false);
 
         /*!
          * \brief Добавление к стандартной иконке символа симлинка
@@ -145,6 +146,10 @@ class EteraIconProvider
         QMap<QString, QIcon> m_cache_icon;        /*!< \brief Карта иконок             */
         QMap<QString, QIcon> m_cache_icon_link;   /*!< \brief Карта публичных иконок   */
         QSet<QString>        m_cache_icon_miss;   /*!< \brief Кэш отсутствующих иконок */
+#endif
+
+#ifdef ETERA_WS_WIN
+        QSet<QString> m_jumbo_workaround;   /*!< \brief Кэш расширений иконок не имеющих большого размера */
 #endif
 };
 
