@@ -196,7 +196,7 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
         int size = sizes[i];
 
         IImageList* ilist;
-        HRESULT result = SHGetImageList(SHIL_EXTRALARGE /* 48x48 */, ETERA_IID_IImageList, (void**)&ilist);
+        HRESULT result = SHGetImageList(size, ETERA_IID_IImageList, (void**)&ilist);
         if (result != S_OK)
             return false;
 
