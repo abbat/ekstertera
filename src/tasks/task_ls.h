@@ -20,8 +20,10 @@ class EteraTaskLS : public EteraTaskSync
         /*!
          * \brief Конструктор
          * \param path Путь для получения списка файлов и директорий
+         * \param preview Размер превью
+         * \param crop Параметр для обрезания превью
          */
-        EteraTaskLS(const QString& path);
+        EteraTaskLS(const QString& path, const QString& preview = "", bool crop = false);
         ~EteraTaskLS();
 
         /*!

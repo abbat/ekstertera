@@ -19,6 +19,7 @@
 #include <QObject>
 #include <QWidget>
 #include <QDialog>
+#include <QBuffer>
 #include <QPainter>
 #include <QMenuBar>
 #include <QToolBar>

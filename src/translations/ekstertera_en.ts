@@ -86,9 +86,14 @@
 <context>
     <name>EteraTaskGET</name>
     <message>
-        <location filename="../tasks/task_get.cpp" line="21"/>
+        <location filename="../tasks/task_get.cpp" line="32"/>
         <source>Сохранение %1 в %2</source>
         <translation>Download %1 to %2</translation>
+    </message>
+    <message>
+        <location filename="../tasks/task_get.cpp" line="34"/>
+        <source>Получение %1</source>
+        <translation>Download %1</translation>
     </message>
 </context>
 <context>
@@ -102,7 +107,7 @@
 <context>
     <name>EteraTaskLS</name>
     <message>
-        <location filename="../tasks/task_ls.cpp" line="19"/>
+        <location filename="../tasks/task_ls.cpp" line="23"/>
         <source>Чтение директории %1</source>
         <translation>Read directory %1</translation>
     </message>
@@ -170,7 +175,7 @@
 <context>
     <name>EteraTaskSTAT</name>
     <message>
-        <location filename="../tasks/task_stat.cpp" line="19"/>
+        <location filename="../tasks/task_stat.cpp" line="23"/>
         <source>Чтение информации о %1</source>
         <translation>Read %1</translation>
     </message>

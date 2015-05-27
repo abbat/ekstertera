@@ -20,8 +20,10 @@ class EteraTaskSTAT : public EteraTaskSync
         /*!
          * \brief Конструктор
          * \param path Путь до объекта
+         * \param preview Размер превью
+         * \param crop Параметр для обрезания превью
          */
-        EteraTaskSTAT(const QString& path);
+        EteraTaskSTAT(const QString& path, const QString& preview = "", bool crop = false);
         ~EteraTaskSTAT();
 
         /*!

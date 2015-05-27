@@ -5,6 +5,15 @@ EteraTaskGET::EteraTaskGET(const QString& source, const QString& target) : Etera
 {
     m_args["source"] = source;
     m_args["target"] = target;
+    m_args["device"] = QVariant::fromValue(NULL);
+}
+//----------------------------------------------------------------------------------------------
+
+EteraTaskGET::EteraTaskGET(const QString& source, QIODevice* device) : EteraTaskProgress()
+{
+    m_args["source"] = source;
+    m_args["target"] = QString();
+    m_args["device"] = QVariant::fromValue(device);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -15,14 +24,24 @@ EteraTaskGET::~EteraTaskGET()
 
 void EteraTaskGET::run()
 {
-    QString source = m_args["source"].toString();
-    QString target = m_args["target"].toString();
+    QString    source = m_args["source"].toString();
+    QString    target = m_args["target"].toString();
+    QIODevice* device = m_args.value("device", QVariant::fromValue(NULL)).value<QIODevice*>();
 
-    emit onStart(m_id, trUtf8("Сохранение %1 в %2").arg(source).arg(target), m_args);
+    if (device == NULL)
+        emit onStart(m_id, trUtf8("Сохранение %1 в %2").arg(source).arg(target), m_args);
+    else
+        emit onStart(m_id, trUtf8("Получение %1").arg(source), m_args);
 
     init();
 
-    if (m_api->get(source, target) == false)
+    bool result;
+    if (device == NULL)
+        result = m_api->get(source, target);
+    else
+        result = m_api->get(source, device);
+
+    if (result == false)
         emit onError(m_id, m_api->lastErrorCode(), m_api->lastErrorMessage(), m_args);
     else {
         successLock();

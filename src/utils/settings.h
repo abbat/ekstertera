@@ -54,14 +54,17 @@ class EteraSettings
          */
         bool closeToTray() const { return m_close_to_tray; }
 
+        bool preview() const { return m_preview; }
+
     private:
 
         EteraSettings();
         ~EteraSettings();
 
-        QString m_language;        /*!< \brief Текущий язык                              */
-        QString m_token;           /*!< \brief OAuth токен                               */
-        bool    m_close_to_tray;   /*!< \brief Флаг сворачивания в трей вместо закрытия  */
+        QString m_language;        /*!< \brief Текущий язык                             */
+        QString m_token;           /*!< \brief OAuth токен                              */
+        bool    m_close_to_tray;   /*!< \brief Флаг сворачивания в трей вместо закрытия */
+        bool    m_preview;         /*!< \brief Загружать превью                         */
 };
 
 #endif   // _ekstertera_settings_h_

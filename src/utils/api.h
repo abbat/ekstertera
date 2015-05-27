@@ -372,17 +372,21 @@ class EteraAPI : public QObject
          * \brief Получение информации об объекте на диске
          * \param path Путь к объекту
          * \param result Описатель объекта
+         * \param preview Размер превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
+         * \param crop Параметр для обрезания превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
          * \return Флаг успеха
          */
-        bool stat(const QString& path, EteraItem& result);
+        bool stat(const QString& path, EteraItem& result, const QString& preview = "", bool crop = false);
 
         /*!
          * \brief Получение списка объектов на диске
          * \param path Путь к объекту или родительской директории
          * \param result Список описателей объектов
+         * \param preview Размер превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
+         * \param crop Параметр для обрезания превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
          * \return Флаг успеха
          */
-        bool ls(const QString& path, EteraItemList& result);
+        bool ls(const QString& path, EteraItemList& result, const QString& preview = "", bool crop = false);
 
         /*!
          * \brief Создание директории на диске
@@ -433,6 +437,14 @@ class EteraAPI : public QObject
          * \return Флаг успеха
          */
         bool get(const QString& source, const QString& target);
+
+        /*!
+         * \brief Получение файла с диска
+         * \param source Имя файла на диске
+         * \param target Буфер для записи
+         * \return Флаг успеха
+         */
+        bool get(const QString& source, QIODevice* target);
 
         /*!
          * \brief Открыть доступ к объекту

@@ -750,13 +750,18 @@ bool EteraAPI::info(EteraInfo& result)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::stat(const QString& path, EteraItem& result)
+bool EteraAPI::stat(const QString& path, EteraItem& result, const QString& preview, bool crop)
 {
     EteraArgs args;
 
     args["path"]   = path;
     args["offset"] = "0";
     args["limit"]  = "0";
+
+    if (preview.isEmpty() == false)
+        args["preview_size"] = preview;
+    if (crop == true)
+        args["preview_crop"] = "true";
 
     int     code;
     QString body;
@@ -774,7 +779,7 @@ bool EteraAPI::stat(const QString& path, EteraItem& result)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::ls(const QString& path, EteraItemList& result)
+bool EteraAPI::ls(const QString& path, EteraItemList& result, const QString& preview, bool crop)
 {
     quint64 offset = 0;
 
@@ -783,6 +788,11 @@ bool EteraAPI::ls(const QString& path, EteraItemList& result)
     args["path"]   = path;
     args["offset"] = QString::number(offset);
     args["limit"]  = QString::number(m_limit);
+
+    if (preview.isEmpty() == false)
+        args["preview_size"] = preview;
+    if (crop == true)
+        args["preview_crop"] = "true";
 
     while (true) {
         int     code;
@@ -984,6 +994,21 @@ bool EteraAPI::put(const QString& source, const QString& target, bool overwrite)
 
 bool EteraAPI::get(const QString& source, const QString& target)
 {
+    QFile file(target);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+         return setLastError(file.error(), FILE_OPEN_ERROR);
+
+    if (get(source, &file) == false) {
+        file.remove();
+        return false;
+    }
+
+    return true;
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraAPI::get(const QString& source, QIODevice* target)
+{
     EteraArgs args;
 
     args["path"] = source;
@@ -1006,16 +1031,11 @@ bool EteraAPI::get(const QString& source, const QString& target)
     if (method != ermGET)
         return setLastError(1, UNSUPPORTED_LINK_METHOD);
 
-    QFile file(target);
-
-    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-         return setLastError(file.error(), FILE_OPEN_ERROR);
-
     QNetworkRequest request(url);
     setDefaultHeaders(request, 0, true, true);
 
     while (true) {
-        if (makeRequest(request, code, body, method, "", &file) == false)
+        if (makeRequest(request, code, body, method, "", target) == false)
             return false;
 
         if (code == 200)

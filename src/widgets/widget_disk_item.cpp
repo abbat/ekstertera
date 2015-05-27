@@ -1,6 +1,7 @@
 #include "widget_disk_item.h"
 //----------------------------------------------------------------------------------------------
 #include "utils/icon.h"
+#include "utils/settings.h"
 //----------------------------------------------------------------------------------------------
 
 WidgetDiskItem::WidgetDiskItem(QListWidget* parent, const EteraItem& item) : QListWidgetItem(parent, QListWidgetItem::UserType)
@@ -34,7 +35,8 @@ void WidgetDiskItem::update()
 
     setText(m_item.name());
 
-    setIcon(icon_provider->icon(m_item));
+    if (EteraSettings::instance()->preview() == false || m_item.preview().isEmpty() == true)
+        setIcon(icon_provider->icon(m_item));
 }
 //----------------------------------------------------------------------------------------------
 
