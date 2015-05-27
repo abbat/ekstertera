@@ -86,12 +86,12 @@
 <context>
     <name>EteraTaskGET</name>
     <message>
-        <location filename="../tasks/task_get.cpp" line="32"/>
+        <location filename="../tasks/task_get.cpp" line="30"/>
         <source>Сохранение %1 в %2</source>
         <translation>Download %1 to %2</translation>
     </message>
     <message>
-        <location filename="../tasks/task_get.cpp" line="34"/>
+        <location filename="../tasks/task_get.cpp" line="32"/>
         <source>Получение %1</source>
         <translation>Download %1</translation>
     </message>

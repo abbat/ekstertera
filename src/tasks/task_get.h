@@ -8,8 +8,6 @@
 
 #include "task_progress.h"
 
-Q_DECLARE_METATYPE(QIODevice*);
-
 /*!
  * \brief Асинхронная задача EteraAPI::get
  */
@@ -22,17 +20,9 @@ class EteraTaskGET : public EteraTaskProgress
         /*!
          * \brief Конструктор
          * \param source Имя файла на диске
-         * \param target Имя локального файла
+         * \param target Имя локального файла (при пустом имени, данные сохраняются в кэш)
          */
         EteraTaskGET(const QString& source, const QString& target);
-
-        /*!
-         * \brief Конструктор
-         * \param source Имя файла на диске
-         * \param device Устройство для сохранения результата
-         */
-        EteraTaskGET(const QString& source, QIODevice* device);
-
         ~EteraTaskGET();
 
         /*!

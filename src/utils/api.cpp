@@ -994,21 +994,6 @@ bool EteraAPI::put(const QString& source, const QString& target, bool overwrite)
 
 bool EteraAPI::get(const QString& source, const QString& target)
 {
-    QFile file(target);
-    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-         return setLastError(file.error(), FILE_OPEN_ERROR);
-
-    if (get(source, &file) == false) {
-        file.remove();
-        return false;
-    }
-
-    return true;
-}
-//----------------------------------------------------------------------------------------------
-
-bool EteraAPI::get(const QString& source, QIODevice* target)
-{
     EteraArgs args;
 
     args["path"] = source;
@@ -1031,11 +1016,29 @@ bool EteraAPI::get(const QString& source, QIODevice* target)
     if (method != ermGET)
         return setLastError(1, UNSUPPORTED_LINK_METHOD);
 
+    QFile file(target);
+    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
+         return setLastError(file.error(), FILE_OPEN_ERROR);
+
+    if (get(url, &file) == false) {
+        file.remove();
+        return false;
+    }
+
+    return true;
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraAPI::get(const QUrl& url, QIODevice* target)
+{
     QNetworkRequest request(url);
     setDefaultHeaders(request, 0, true, true);
 
+    int     code;
+    QString body;
+
     while (true) {
-        if (makeRequest(request, code, body, method, "", target) == false)
+        if (makeRequest(request, code, body, ermGET, "", target) == false)
             return false;
 
         if (code == 200)

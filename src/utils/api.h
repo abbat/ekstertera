@@ -440,11 +440,11 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение файла с диска
-         * \param source Имя файла на диске
+         * \param url Ссылка
          * \param target Буфер для записи
          * \return Флаг успеха
          */
-        bool get(const QString& source, QIODevice* target);
+        bool get(const QUrl& url, QIODevice* target);
 
         /*!
          * \brief Открыть доступ к объекту
