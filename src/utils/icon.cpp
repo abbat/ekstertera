@@ -1,5 +1,8 @@
 #include "icon.h"
 //----------------------------------------------------------------------------------------------
+#include "pool.h"
+#include "tasks/all.h"
+//----------------------------------------------------------------------------------------------
 static EteraIconProvider* g_icon_provider = NULL;
 //----------------------------------------------------------------------------------------------
 
@@ -21,7 +24,7 @@ EteraIconProvider* EteraIconProvider::instance()
 }
 //----------------------------------------------------------------------------------------------
 
-EteraIconProvider::EteraIconProvider()
+EteraIconProvider::EteraIconProvider() : QObject()
 {
     m_icon_sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128 << 256;
     m_default_icon_size_index = 3 /* 48 */;
@@ -309,29 +312,117 @@ bool EteraIconProvider::mediaIcon(QIcon& icon, EteraItemMediaType type, bool sha
 }
 //----------------------------------------------------------------------------------------------
 
-QIcon EteraIconProvider::icon(const EteraItem& item)
+QIcon EteraIconProvider::icon(const EteraItem* item)
 {
-    if (item.isDir() == true)
-        return (item.isPublic() == true ? m_dir_link : m_dir);
-    else if (item.isFile() == true) {
+    if (item->isDir() == true)
+        return (item->isPublic() == true ? m_dir_link : m_dir);
+    else if (item->isFile() == true) {
         QIcon result;
 
 #ifdef ETERA_WS_WIN
-        if (extensionIcon(result, item.extension(), item.isPublic()) == true)
+        if (extensionIcon(result, item->extension(), item->isPublic()) == true)
             return result;
 #endif
 
 #ifdef ETERA_WS_X11
-        if (mimeIcon(result, item.mimeType(), item.isPublic()) == true)
+        if (mimeIcon(result, item->mimeType(), item->isPublic()) == true)
             return result;
 #endif
 
-        if (mediaIcon(result, item.mediaType(), item.isPublic()) == true)
+        if (mediaIcon(result, item->mediaType(), item->isPublic()) == true)
             return result;
 
-        return (item.isPublic() == true ? m_file_link : m_file);
+        return (item->isPublic() == true ? m_file_link : m_file);
     }
 
     return QIcon();
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraIconProvider::preview(WidgetDiskItem* item)
+{
+    const EteraItem* eitem = item->item();
+
+    QString preview = eitem->preview();
+
+    if (eitem->isPublic() == true) {
+        if (m_preview_cache_link.contains(preview) == true) {
+            item->setIcon(m_preview_cache_link[preview]);
+            return true;
+        }
+
+        if (m_preview_cache.contains(preview) == true) {
+            QIcon link_icon = addLinkIcon(m_preview_cache[preview]);
+            m_preview_cache_link[preview] = link_icon;
+            item->setIcon(link_icon);
+            return true;
+        }
+    } else if (m_preview_cache.contains(preview) == true) {
+        item->setIcon(m_preview_cache[preview]);
+        return true;
+    }
+
+    item->setIcon(icon(eitem));
+
+    m_preview_wait[preview] = item;
+
+    EteraTaskGET* get = new EteraTaskGET(preview, "");
+
+    connect(get, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_get_preview_success(quint64, const QVariantMap&)));
+    connect(get, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_get_preview_error(quint64, int, const QString&, const QVariantMap&)));
+
+    EteraThreadPool::globalInstance()->start(get);
+
+    return false;
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraIconProvider::cancelPreview(const WidgetDiskItem* item)
+{
+    QString preview = item->item()->preview();
+    if (m_preview_wait.contains(preview) == true)
+        m_preview_wait.remove(preview);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraIconProvider::task_on_get_preview_success(quint64 /*id*/, const QVariantMap& args)
+{
+    QString    source = args["source"].toString();
+    QByteArray target = args["target"].toByteArray();
+
+    QPixmap pixmap;
+    pixmap.loadFromData(target);
+
+    if (pixmap.isNull() == true) {
+        m_preview_wait.remove(source);
+        return;
+    }
+
+    QIcon icon;
+    icon.addPixmap(pixmap);
+
+    icon = prepareIcon(icon);
+
+    m_preview_cache[source] = icon;
+
+    WidgetDiskItem* item = m_preview_wait.value(source, NULL);
+    if (item != NULL) {
+        m_preview_wait.remove(source);
+
+        if (item->item()->isPublic() == false)
+            item->setIcon(icon);
+        else {
+            QIcon link_icon = addLinkIcon(icon);
+            m_preview_cache_link[source] = link_icon;
+            item->setIcon(link_icon);
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraIconProvider::task_on_get_preview_error(quint64 /*id*/, int /*code*/, const QString& /*error*/, const QVariantMap& args)
+{
+    QString source = args["source"].toString();
+    m_preview_wait.remove(source);
 }
 //----------------------------------------------------------------------------------------------

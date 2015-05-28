@@ -12,6 +12,7 @@ WidgetDiskItem::WidgetDiskItem(QListWidget* parent, const EteraItem& item) : QLi
 
 WidgetDiskItem::~WidgetDiskItem()
 {
+    EteraIconProvider::instance()->cancelPreview(this);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -36,7 +37,9 @@ void WidgetDiskItem::update()
     setText(m_item.name());
 
     if (EteraSettings::instance()->preview() == false || m_item.preview().isEmpty() == true)
-        setIcon(icon_provider->icon(m_item));
+        setIcon(icon_provider->icon(&m_item));
+    else
+        icon_provider->preview(this);
 }
 //----------------------------------------------------------------------------------------------
 

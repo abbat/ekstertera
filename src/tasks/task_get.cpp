@@ -18,12 +18,11 @@ void EteraTaskGET::run()
     QString source = m_args["source"].toString();
     QString target = m_args["target"].toString();
 
-    QIODevice* device = NULL;
+    QBuffer* device = NULL;
 
     if (target.isEmpty() == true) {
-        // TODO:
-        if (device == NULL)
-            return;
+        device = new QBuffer();
+        device->open(QIODevice::WriteOnly | QIODevice::Truncate);
     }
 
     if (device == NULL)
@@ -39,13 +38,21 @@ void EteraTaskGET::run()
     else
         result = m_api->get(QUrl::fromEncoded(source.toUtf8()), device);
 
+    if (device != NULL)
+        device->close();
+
     if (result == false) {
         emit onError(m_id, m_api->lastErrorCode(), m_api->lastErrorMessage(), m_args);
     } else {
+        if (device != NULL)
+            m_args["target"] = device->data();
+
         successLock();
         emit onSuccess(m_id, m_args);
         successUnlock();
     }
+
+    delete device;
 
     cleanup();
 }

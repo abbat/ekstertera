@@ -6,13 +6,15 @@
 #ifndef _ekstertera_icon_h_
 #define _ekstertera_icon_h_
 
-#include "api.h"
+#include "widgets/widget_disk_item.h"
 
 /*!
  * \brief Работа с провайдером иконок
  */
-class EteraIconProvider
+class EteraIconProvider : public QObject
 {
+    Q_OBJECT
+
     public:
 
         /*!
@@ -36,13 +38,35 @@ class EteraIconProvider
          * \param item Описатель элемента
          * \return Иконка для запрошенного элемента
          */
-        QIcon icon(const EteraItem& item);
+        QIcon icon(const EteraItem* item);
+
+        /*!
+         * \brief Получение превью или постановка в очередь на ожидание
+         * \param item Описатель элемента
+         * Если превью не найдено, будет установлена иконка по умолчанию
+         * и элемент будет поставлен в очередь на ожидание, для отмены ожидания
+         * элемент должен вызвать cancelPreview
+         * \return true если установлено превью, false если поставлено в очередь
+         */
+        bool preview(WidgetDiskItem* item);
+
+        /*!
+         * \brief Отмена ожидания загрузки превью
+         * \param item Описатель элемента
+         */
+        void cancelPreview(const WidgetDiskItem* item);
 
         /*!
          * \brief Получение списка поддерживаемых размеров иконок
          * \return Список размеров
          */
         const QList<int>* iconSizes() const { return &m_icon_sizes; }
+
+        /*!
+         * \brief Получение максимального размера иконки
+         * \return Максимальный размер иконки
+         */
+        int maxIconSize() const { return m_icon_sizes[m_icon_sizes.count() - 1]; }
 
         /*!
          * \brief Получение индекса размера по умолчанию
@@ -142,6 +166,10 @@ class EteraIconProvider
         QMap<EteraItemMediaType, QIcon> m_media_icon;        /*!< \brief Карта иконок по медиа типу           */
         QMap<EteraItemMediaType, QIcon> m_media_icon_link;   /*!< \brief Карта публичных иконок по медиа типу */
 
+        QMap<QUrl, WidgetDiskItem*> m_preview_wait;         /*!< \brief Карта ожидающих превью           */
+        QMap<QUrl, QIcon>           m_preview_cache;        /*!< \brief Карта иконок по превью           */
+        QMap<QUrl, QIcon>           m_preview_cache_link;   /*!< \brief Карта публичных иконок по превью */
+
 #ifdef ETERA_WS_X11_OR_WIN
         QMap<QString, QIcon> m_cache_icon;        /*!< \brief Карта иконок             */
         QMap<QString, QIcon> m_cache_icon_link;   /*!< \brief Карта публичных иконок   */
@@ -151,6 +179,11 @@ class EteraIconProvider
 #ifdef ETERA_WS_WIN
         QSet<QString> m_jumbo_workaround;   /*!< \brief Кэш расширений иконок не имеющих большого размера */
 #endif
+
+    private slots:
+
+        void task_on_get_preview_success(quint64 id, const QVariantMap& args);
+        void task_on_get_preview_error(quint64 id, int code, const QString& error, const QVariantMap& args);
 };
 
 #endif   // _ekstertera_icon_h_

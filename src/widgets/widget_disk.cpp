@@ -241,7 +241,10 @@ void WidgetDisk::changePath(const QString& path)
     if (_path.endsWith("/") == false)
         _path += "/";
 
-    EteraTaskLS* ls = new EteraTaskLS(_path);
+    int     size    = EteraIconProvider::instance()->maxIconSize();
+    QString preview = QString("%1x%2").arg(size).arg(size);
+
+    EteraTaskLS* ls = new EteraTaskLS(_path, preview, true);
 
     connect(ls, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
     connect(ls, SIGNAL(onSuccess(quint64, const EteraItemList&, const QVariantMap&)), this, SLOT(task_on_ls_success(quint64, const EteraItemList&, const QVariantMap&)));

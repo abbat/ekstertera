@@ -45,12 +45,14 @@ int main (int argc, char* argv[])
     EteraIconProvider::init();
 
     // главная форма
-    FormMain form;
-    form.show();
+    FormMain* form = new FormMain();
+    form->show();
 
     app.connect(&app, SIGNAL(lastWindowClosed()), &app, SLOT(quit()));
 
     int retval = app.exec();
+
+    delete form;
 
     // очистка ресурсов провайдера иконок
     EteraIconProvider::cleanup();
