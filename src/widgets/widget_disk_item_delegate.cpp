@@ -11,6 +11,17 @@ WidgetDiskItemDelegate::~WidgetDiskItemDelegate()
 }
 //----------------------------------------------------------------------------------------------
 
+QSize WidgetDiskItemDelegate::sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const
+{
+    QSize result = QStyledItemDelegate::sizeHint(option, index);
+
+    result.setWidth(result.width()   + adjust_dx * 3);
+    result.setHeight(result.height() + adjust_dy * 3);
+
+    return result;
+}
+//----------------------------------------------------------------------------------------------
+
 void WidgetDiskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const
 {
     QStyleOptionViewItemV4 opt = *qstyleoption_cast<const QStyleOptionViewItemV4*>(&option);
@@ -38,28 +49,30 @@ void WidgetDiskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
             break;
     }
 
-    QRect icon_rect = style->itemPixmapRect(opt.rect, alignment, pixmap);
-    style->drawItemPixmap(painter, opt.rect, alignment, pixmap);
+    QRect icon_rect = style->itemPixmapRect(opt.rect.adjusted(adjust_dx, adjust_dy, -adjust_dx, -adjust_dy), alignment, pixmap);
+    style->drawItemPixmap(painter, icon_rect, opt.decorationAlignment, pixmap);
 
     QRect free_rect;
     switch (opt.decorationPosition) {
         case QStyleOptionViewItem::Left:
-            free_rect = opt.rect.adjusted(icon_rect.width() + 5, 0, -5, 0);
+            free_rect = opt.rect.adjusted(icon_rect.width() + adjust_dx * 3, adjust_dy, -adjust_dx, -adjust_dy);
             break;
         case QStyleOptionViewItem::Right:
-            free_rect = opt.rect.adjusted(0, 0, -icon_rect.width() - 5, 0);
+            free_rect = opt.rect.adjusted(adjust_dx, adjust_dy, -icon_rect.width() - adjust_dx * 3, -adjust_dy);
             break;
         case QStyleOptionViewItem::Top:
-            free_rect = opt.rect.adjusted(0, icon_rect.height() + 5, 0, 0);
+            free_rect = opt.rect.adjusted(adjust_dx, icon_rect.height() + adjust_dy * 3, -adjust_dx, -adjust_dy);
             break;
         case QStyleOptionViewItem::Bottom:
-            free_rect = opt.rect.adjusted(0, 0, -icon_rect.height() - 5, 0);
+            free_rect = opt.rect.adjusted(adjust_dx, adjust_dy, -adjust_dx, -icon_rect.height() - adjust_dy * 3);
             break;
     }
 
     if (selected == true) {
+        int dr = qMax(adjust_dx, adjust_dy);
+
         QRect text_rect = style->itemTextRect(opt.fontMetrics, free_rect, alignment, true, text);
-        QRect high_rect = text_rect.adjusted(-5, -5, 5, 5);
+        QRect high_rect = text_rect.adjusted(-dr, -dr, dr, dr);
 
         painter->save();
 
@@ -67,7 +80,7 @@ void WidgetDiskItemDelegate::paint(QPainter* painter, const QStyleOptionViewItem
 
         painter->setPen(opt.palette.highlight().color());
         painter->setBrush(opt.palette.highlight());
-        painter->drawRoundedRect(high_rect, 5, 5);
+        painter->drawRoundedRect(high_rect, dr, dr);
 
         painter->restore();
     }

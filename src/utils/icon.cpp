@@ -26,8 +26,8 @@ EteraIconProvider* EteraIconProvider::instance()
 
 EteraIconProvider::EteraIconProvider() : QObject()
 {
-    m_icon_sizes << 32 << 48 << 64 << 96 << 128 << 256;
-    m_default_icon_size_index = 1 /* 48 */;
+    m_icon_sizes << 24 << 32 << 48 << 64 << 96 << 128 << 256;
+    m_default_icon_size_index = 2 /* 48 */;
 
 #ifdef ETERA_WS_WIN
     // данные типы файлов не имеют больших иконок под windows

@@ -21,7 +21,13 @@ class WidgetDiskItemDelegate : public QStyledItemDelegate
     // QStyledItemDelegate
     public:
 
+        QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const;
         void paint(QPainter* painter, const QStyleOptionViewItem& option, const QModelIndex& index) const;
+
+    private:
+
+        static const int adjust_dx = 4;   /*!< \brief Отсуп у горизонтальных границ */
+        static const int adjust_dy = 2;   /*!< \brief Отсуп у вертикальных границ   */
 };
 
 #endif   // _ekstertera_widgets_widget_disk_item_delegate_h_
