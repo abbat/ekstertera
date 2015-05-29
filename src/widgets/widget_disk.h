@@ -70,8 +70,9 @@ class WidgetDisk : public QTabWidget
         /*!
          * \brief Установить текущий размер иконок
          * \factor Индекс размера
+         * \return -1 если больше нельзя уменьшать, +1 если больше нельзя увеличить, 0 - в остальных случаях
          */
-        void setZoomFactor(int factor);
+        int setZoomFactor(int factor);
 
         /*!
          * \brief Пункты контекстного меню

@@ -26,8 +26,8 @@ EteraIconProvider* EteraIconProvider::instance()
 
 EteraIconProvider::EteraIconProvider() : QObject()
 {
-    m_icon_sizes << 16 << 24 << 32 << 48 << 64 << 96 << 128 << 256;
-    m_default_icon_size_index = 3 /* 48 */;
+    m_icon_sizes << 32 << 48 << 64 << 96 << 128 << 256;
+    m_default_icon_size_index = 1 /* 48 */;
 
 #ifdef ETERA_WS_WIN
     // данные типы файлов не имеют больших иконок под windows
@@ -229,7 +229,7 @@ bool EteraIconProvider::extensionIcon(QIcon& icon, const QString& ext, bool shar
     QIcon base_icon;
 
     QList<int> sizes;
-    sizes << SHIL_SMALL << SHIL_LARGE << SHIL_EXTRALARGE;
+    sizes << SHIL_LARGE << SHIL_EXTRALARGE;
 
     bool center = m_jumbo_workaround.contains(ext);
     if (center == false)

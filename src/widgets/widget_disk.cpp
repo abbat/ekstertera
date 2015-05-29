@@ -1,5 +1,7 @@
 #include "widget_disk.h"
 //----------------------------------------------------------------------------------------------
+#include "widget_disk_item_delegate.h"
+//----------------------------------------------------------------------------------------------
 #include "tasks/all.h"
 #include "utils/pool.h"
 #include "utils/icon.h"
@@ -18,6 +20,7 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     m_explorer->setContextMenuPolicy(Qt::CustomContextMenu);
     m_explorer->setSelectionMode(QAbstractItemView::ExtendedSelection);
     m_explorer->setSortingEnabled(true);
+    m_explorer->setItemDelegate(new WidgetDiskItemDelegate(m_explorer));
 
     setZoomFactor(EteraIconProvider::instance()->defaultIconSizeIndex());
 
@@ -1353,7 +1356,7 @@ void WidgetDisk::shareObjects(bool share)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::setZoomFactor(int factor)
+int WidgetDisk::setZoomFactor(int factor)
 {
     const QList<int>* sizes = EteraIconProvider::instance()->iconSizes();
 
@@ -1365,6 +1368,13 @@ void WidgetDisk::setZoomFactor(int factor)
     int size = sizes->at(m_icon_size_index);
 
     m_explorer->setIconSize(QSize(size, size));
+
+    if (m_icon_size_index == 0)
+        return -1;
+    else if (m_icon_size_index == sizes->count() - 1)
+        return 1;
+
+    return 0;
 }
 //----------------------------------------------------------------------------------------------
 

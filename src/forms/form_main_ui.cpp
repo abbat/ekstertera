@@ -100,8 +100,8 @@ FormMainUI::FormMainUI() : QMainWindow()
     m_action_download = m_toolbar->addAction(QIcon(":/icons/download32.png"), "");
     m_action_download->setEnabled(false);
 
-    m_toolbar->addAction(m_menu_view_zoom_in);
     m_toolbar->addAction(m_menu_view_zoom_out);
+    m_toolbar->addAction(m_menu_view_zoom_in);
 
     //
     // статусбар
@@ -201,7 +201,13 @@ void FormMainUI::save()
 void FormMainUI::restore()
 {
     QSettings settings;
+
     restoreGeometry(settings.value("layout/main").toByteArray());
-    m_widget_disk->setZoomFactor(settings.value("app/zoom", -1).toInt());
+
+    int zoom = m_widget_disk->setZoomFactor(settings.value("app/zoom", -1).toInt());
+    if (zoom < 0)
+        m_menu_view_zoom_out->setEnabled(false);
+    else if (zoom > 0)
+        m_menu_view_zoom_in->setEnabled(false);
 }
 //----------------------------------------------------------------------------------------------

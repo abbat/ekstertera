@@ -61,6 +61,7 @@
 #include <QSystemTrayIcon>
 #include <QDesktopServices>
 #include <QSslConfiguration>
+#include <QStyledItemDelegate>
 #include <QNetworkAccessManager>
 
 #if QT_VERSION >= 0x050000
