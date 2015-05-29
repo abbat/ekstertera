@@ -1,3 +1,10 @@
+ekstertera (0.0.12) unstable; urgency=low
+
+  * Нестанадртная отрисовка элементов в проводнике;
+  * Исправления ошибок при завершении приложения.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Fri, 29 May 2015 22:30:00 +0300
+
 ekstertera (0.0.11) unstable; urgency=low
 
   * Добавление настройки сокрытия в трей/закрытия;
