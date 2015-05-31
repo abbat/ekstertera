@@ -16,6 +16,7 @@
 #include <QLabel>
 #include <QDebug>
 #include <QMutex>
+#include <QQueue>
 #include <QObject>
 #include <QWidget>
 #include <QDialog>
@@ -56,6 +57,7 @@
 #include <QApplication>
 #include <QLibraryInfo>
 #include <QNetworkReply>
+#include <QWaitCondition>
 #include <QNetworkRequest>
 #include <QListWidgetItem>
 #include <QSystemTrayIcon>

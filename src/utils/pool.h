@@ -6,12 +6,12 @@
 #ifndef _ekstertera_pool_h_
 #define _ekstertera_pool_h_
 
-#include "sysheaders.h"
+#include "thread.h"
 
 /*!
  * \brief Пул потоков для асинхронных задач
  */
-class EteraThreadPool : public QThreadPool
+class EteraThreadPool
 {
     public:
 
@@ -26,20 +26,27 @@ class EteraThreadPool : public QThreadPool
         static void cleanup();
 
         /*!
-         * \brief Аналог QThreadPool::globalInstance()
+         * \brief Singleton
          * \return Пул потоков
          */
-        static QThreadPool* globalInstance();
+        static EteraThreadPool* instance();
+
+        /*!
+         * \brief Добавление задачи в очередь
+         * \param task Задача
+         */
+        void start(QRunnable* task);
 
     private:
 
         EteraThreadPool();
         ~EteraThreadPool();
 
-        /*!
-         * \brief Пул потоков
-         */
-        QThreadPool* m_pool;
+        QList<EteraThread*> m_threads;   /*!< \brief Список потоков */
+
+        EteraTaskQueue  m_queue;         /*!< \brief Очередь задач                        */
+        QMutex          m_queue_mutex;   /*!< \brief Блокировка очереди задач             */
+        QWaitCondition  m_queue_wait;    /*!< \brief Блокировка на появление новой задачи */
 };
 
 #endif   // _ekstertera_pool_h_

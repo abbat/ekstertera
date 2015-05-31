@@ -3,9 +3,9 @@
 #include <unistd.h>
 //----------------------------------------------------------------------------------------------
 /*!
- * \brief Флаг инициализации api
+ * \brief Флаг разрешения работы api
  */
-static bool g_api_inited = false;
+static bool g_api_enabled = false;
 //----------------------------------------------------------------------------------------------
 
 EteraInfo::EteraInfo()
@@ -307,13 +307,13 @@ void EteraAPI::init()
     qRegisterMetaType<EteraItem>("EteraItem");
     qRegisterMetaType<EteraItemList>("EteraItemList");
 
-    g_api_inited = true;
+    g_api_enabled = true;
 }
 //----------------------------------------------------------------------------------------------
 
 void EteraAPI::cleanup()
 {
-    g_api_inited = false;
+    g_api_enabled = false;
 }
 //----------------------------------------------------------------------------------------------
 
@@ -355,12 +355,15 @@ void EteraAPI::on_about_to_quit()
 {
     if (m_reply != NULL)
         m_reply->abort();
+
+    // приложение завершает работу - запрет работы api
+    g_api_enabled = false;
 }
 //----------------------------------------------------------------------------------------------
 
 void EteraAPI::on_download_progress(qint64 done, qint64 total)
 {
-    if (g_api_inited == true)
+    if (g_api_enabled == true)
         emit onProgress(done, total);
     else
         m_reply->abort();
@@ -369,7 +372,7 @@ void EteraAPI::on_download_progress(qint64 done, qint64 total)
 
 void EteraAPI::on_upload_progress(qint64 done, qint64 total)
 {
-    if (g_api_inited == true)
+    if (g_api_enabled == true)
         emit onProgress(done, total);
     else
         m_reply->abort();
@@ -388,7 +391,7 @@ void EteraAPI::on_ssl_errors(const QList<QSslError>& errors)
 
 void EteraAPI::on_ready_read()
 {
-    if (g_api_inited == true)
+    if (g_api_enabled == true)
         m_io->write(m_reply->readAll());
     else
         m_reply->abort();
@@ -489,7 +492,7 @@ void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, c
 
 bool EteraAPI::makeRequest(const QNetworkRequest& request, int& code, QString& body, EteraRequestMethod method, const QString& data, QIODevice* io)
 {
-    if (g_api_inited == false)
+    if (g_api_enabled == false)
         return setLastError(1, trUtf8("API не инициализировано"));
 
     QNetworkReply* reply;
@@ -575,8 +578,7 @@ bool EteraAPI::makeSimpleRequest(int& code, QString& body, const QString& url, c
 
     if (method == ermPOST) {
         // content-type missing in HTTP POST, defaulting to application/x-www-form-urlencoded.
-        // Use QNetworkRequest::setHeader() to fix this problem.
-        request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
+        request.setHeader(QNetworkRequest::ContentTypeHeader,   "application/json");
         request.setHeader(QNetworkRequest::ContentLengthHeader, "0");
     }
 

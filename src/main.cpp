@@ -39,10 +39,10 @@ int main (int argc, char* argv[])
     EteraTranslator::init();
     // инициализация буфера обмена
     EteraClipboard::init();
-    // инициализация пула асинхронных задач и api
-    EteraThreadPool::init();
     // инициализация провайдера иконок
     EteraIconProvider::init();
+    // инициализация пула асинхронных задач и api
+    EteraThreadPool::init();
 
     // главная форма
     FormMain* form = new FormMain();
@@ -54,10 +54,10 @@ int main (int argc, char* argv[])
 
     delete form;
 
-    // очистка ресурсов провайдера иконок
-    EteraIconProvider::cleanup();
     // очистка ресурсов пула асинхронных задач и api
     EteraThreadPool::cleanup();
+    // очистка ресурсов провайдера иконок
+    EteraIconProvider::cleanup();
     // очистка ресурсов буфера обмена
     EteraClipboard::cleanup();
     // очистка ресурсов локализации
