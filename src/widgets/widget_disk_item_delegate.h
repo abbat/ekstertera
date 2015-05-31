@@ -26,8 +26,8 @@ class WidgetDiskItemDelegate : public QStyledItemDelegate
 
     private:
 
-        static const int adjust_dx = 4;   /*!< \brief Отсуп у горизонтальных границ */
-        static const int adjust_dy = 2;   /*!< \brief Отсуп у вертикальных границ   */
+        int adjust_dx;   /*!< \brief Отсуп у горизонтальных границ */
+        int adjust_dy;   /*!< \brief Отсуп у вертикальных границ   */
 };
 
 #endif   // _ekstertera_widgets_widget_disk_item_delegate_h_

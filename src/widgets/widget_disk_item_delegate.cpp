@@ -3,6 +3,8 @@
 
 WidgetDiskItemDelegate::WidgetDiskItemDelegate(QObject* parent) : QStyledItemDelegate(parent)
 {
+    adjust_dx = 4;
+    adjust_dy = 2;
 }
 //----------------------------------------------------------------------------------------------
 

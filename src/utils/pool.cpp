@@ -28,7 +28,7 @@ EteraThreadPool::EteraThreadPool()
     EteraAPI::init();
 
     for (int i = 0; i < QThread::idealThreadCount(); i++) {
-        EteraThread* thread = new EteraThread(&m_queue, &m_queue_mutex, &m_queue_wait);
+        EteraThread* thread = new EteraThread(&m_queue, &m_wait);
         m_threads.append(thread);
         thread->start();
     }
@@ -45,20 +45,11 @@ EteraThreadPool::~EteraThreadPool()
         m_threads[i]->stop();
 
     // очистка очереди
-    m_queue_mutex.lock();
-
-    for (int i = 0; i < m_queue.count(); i++) {
-        QRunnable* task = m_queue[i];
-        delete task;
-    }
-
     m_queue.clear();
-
-    m_queue_mutex.unlock();
 
     // даем возможность завершиться потокам самостоятельно
     while (m_threads.isEmpty() == false) {
-        m_queue_wait.wakeAll();
+        m_wait.wakeAll();
 
         int i = 0;
         while (i < m_threads.count()) {
@@ -73,12 +64,9 @@ EteraThreadPool::~EteraThreadPool()
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraThreadPool::start(QRunnable* task)
+void EteraThreadPool::start(QRunnable* task, EteraTaskPriority priority)
 {
-    m_queue_mutex.lock();
-    m_queue.enqueue(task);
-    m_queue_mutex.unlock();
-
-    m_queue_wait.wakeOne();
+    m_queue.enqueue(task, priority);
+    m_wait.wakeOne();
 }
 //----------------------------------------------------------------------------------------------

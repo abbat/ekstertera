@@ -34,8 +34,9 @@ class EteraThreadPool
         /*!
          * \brief Добавление задачи в очередь
          * \param task Задача
+         * \param priority Приоритет
          */
-        void start(QRunnable* task);
+        void start(QRunnable* task, EteraTaskPriority priority = etpNormal);
 
     private:
 
@@ -44,9 +45,8 @@ class EteraThreadPool
 
         QList<EteraThread*> m_threads;   /*!< \brief Список потоков */
 
-        EteraTaskQueue  m_queue;         /*!< \brief Очередь задач                        */
-        QMutex          m_queue_mutex;   /*!< \brief Блокировка очереди задач             */
-        QWaitCondition  m_queue_wait;    /*!< \brief Блокировка на появление новой задачи */
+        EteraTaskQueue m_queue;   /*!< \brief Очередь задач                        */
+        QWaitCondition m_wait;    /*!< \brief Блокировка на появление новой задачи */
 };
 
 #endif   // _ekstertera_pool_h_
