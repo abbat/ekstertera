@@ -17,6 +17,7 @@
 #include <QDebug>
 #include <QMutex>
 #include <QQueue>
+#include <QThread>
 #include <QObject>
 #include <QWidget>
 #include <QDialog>
@@ -36,7 +37,6 @@
 #include <QScrollBar>
 #include <QSslCipher>
 #include <QTextCodec>
-#include <QThreadPool>
 #include <QFormLayout>
 #include <QPushButton>
 #include <QSpacerItem>
