@@ -84,9 +84,10 @@ class EteraIconProvider : public QObject
          * \param icon Базовая иконка
          * \param scale Фактор уменьшения
          * \param center Центрировать меньшее изображение вместо масштабирования
+         * \param preview Рамка превью
          * \return Результирующая иконка
          */
-        QIcon prepareIcon(const QIcon& icon, int scale = 1, bool center = false);
+        QIcon prepareIcon(const QIcon& icon, int scale = 1, bool center = false, bool preview = false);
 
         /*!
          * \brief Добавление к стандартной иконке символа симлинка

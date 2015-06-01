@@ -25,7 +25,7 @@ void EteraThread::run()
             bool timedout = m_wait->wait(&m_mutex, 30000);
             m_mutex.unlock();
 
-            if (timedout == true)
+            if (timedout == false)
                 break;
         } else {
             task->run();

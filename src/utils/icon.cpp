@@ -108,7 +108,7 @@ EteraIconProvider::~EteraIconProvider()
 }
 //----------------------------------------------------------------------------------------------
 
-QIcon EteraIconProvider::prepareIcon(const QIcon& icon, int scale, bool center)
+QIcon EteraIconProvider::prepareIcon(const QIcon& icon, int scale, bool center, bool preview)
 {
     QIcon result;
 
@@ -131,6 +131,16 @@ QIcon EteraIconProvider::prepareIcon(const QIcon& icon, int scale, bool center)
 
                 pixmap = base_pixmap;
             }
+        }
+
+        if (preview == true) {
+            QPainter painter(&pixmap);
+
+            painter.setPen(Qt::black);
+            painter.drawRect(0, 0, size - 1, size - 1);
+
+            painter.setPen(QColor(0xbb, 0xbb, 0xbb));
+            painter.drawRect(1, 1, size - 3, size - 3);
         }
 
         result.addPixmap(pixmap);
@@ -401,7 +411,7 @@ void EteraIconProvider::task_on_get_preview_success(quint64 /*id*/, const QVaria
     QIcon icon;
     icon.addPixmap(pixmap);
 
-    icon = prepareIcon(icon);
+    icon = prepareIcon(icon, 1, false, true);
 
     m_preview_cache[source] = icon;
 
