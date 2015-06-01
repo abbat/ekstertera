@@ -8,7 +8,7 @@
 static quint64 g_task_id = 0;
 //----------------------------------------------------------------------------------------------
 
-EteraTask::EteraTask() : QObject(), QRunnable()
+EteraTask::EteraTask() : QObject()
 {
     m_api   = NULL;
     m_token = EteraSettings::instance()->token();

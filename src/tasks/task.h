@@ -11,9 +11,7 @@
 /*!
  * \brief Базовый класс для асинхронных вызовов API в QThreadPool
  */
-class EteraTask :
-    public QObject,
-    public QRunnable
+class EteraTask : public QObject
 {
     Q_OBJECT
 
@@ -21,6 +19,11 @@ class EteraTask :
 
         EteraTask();
         virtual ~EteraTask();
+
+        /*!
+         * \brief Выполнение задачи
+         */
+        virtual void run() = 0;
 
         /*!
          * \brief Добавление нестандартного аргумента к списку

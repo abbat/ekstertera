@@ -29,7 +29,6 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QSettings>
-#include <QRunnable>
 #include <QMimeData>
 #include <QFileInfo>
 #include <QTreeView>

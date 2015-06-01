@@ -23,15 +23,9 @@ EteraThreadPool* EteraThreadPool::instance()
 }
 //----------------------------------------------------------------------------------------------
 
-EteraThreadPool::EteraThreadPool()
+EteraThreadPool::EteraThreadPool() : QObject()
 {
     EteraAPI::init();
-
-    for (int i = 0; i < QThread::idealThreadCount(); i++) {
-        EteraThread* thread = new EteraThread(&m_queue, &m_wait);
-        m_threads.append(thread);
-        thread->start();
-    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -64,9 +58,45 @@ EteraThreadPool::~EteraThreadPool()
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraThreadPool::start(QRunnable* task, EteraTaskPriority priority)
+void EteraThreadPool::spawnThread()
+{
+    EteraThread* thread = new EteraThread(&m_queue, &m_wait);
+
+    connect(thread, SIGNAL(finished()), this, SLOT(on_thread_finished()));
+
+    m_threads.append(thread);
+
+    thread->start();
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraThreadPool::start(EteraTask* task, EteraTaskPriority priority)
 {
     m_queue.enqueue(task, priority);
+
+    if (m_threads.count() < QThread::idealThreadCount() || priority == etpHigh)
+        spawnThread();
+
     m_wait.wakeOne();
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraThreadPool::gcThreads()
+{
+    int i = 0;
+    while (i < m_threads.count()) {
+        EteraThread* thread = m_threads[i];
+        if (thread->isFinished() == true) {
+            delete thread;
+            m_threads.removeAt(i);
+        } else
+            i++;
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraThreadPool::on_thread_finished()
+{
+    gcThreads();
 }
 //----------------------------------------------------------------------------------------------

@@ -6,7 +6,7 @@
 #ifndef _ekstertera_queue_h_
 #define _ekstertera_queue_h_
 
-#include "sysheaders.h"
+#include "tasks/task.h"
 
 /*!
  * \brief Приоритет задачи
@@ -32,14 +32,14 @@ class EteraTaskQueue
          * \return Задача или NULL если очередь пуста
          * Задачи отдаются согласно приоритету
          */
-        QRunnable* dequeue();
+        EteraTask* dequeue();
 
         /*!
          * \brief Постановка задачи в очередь
          * \param task Задача
          * \param priority Приоритет
          */
-        void enqueue(QRunnable* task, EteraTaskPriority priority);
+        void enqueue(EteraTask* task, EteraTaskPriority priority);
 
         /*!
          * \brief Очистка очереди
@@ -51,7 +51,7 @@ class EteraTaskQueue
         /*!
          * \brief Тип для очереди задач
          */
-        typedef QQueue<QRunnable*> EteraRunnableQueue;
+        typedef QQueue<EteraTask*> EteraRunnableQueue;
 
         /*!
          * \brief Очистка очереди

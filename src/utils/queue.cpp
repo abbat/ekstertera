@@ -12,11 +12,11 @@ EteraTaskQueue::~EteraTaskQueue()
 }
 //----------------------------------------------------------------------------------------------
 
-QRunnable* EteraTaskQueue::dequeue()
+EteraTask* EteraTaskQueue::dequeue()
 {
     m_mutex.lock();
 
-    QRunnable* task = NULL;
+    EteraTask* task = NULL;
 
     if (m_high.isEmpty() == false)
         task = m_high.dequeue();
@@ -31,7 +31,7 @@ QRunnable* EteraTaskQueue::dequeue()
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraTaskQueue::enqueue(QRunnable* task, EteraTaskPriority priority = etpNormal)
+void EteraTaskQueue::enqueue(EteraTask* task, EteraTaskPriority priority = etpNormal)
 {
     m_mutex.lock();
 
@@ -56,7 +56,7 @@ void EteraTaskQueue::enqueue(QRunnable* task, EteraTaskPriority priority = etpNo
 void EteraTaskQueue::clearQueue(EteraRunnableQueue& queue)
 {
     for (int i = 0; i < queue.count(); i++) {
-        QRunnable* task = queue[i];
+        EteraTask* task = queue[i];
         delete task;
     }
 

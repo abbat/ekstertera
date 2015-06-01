@@ -17,17 +17,16 @@ EteraThread::~EteraThread()
 void EteraThread::run()
 {
     while (m_stopped == false) {
-        QRunnable* task = m_queue->dequeue();
+        EteraTask* task = m_queue->dequeue();
 
         if (task == NULL) {
             m_mutex.lock();
-            m_wait->wait(&m_mutex);
+            bool timedout = m_wait->wait(&m_mutex, 30000);
             m_mutex.unlock();
 
-            task = m_queue->dequeue();
-        }
-
-        if (task != NULL) {
+            if (timedout == true)
+                break;
+        } else {
             task->run();
             delete task;
         }

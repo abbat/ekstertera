@@ -43,4 +43,9 @@ class EteraThread : public QThread
         QWaitCondition* m_wait;      /*!< \brief Блокировка на появление новой задачи */
 };
 
+/*!
+ * \brief Список потоков для пула асинхронных задач
+ */
+typedef QList<EteraThread*> EteraThreadList;
+
 #endif   // _ekstertera_thread_h_

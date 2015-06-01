@@ -11,8 +11,10 @@
 /*!
  * \brief Пул потоков для асинхронных задач
  */
-class EteraThreadPool
+class EteraThreadPool : public QObject
 {
+    Q_OBJECT
+
     public:
 
         /*!
@@ -36,17 +38,27 @@ class EteraThreadPool
          * \param task Задача
          * \param priority Приоритет
          */
-        void start(QRunnable* task, EteraTaskPriority priority = etpNormal);
+        void start(EteraTask* task, EteraTaskPriority priority = etpNormal);
 
     private:
 
         EteraThreadPool();
         ~EteraThreadPool();
 
-        QList<EteraThread*> m_threads;   /*!< \brief Список потоков */
+        void gcThreads();     /*!< \brief Удаление завершившихся потоков */
+        void spawnThread();   /*!< \brief Запуск нового потока           */
 
-        EteraTaskQueue m_queue;   /*!< \brief Очередь задач                        */
-        QWaitCondition m_wait;    /*!< \brief Блокировка на появление новой задачи */
+        EteraTaskQueue  m_queue;     /*!< \brief Очередь задач                        */
+        QWaitCondition  m_wait;      /*!< \brief Блокировка на появление новой задачи */
+        EteraThreadList m_threads;   /*!< \brief Список потоков                       */
+
+    private slots:
+
+        /*!
+         * \brief Сигнал завершения рабочего потока
+         * Поток не дождался новых задач в течении периода ожидания
+         */
+        void on_thread_finished();
 };
 
 #endif   // _ekstertera_pool_h_
