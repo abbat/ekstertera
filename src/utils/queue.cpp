@@ -12,18 +12,18 @@ EteraTaskQueue::~EteraTaskQueue()
 }
 //----------------------------------------------------------------------------------------------
 
-EteraTask* EteraTaskQueue::dequeue()
+EteraTask* EteraTaskQueue::dequeue(EteraTaskPriority priority)
 {
     m_mutex.lock();
 
     EteraTask* task = NULL;
 
-    if (m_high.isEmpty() == false)
-        task = m_high.dequeue();
-    else if (m_normal.isEmpty() == false)
-        task = m_normal.dequeue();
-    else if (m_low.isEmpty() == false)
-        task = m_low.dequeue();
+    if (m_foreground.isEmpty() == false)
+        task = m_foreground.dequeue();
+    else if ((priority == etpIdle || priority == etpBackground) && m_background.isEmpty() == false)
+        task = m_background.dequeue();
+    else if (priority == etpIdle && m_idle.isEmpty() == false)
+        task = m_idle.dequeue();
 
     m_mutex.unlock();
 
@@ -31,19 +31,19 @@ EteraTask* EteraTaskQueue::dequeue()
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraTaskQueue::enqueue(EteraTask* task, EteraTaskPriority priority = etpNormal)
+void EteraTaskQueue::enqueue(EteraTask* task, EteraTaskPriority priority)
 {
     m_mutex.lock();
 
     switch (priority) {
-        case etpLow:
-            m_low.enqueue(task);
+        case etpForeground:
+            m_foreground.enqueue(task);
             break;
-        case etpNormal:
-            m_normal.enqueue(task);
+        case etpBackground:
+            m_background.enqueue(task);
             break;
-        case etpHigh:
-            m_high.enqueue(task);
+        case etpIdle:
+            m_idle.enqueue(task);
             break;
         default:
             delete task;
@@ -68,9 +68,9 @@ void EteraTaskQueue::clear()
 {
     m_mutex.lock();
 
-    clearQueue(m_low);
-    clearQueue(m_normal);
-    clearQueue(m_high);
+    clearQueue(m_foreground);
+    clearQueue(m_background);
+    clearQueue(m_idle);
 
     m_mutex.unlock();
 }

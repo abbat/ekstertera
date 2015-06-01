@@ -253,7 +253,7 @@ void WidgetDisk::changePath(const QString& path)
     connect(ls, SIGNAL(onSuccess(quint64, const EteraItemList&, const QVariantMap&)), this, SLOT(task_on_ls_success(quint64, const EteraItemList&, const QVariantMap&)));
     connect(ls, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_ls_error(quint64, int, const QString&, const QVariantMap&)));
 
-    EteraThreadPool::instance()->start(ls, etpHigh);
+    EteraThreadPool::instance()->start(ls, etpForeground);
 }
 //----------------------------------------------------------------------------------------------
 

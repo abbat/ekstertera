@@ -371,7 +371,7 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
     connect(get, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_get_preview_success(quint64, const QVariantMap&)));
     connect(get, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_get_preview_error(quint64, int, const QString&, const QVariantMap&)));
 
-    EteraThreadPool::instance()->start(get, etpLow);
+    EteraThreadPool::instance()->start(get, etpBackground);
 
     return false;
 }

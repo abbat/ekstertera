@@ -21,14 +21,21 @@ class EteraThread : public QThread
          * \brief Конструктор
          * \param queue Общая очередь задач
          * \param wait Блокировка на появление новой задачи
+         * \param destiny Предпочитаемый приоритет задач
          */
-        EteraThread(EteraTaskQueue* queue, QWaitCondition* wait);
+        EteraThread(EteraTaskQueue* queue, QWaitCondition* wait, EteraTaskPriority destiny = etpIdle);
         ~EteraThread();
 
         /*!
          * \brief Остановка разбора очереди задач
          */
         void stop() { m_stopped = true; }
+
+        /*!
+         * \brief Предпочитаемый приоритет задач
+         * \return Предпочитаемый приоритет задач
+         */
+        EteraTaskPriority destiny() const { return m_destiny; }
 
     protected:
 
@@ -37,10 +44,11 @@ class EteraThread : public QThread
 
     private:
 
-        bool            m_stopped;   /*!< \brief Флаг необходимости завершения работы */
-        QMutex          m_mutex;     /*!< \brief Блокировка для m_wait                */
-        EteraTaskQueue* m_queue;     /*!< \brief Очередь задач                        */
-        QWaitCondition* m_wait;      /*!< \brief Блокировка на появление новой задачи */
+        bool              m_stopped;   /*!< \brief Флаг необходимости завершения работы */
+        QMutex            m_mutex;     /*!< \brief Блокировка для m_wait                */
+        EteraTaskQueue*   m_queue;     /*!< \brief Очередь задач                        */
+        QWaitCondition*   m_wait;      /*!< \brief Блокировка на появление новой задачи */
+        EteraTaskPriority m_destiny;   /*!< \brief Предпочитаемый приоритет задач       */
 };
 
 /*!

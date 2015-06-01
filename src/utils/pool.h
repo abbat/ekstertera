@@ -38,15 +38,28 @@ class EteraThreadPool : public QObject
          * \param task Задача
          * \param priority Приоритет
          */
-        void start(EteraTask* task, EteraTaskPriority priority = etpNormal);
+        void start(EteraTask* task, EteraTaskPriority priority = etpIdle);
 
     private:
 
         EteraThreadPool();
         ~EteraThreadPool();
 
-        void gcThreads();     /*!< \brief Удаление завершившихся потоков */
-        void spawnThread();   /*!< \brief Запуск нового потока           */
+        /*!
+         * \brief Удаление завершившихся потоков
+         */
+        void gcThreads();
+
+        /*!
+         * \brief Запуск нового потока
+         * \param destiny Предпочитаемый приоритет задач
+         */
+        void spawnThread(EteraTaskPriority destiny = etpIdle);
+
+        int m_max_threads;          /*!< \brief Максимальное число потоков    */
+        int m_foreground_threads;   /*!< \brief Количество foreground потоков */
+        int m_background_threads;   /*!< \brief Количество background потоков */
+        int m_idle_threads;         /*!< \brief Количество idle потоков       */
 
         EteraTaskQueue  m_queue;     /*!< \brief Очередь задач                        */
         QWaitCondition  m_wait;      /*!< \brief Блокировка на появление новой задачи */

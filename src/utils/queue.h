@@ -12,9 +12,9 @@
  * \brief Приоритет задачи
  */
 typedef enum {
-    etpLow,      /*!< \brief Низкий (загрузка превью)          */
-    etpNormal,   /*!< \brief Нормальный (загрузка файлов)      */
-    etpHigh      /*!< \brief Высокий (получение списка файлов) */
+    etpForeground,   /*!< \brief Задачи отзывчивости UI    */
+    etpBackground,   /*!< \brief Фоновые задачи UI         */
+    etpIdle          /*!< \brief Задачи некритичные для UI */
 } EteraTaskPriority;
 
 /*!
@@ -29,10 +29,10 @@ class EteraTaskQueue
 
         /*!
          * \brief Получение задачи из очереди
-         * \return Задача или NULL если очередь пуста
-         * Задачи отдаются согласно приоритету
+         * \param priority Минимально требуемый приоритет задачи
+         * \return Задача или NULL если очередь с требуемым приоритетом пуста
          */
-        EteraTask* dequeue();
+        EteraTask* dequeue(EteraTaskPriority priority);
 
         /*!
          * \brief Постановка задачи в очередь
@@ -58,10 +58,10 @@ class EteraTaskQueue
          */
         void clearQueue(EteraRunnableQueue& queue);
 
-        QMutex             m_mutex;    /*!< \brief Блокировка для доступа                 */
-        EteraRunnableQueue m_low;      /*!< \brief Очередь задач с низким приоритетом     */
-        EteraRunnableQueue m_normal;   /*!< \brief Очередь задач с нормальным приоритетом */
-        EteraRunnableQueue m_high;     /*!< \brief Очередь задач с высоким приоритетом    */
+        QMutex             m_mutex;        /*!< \brief Блокировка для доступа           */
+        EteraRunnableQueue m_foreground;   /*!< \brief Очередь задач критичных для UI   */
+        EteraRunnableQueue m_background;   /*!< \brief Очередь фоновых задач UI         */
+        EteraRunnableQueue m_idle;         /*!< \brief Очередь задач некритичных для UI */
 };
 
 #endif   // _ekstertera_queue_h_
