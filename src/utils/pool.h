@@ -56,14 +56,20 @@ class EteraThreadPool : public QObject
          */
         void spawnThread(EteraTaskPriority destiny = etpIdle);
 
-        int m_max_threads;          /*!< \brief Максимальное число потоков    */
+        EteraTaskQueue  m_queue;     /*!< \brief Очередь задач  */
+        EteraThreadList m_threads;   /*!< \brief Список потоков */
+
+        int m_max_foreground_threads;   /*!< \brief Максимальное число foreground потоков */
+        int m_max_background_threads;   /*!< \brief Максимальное число background потоков */
+        int m_max_idle_threads;         /*!< \brief Максимальное число idle потоков       */
+
         int m_foreground_threads;   /*!< \brief Количество foreground потоков */
         int m_background_threads;   /*!< \brief Количество background потоков */
         int m_idle_threads;         /*!< \brief Количество idle потоков       */
 
-        EteraTaskQueue  m_queue;     /*!< \brief Очередь задач                        */
-        QWaitCondition  m_wait;      /*!< \brief Блокировка на появление новой задачи */
-        EteraThreadList m_threads;   /*!< \brief Список потоков                       */
+        QWaitCondition  m_foreground_wait;   /*!< \brief Блокировка на появление новой foreground задачи */
+        QWaitCondition  m_background_wait;   /*!< \brief Блокировка на появление новой background задачи */
+        QWaitCondition  m_idle_wait;         /*!< \brief Блокировка на появление новой idle задачи       */
 
     private slots:
 

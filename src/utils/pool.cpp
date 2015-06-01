@@ -27,7 +27,15 @@ EteraThreadPool::EteraThreadPool() : QObject()
 {
     EteraAPI::init();
 
-    m_max_threads        = QThread::idealThreadCount() < 4 ? 4 : QThread::idealThreadCount();
+    m_max_idle_threads = QThread::idealThreadCount();
+    if (m_max_idle_threads < 4)
+        m_max_idle_threads = 4;
+    else if (m_max_idle_threads > 8)
+        m_max_idle_threads = 8;
+
+    m_max_background_threads = m_max_idle_threads / 2;
+    m_max_foreground_threads = m_max_idle_threads / 4;
+
     m_foreground_threads = 0;
     m_background_threads = 0;
     m_idle_threads       = 0;
@@ -48,7 +56,9 @@ EteraThreadPool::~EteraThreadPool()
 
     // даем возможность завершиться потокам самостоятельно
     while (m_threads.isEmpty() == false) {
-        m_wait.wakeAll();
+        m_idle_wait.wakeAll();
+        m_background_wait.wakeAll();
+        m_foreground_wait.wakeAll();
 
         int i = 0;
         while (i < m_threads.count()) {
@@ -65,13 +75,24 @@ EteraThreadPool::~EteraThreadPool()
 
 void EteraThreadPool::spawnThread(EteraTaskPriority destiny)
 {
+    QWaitCondition* wait = NULL;
+
     switch (destiny) {
-        case etpForeground: m_foreground_threads++; break;
-        case etpBackground: m_background_threads++; break;
-        case etpIdle:       m_idle_threads++;       break;
+        case etpForeground:
+            wait = &m_foreground_wait;
+            m_foreground_threads++;
+            break;
+        case etpBackground:
+            wait = &m_background_wait;
+            m_background_threads++;
+            break;
+        case etpIdle:
+            wait = &m_idle_wait;
+            m_idle_threads++;
+            break;
     }
 
-    EteraThread* thread = new EteraThread(&m_queue, &m_wait, destiny);
+    EteraThread* thread = new EteraThread(&m_queue, wait, destiny);
 
     connect(thread, SIGNAL(finished()), this, SLOT(on_thread_finished()));
 
@@ -85,10 +106,20 @@ void EteraThreadPool::start(EteraTask* task, EteraTaskPriority priority)
 {
     m_queue.enqueue(task, priority);
 
-    if (m_threads.count() < m_max_threads /*|| priority == etpForeground*/)
-        spawnThread();
-
-    m_wait.wakeOne();
+    if (m_idle_threads < m_max_idle_threads)
+        spawnThread(etpIdle);
+    else if (priority == etpForeground) {
+        if (m_foreground_threads < m_max_foreground_threads)
+            spawnThread(etpForeground);
+        else
+            m_foreground_wait.wakeOne();
+    } else if (priority == etpBackground) {
+        if (m_background_threads < m_max_background_threads)
+            spawnThread(etpBackground);
+        else
+            m_background_wait.wakeOne();
+    } else
+        m_idle_wait.wakeOne();
 }
 //----------------------------------------------------------------------------------------------
 
