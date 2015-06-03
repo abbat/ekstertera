@@ -1417,6 +1417,9 @@ void WidgetDisk::setPreviewMode(bool mode)
 {
     m_preview_mode = mode;
 
+    if (m_preview_mode == false)
+        EteraThreadPool::instance()->purge(etpBackground);
+
     for (int i = 0; i < m_explorer->count(); i++) {
         WidgetDiskItem* item = static_cast<WidgetDiskItem*>(m_explorer->item(i));
         item->update(m_preview_mode);

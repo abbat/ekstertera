@@ -1,3 +1,10 @@
+ekstertera (0.0.13) unstable; urgency=low
+
+  * Загрузка превью;
+  * Попытка улучшения отзывчивости UI.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Wed, 03 Jun 2015 21:00:00 +0300
+
 ekstertera (0.0.12) unstable; urgency=low
 
   * Нестанадртная отрисовка элементов в проводнике;
