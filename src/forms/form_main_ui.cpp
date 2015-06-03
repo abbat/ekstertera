@@ -218,5 +218,6 @@ void FormMainUI::restore()
         m_menu_view_zoom_in->setEnabled(false);
 
     m_menu_view_preview->setChecked(settings.value("app/preview", false).toBool());
+    m_widget_disk->setPreviewMode(m_menu_view_preview->isChecked());
 }
 //----------------------------------------------------------------------------------------------
