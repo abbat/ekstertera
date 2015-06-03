@@ -239,6 +239,9 @@ void WidgetDisk::changePath(const QString& path)
 {
     m_explorer->setCursor(Qt::BusyCursor);
 
+    if (m_preview_mode == true)
+        EteraThreadPool::instance()->purge(etpBackground);
+
     m_path = "";
     m_explorer->clear();
 

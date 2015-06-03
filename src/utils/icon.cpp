@@ -100,11 +100,17 @@ EteraIconProvider::EteraIconProvider() : QObject()
 
         map++;
     }
+
+    m_preview_cache_size       = 0;
+    m_preview_cache_link_size  = 0;
+    m_preview_cache_size_limit = 100 * 1024 * 1024; // TODO: сделать настраиваемым, 100MB ~> 3 тыс. превьюшек
 }
 //----------------------------------------------------------------------------------------------
 
 EteraIconProvider::~EteraIconProvider()
 {
+    clearPreviewCache(&m_preview_cache);
+    clearPreviewCache(&m_preview_cache_link);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -351,25 +357,47 @@ QIcon EteraIconProvider::icon(const EteraItem* item)
 
 bool EteraIconProvider::preview(WidgetDiskItem* item)
 {
+    QDateTime now = QDateTime::currentDateTime();
+
     const EteraItem* eitem = item->item();
 
     QString preview = eitem->preview();
 
     if (eitem->isPublic() == true) {
-        if (m_preview_cache_link.contains(preview) == true) {
-            item->setIcon(m_preview_cache_link[preview]);
+        EteraPreviewCacheItem* citem = m_preview_cache_link.value(preview, NULL);
+
+        if (citem != NULL) {
+            citem->ATime = now;
+            item->setIcon(citem->Icon);
             return true;
         }
 
-        if (m_preview_cache.contains(preview) == true) {
-            QIcon link_icon = addLinkIcon(m_preview_cache[preview]);
-            m_preview_cache_link[preview] = link_icon;
-            item->setIcon(link_icon);
+        citem = m_preview_cache.value(preview, NULL);
+
+        if (citem != NULL) {
+            citem->ATime = now;
+
+            EteraPreviewCacheItem* litem = new EteraPreviewCacheItem();
+
+            litem->Icon  = addLinkIcon(citem->Icon);
+            litem->Size  = citem->Size;
+            litem->ATime = now;
+
+            m_preview_cache_link[preview] = litem;
+            m_preview_cache_link_size += litem->Size;
+
+            item->setIcon(litem->Icon);
+
             return true;
         }
-    } else if (m_preview_cache.contains(preview) == true) {
-        item->setIcon(m_preview_cache[preview]);
-        return true;
+    } else {
+        EteraPreviewCacheItem* citem = m_preview_cache.value(preview, NULL);
+
+        if (citem != NULL) {
+            citem->ATime = now;
+            item->setIcon(citem->Icon);
+            return true;
+        }
     }
 
     item->setIcon(icon(eitem));
@@ -397,6 +425,7 @@ void EteraIconProvider::cancelPreview(const WidgetDiskItem* item)
 
 void EteraIconProvider::task_on_get_preview_success(quint64 /*id*/, const QVariantMap& args)
 {
+    QDateTime  now    = QDateTime::currentDateTime();
     QString    source = args["source"].toString();
     QByteArray target = args["target"].toByteArray();
 
@@ -413,20 +442,37 @@ void EteraIconProvider::task_on_get_preview_success(quint64 /*id*/, const QVaria
 
     icon = prepareIcon(icon, 1, false, true);
 
-    m_preview_cache[source] = icon;
+    EteraPreviewCacheItem* citem = new EteraPreviewCacheItem();
+
+    citem->Icon  = icon;
+    citem->Size  = target.size();
+    citem->ATime = now;
+
+    m_preview_cache[source] = citem;
+    m_preview_cache_size += citem->Size;
 
     WidgetDiskItem* item = m_preview_wait.value(source, NULL);
     if (item != NULL) {
         m_preview_wait.remove(source);
 
         if (item->item()->isPublic() == false)
-            item->setIcon(icon);
+            item->setIcon(citem->Icon);
         else {
-            QIcon link_icon = addLinkIcon(icon);
-            m_preview_cache_link[source] = link_icon;
-            item->setIcon(link_icon);
+            EteraPreviewCacheItem* litem = new EteraPreviewCacheItem();
+
+            litem->Icon  = addLinkIcon(citem->Icon);
+            litem->Size  = citem->Size;
+            litem->ATime = now;
+
+            m_preview_cache_link[source] = litem;
+            m_preview_cache_link_size += litem->Size;
+
+            item->setIcon(litem->Icon);
         }
     }
+
+    if (m_preview_cache_size + m_preview_cache_link_size > m_preview_cache_size_limit)
+        gcPreviewCache();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -434,5 +480,68 @@ void EteraIconProvider::task_on_get_preview_error(quint64 /*id*/, int /*code*/, 
 {
     QString source = args["source"].toString();
     m_preview_wait.remove(source);
+
+    if (m_preview_cache_size + m_preview_cache_link_size > m_preview_cache_size_limit)
+        gcPreviewCache();
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraIconProvider::clearPreviewCache(EteraPreviewCache* cache)
+{
+    EteraPreviewCache::const_iterator i = cache->constBegin();
+    while (i != cache->constEnd()) {
+        EteraPreviewCacheItem* item = i.value();
+        delete item;
+        ++i;
+    }
+
+    cache->clear();
+
+    if (cache == &m_preview_cache)
+        m_preview_cache_size = 0;
+    else if (cache == &m_preview_cache_link)
+        m_preview_cache_link_size = 0;
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraIconProvider::gcPreviewCache()
+{
+    // пока что простой LRU
+    QMap<QDateTime, QUrl> map;
+
+    EteraPreviewCache::const_iterator i = m_preview_cache.constBegin();
+    while (i != m_preview_cache.constEnd()) {
+        map[i.value()->ATime] = i.key();
+        ++i;
+    }
+
+    i = m_preview_cache_link.constBegin();
+    while (i != m_preview_cache_link.constEnd()) {
+        map[i.value()->ATime] = i.key();
+        ++i;
+    }
+
+    quint64 threshold = m_preview_cache_size_limit / 4 * 3;
+
+    QMap<QDateTime, QUrl>::const_iterator j = map.constBegin();
+    while (m_preview_cache_size + m_preview_cache_link_size > threshold) {
+        QUrl url = j.value();
+
+        EteraPreviewCacheItem* item = m_preview_cache.value(url, NULL);
+        if (item != NULL) {
+            m_preview_cache_size -= item->Size;
+            delete item;
+            m_preview_cache.remove(url);
+        }
+
+        item = m_preview_cache_link.value(url, NULL);
+        if (item != NULL) {
+            m_preview_cache_link_size -= item->Size;
+            delete item;
+            m_preview_cache_link.remove(url);
+        }
+
+        ++j;
+    }
 }
 //----------------------------------------------------------------------------------------------

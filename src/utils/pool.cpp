@@ -148,3 +148,9 @@ void EteraThreadPool::on_thread_finished()
     gcThreads();
 }
 //----------------------------------------------------------------------------------------------
+
+void EteraThreadPool::purge(EteraTaskPriority priority)
+{
+    m_queue.purge(priority);
+}
+//----------------------------------------------------------------------------------------------

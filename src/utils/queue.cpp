@@ -75,3 +75,23 @@ void EteraTaskQueue::clear()
     m_mutex.unlock();
 }
 //----------------------------------------------------------------------------------------------
+
+void EteraTaskQueue::purge(EteraTaskPriority priority)
+{
+    m_mutex.lock();
+
+    switch (priority) {
+        case etpForeground:
+            clearQueue(m_foreground);
+            break;
+        case etpBackground:
+            clearQueue(m_background);
+            break;
+        case etpIdle:
+            clearQueue(m_idle);
+            break;
+    }
+
+    m_mutex.unlock();
+}
+//----------------------------------------------------------------------------------------------

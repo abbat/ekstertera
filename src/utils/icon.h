@@ -167,9 +167,43 @@ class EteraIconProvider : public QObject
         QMap<EteraItemMediaType, QIcon> m_media_icon;        /*!< \brief Карта иконок по медиа типу           */
         QMap<EteraItemMediaType, QIcon> m_media_icon_link;   /*!< \brief Карта публичных иконок по медиа типу */
 
-        QMap<QUrl, WidgetDiskItem*> m_preview_wait;         /*!< \brief Карта ожидающих превью           */
-        QMap<QUrl, QIcon>           m_preview_cache;        /*!< \brief Карта иконок по превью           */
-        QMap<QUrl, QIcon>           m_preview_cache_link;   /*!< \brief Карта публичных иконок по превью */
+        /*!
+         * \brief Элемент кэша превью
+         */
+        typedef struct {
+            QIcon     Icon;    /*!< \brief Иконка                   */
+            quint64   Size;    /*!< \brief Исходный объем           */
+            QDateTime ATime;   /*!< \brief Время последнего доступа */
+        } EteraPreviewCacheItem;
+
+        /*!
+         * \brief Кэш превью
+         */
+        typedef QMap<QUrl, EteraPreviewCacheItem*> EteraPreviewCache;
+
+        /*!
+         * \brief Кэш ожидающих превью
+         */
+        typedef QMap<QUrl, WidgetDiskItem*> EteraPreviewWaitCache;
+
+        EteraPreviewWaitCache m_preview_wait;         /*!< \brief Карта ожидающих превью           */
+        EteraPreviewCache     m_preview_cache;        /*!< \brief Карта иконок по превью           */
+        EteraPreviewCache     m_preview_cache_link;   /*!< \brief Карта публичных иконок по превью */
+
+        quint64 m_preview_cache_size;         /*!< \brief Размер иконок превью            */
+        quint64 m_preview_cache_link_size;    /*!< \brief Размер публичных иконок превью  */
+        quint64 m_preview_cache_size_limit;   /*!< \brief Максимальный размер кэша превью */
+
+        /*!
+         * \brief Очистка кэша превью
+         * \param cache Кэш
+         */
+        void clearPreviewCache(EteraPreviewCache* cache);
+
+        /*!
+         * \brief Уменьшение размера кэша превью
+         */
+        void gcPreviewCache();
 
 #ifdef ETERA_WS_X11_OR_WIN
         QMap<QString, QIcon> m_cache_icon;        /*!< \brief Карта иконок             */

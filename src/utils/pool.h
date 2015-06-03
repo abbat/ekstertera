@@ -40,6 +40,12 @@ class EteraThreadPool : public QObject
          */
         void start(EteraTask* task, EteraTaskPriority priority = etpIdle);
 
+        /*!
+         * \brief Очистка очереди по приоритету
+         * \param priority Приоритет
+         */
+        void purge(EteraTaskPriority priority);
+
     private:
 
         EteraThreadPool();

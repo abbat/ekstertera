@@ -12,9 +12,9 @@
  * \brief Приоритет задачи
  */
 typedef enum {
-    etpForeground,   /*!< \brief Задачи отзывчивости UI    */
-    etpBackground,   /*!< \brief Фоновые задачи UI         */
-    etpIdle          /*!< \brief Задачи некритичные для UI */
+    etpForeground,   /*!< \brief Задачи отзывчивости UI (загрузка списка файлов и директорий) */
+    etpBackground,   /*!< \brief Фоновые задачи UI (загрузка превью)                          */
+    etpIdle          /*!< \brief Задачи некритичные для UI (upload / download)                */
 } EteraTaskPriority;
 
 /*!
@@ -45,6 +45,12 @@ class EteraTaskQueue
          * \brief Очистка очереди
          */
         void clear();
+
+        /*!
+         * \brief Очистка очереди по приоритету
+         * \param priority Приоритет
+         */
+        void purge(EteraTaskPriority priority);
 
     private:
 
