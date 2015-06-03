@@ -47,9 +47,10 @@ class FormMain : public FormMainUI
         void menu_edit_settings_triggered();   /*!< \brief Параметры / Настройки */
 
         // Вид
-        void menu_view_refresh_triggered();    /*!< \brief Обновить  */
-        void menu_view_zoom_in_triggered();    /*!< \brief Увеличить */
-        void menu_view_zoom_out_triggered();   /*!< \brief Уменьшить */
+        void menu_view_refresh_triggered();    /*!< \brief Обновить     */
+        void menu_view_zoom_in_triggered();    /*!< \brief Увеличить    */
+        void menu_view_zoom_out_triggered();   /*!< \brief Уменьшить    */
+        void menu_view_preview_changed();      /*!< \brief Предпросмотр */
 
         // ?
         void menu_help_about_triggered();      /*!< \brief ? / О программе */

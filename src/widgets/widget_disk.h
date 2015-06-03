@@ -75,6 +75,12 @@ class WidgetDisk : public QTabWidget
         int setZoomFactor(int factor);
 
         /*!
+         * \brief Установка режима предпросмотра
+         * \param mode Режим
+         */
+        void setPreviewMode(bool mode);
+
+        /*!
          * \brief Пункты контекстного меню
          * \return Список пунктов
          */
@@ -113,6 +119,11 @@ class WidgetDisk : public QTabWidget
          * \brief Текущий индекс размера иконок
          */
         int m_icon_size_index;
+
+        /*!
+         * \brief Режим предпросмотра
+         */
+        bool m_preview_mode;
 
         /*!
          * Виджет списка файлов и директорий

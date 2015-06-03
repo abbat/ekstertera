@@ -77,6 +77,11 @@ FormMainUI::FormMainUI() : QMainWindow()
     m_menu_view_zoom_out = m_menu_view->addAction(QIcon::fromTheme("zoom-out", QIcon(":/icons/gnome/zoom-out32.png")), "");
     m_menu_view_zoom_out->setShortcut(QKeySequence(QKeySequence::ZoomOut));
 
+    m_menu_view->addSeparator();
+
+    m_menu_view_preview = m_menu_view->addAction("");
+    m_menu_view_preview->setCheckable(true);
+
     //
     // меню "?"
     //
@@ -174,6 +179,7 @@ void FormMainUI::retranslateUi()
     m_menu_view_refresh->setText(trUtf8("Обновить"));
     m_menu_view_zoom_in->setText(trUtf8("Увеличить"));
     m_menu_view_zoom_out->setText(trUtf8("Уменьшить"));
+    m_menu_view_preview->setText(trUtf8("Предпросмотр"));
 
     m_menu_help->setTitle(trUtf8("&?"));
 
@@ -194,7 +200,8 @@ void FormMainUI::save()
 {
     QSettings settings;
     settings.setValue("layout/main", this->saveGeometry());
-    settings.setValue("app/zoom", m_widget_disk->zoomFactor());
+    settings.setValue("app/zoom",    m_widget_disk->zoomFactor());
+    settings.setValue("app/preview", m_menu_view_preview->isChecked());
 }
 //----------------------------------------------------------------------------------------------
 
@@ -209,5 +216,7 @@ void FormMainUI::restore()
         m_menu_view_zoom_out->setEnabled(false);
     else if (zoom > 0)
         m_menu_view_zoom_in->setEnabled(false);
+
+    m_menu_view_preview->setChecked(settings.value("app/preview", false).toBool());
 }
 //----------------------------------------------------------------------------------------------

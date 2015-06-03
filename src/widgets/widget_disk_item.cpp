@@ -4,9 +4,9 @@
 #include "utils/settings.h"
 //----------------------------------------------------------------------------------------------
 
-WidgetDiskItem::WidgetDiskItem(QListWidget* parent, const EteraItem& item) : QListWidgetItem(parent, QListWidgetItem::UserType)
+WidgetDiskItem::WidgetDiskItem(QListWidget* parent, const EteraItem& item, bool preview) : QListWidgetItem(parent, QListWidgetItem::UserType)
 {
-    replaceItem(item);
+    replaceItem(item, preview);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -30,13 +30,13 @@ bool WidgetDiskItem::operator<(const QListWidgetItem& other) const
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDiskItem::update()
+void WidgetDiskItem::update(bool preview)
 {
     EteraIconProvider* icon_provider = EteraIconProvider::instance();
 
     setText(m_item.name());
 
-    if (EteraSettings::instance()->preview() == false || m_item.preview().isEmpty() == true)
+    if (preview == false || m_item.preview().isEmpty() == true)
         setIcon(icon_provider->icon(&m_item));
     else
         icon_provider->preview(this);
@@ -49,9 +49,10 @@ void WidgetDiskItem::revertText()
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDiskItem::replaceItem(const EteraItem& item)
+void WidgetDiskItem::replaceItem(const EteraItem& item, bool preview)
 {
     m_item = item;
-    update();
+
+    update(preview);
 }
 //----------------------------------------------------------------------------------------------

@@ -39,6 +39,5 @@ void EteraSettings::reload()
     m_language      = settings.value("app/language", "").toString();
     m_token         = settings.value("api/token",    "").toString();
     m_close_to_tray = settings.value("app/tray",      1).toBool();
-    m_preview       = false;
 }
 //----------------------------------------------------------------------------------------------

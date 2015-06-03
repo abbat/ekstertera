@@ -19,6 +19,7 @@ FormMain::FormMain() : FormMainUI()
     connect(m_menu_view_refresh,  SIGNAL(triggered()), this, SLOT(menu_view_refresh_triggered()));
     connect(m_menu_view_zoom_in,  SIGNAL(triggered()), this, SLOT(menu_view_zoom_in_triggered()));
     connect(m_menu_view_zoom_out, SIGNAL(triggered()), this, SLOT(menu_view_zoom_out_triggered()));
+    connect(m_menu_view_preview,  SIGNAL(changed()),   this, SLOT(menu_view_preview_changed()));
 
     // меню "?"
     connect(m_menu_about,    SIGNAL(triggered()), this, SLOT(menu_help_about_triggered()));
@@ -108,6 +109,12 @@ void FormMain::menu_view_zoom_out_triggered()
         m_menu_view_zoom_out->setEnabled(false);
 
     m_menu_view_zoom_in->setEnabled(true);
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::menu_view_preview_changed()
+{
+    m_widget_disk->setPreviewMode(m_menu_view_preview->isChecked());
 }
 //----------------------------------------------------------------------------------------------
 

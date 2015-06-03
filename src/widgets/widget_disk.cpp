@@ -13,6 +13,8 @@
 
 WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 {
+    m_preview_mode = false;
+
     m_explorer = new QListWidget(this);
 
     m_explorer->setWrapping(true);
@@ -221,7 +223,7 @@ void WidgetDisk::task_on_ls_success(quint64 id, const EteraItemList& list, const
     m_explorer->clear();
 
     for (int i = 0; i < list.count(); i++)
-        new WidgetDiskItem(m_explorer, list[i]);
+        new WidgetDiskItem(m_explorer, list[i], m_preview_mode);
 
     emit onPathChanged(path);
 
@@ -310,7 +312,7 @@ void WidgetDisk::task_on_mkdir_error(quint64 id, int code, const QString& error,
 void WidgetDisk::task_on_mkdir_success(quint64 id, const EteraItem& item, const QVariantMap& /*args*/)
 {
     if (item.parentPath() == m_path)
-        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item), QItemSelectionModel::ClearAndSelect);
+        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
     m_tasks->removeSimpleTask(id);
 }
@@ -370,7 +372,7 @@ void WidgetDisk::task_on_copy_paste_error(quint64 id, int code, const QString& e
 void WidgetDisk::task_on_copy_paste_success(quint64 id, const EteraItem& item, const QVariantMap& args)
 {
     if (item.parentPath() == m_path)
-        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item), QItemSelectionModel::ClearAndSelect);
+        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
     QString source = args["source"].toString();
 
@@ -401,7 +403,7 @@ void WidgetDisk::task_on_cut_paste_error(quint64 id, int code, const QString& er
 void WidgetDisk::task_on_cut_paste_success(quint64 id, const EteraItem& item, const QVariantMap& args)
 {
     if (item.parentPath() == m_path)
-        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item), QItemSelectionModel::ClearAndSelect);
+        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
     QString source = args["source"].toString();
 
@@ -559,7 +561,7 @@ void WidgetDisk::task_on_rename_success(quint64 id, const EteraItem& item, const
     // замена описателя
     WidgetDiskItem* witem = findByPath(source);
     if (witem != NULL)
-        witem->replaceItem(item);
+        witem->replaceItem(item, m_preview_mode);
 
     m_tasks->removeSimpleTask(id);
 }
@@ -892,9 +894,9 @@ void WidgetDisk::task_on_put_file_success(quint64 id, const EteraItem& item, con
         WidgetDiskItem* witem = findByPath(item.path());
 
         if (witem == NULL)
-            m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item), QItemSelectionModel::ClearAndSelect);
+            m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
         else
-            witem->replaceItem(item);
+            witem->replaceItem(item, m_preview_mode);
     }
 
     m_tasks->removeChildTask(id);
@@ -954,7 +956,7 @@ void WidgetDisk::task_on_put_dir_error(quint64 id, int code, const QString& erro
 void WidgetDisk::task_on_put_dir_success(quint64 id, const EteraItem& item, const QVariantMap& args)
 {
     if (item.parentPath() == m_path)
-        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item), QItemSelectionModel::ClearAndSelect);
+        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
     QString source    = args["source"].toString();
     QString target    = args["target"].toString();
@@ -1295,7 +1297,7 @@ void WidgetDisk::task_on_share_success(quint64 id, const EteraItem& item, const 
     WidgetDiskItem* witem = findByPath(item.path());
 
     if (witem != NULL)
-        witem->replaceItem(item);
+        witem->replaceItem(item, m_preview_mode);
 
     m_tasks->removeSimpleTask(id);
 }
@@ -1316,7 +1318,7 @@ void WidgetDisk::task_on_revoke_success(quint64 id, const EteraItem& item, const
     WidgetDiskItem* witem = findByPath(item.path());
 
     if (witem != NULL)
-        witem->replaceItem(item);
+        witem->replaceItem(item, m_preview_mode);
 
     m_tasks->removeSimpleTask(id);
 }
@@ -1405,5 +1407,16 @@ bool WidgetDisk::zoomOut()
     m_explorer->setIconSize(QSize(size, size));
 
     return (m_icon_size_index == 0 ? false : true);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::setPreviewMode(bool mode)
+{
+    m_preview_mode = mode;
+
+    for (int i = 0; i < m_explorer->count(); i++) {
+        WidgetDiskItem* item = static_cast<WidgetDiskItem*>(m_explorer->item(i));
+        item->update(m_preview_mode);
+    }
 }
 //----------------------------------------------------------------------------------------------

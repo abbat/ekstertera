@@ -46,6 +46,7 @@ class FormMainUI : public QMainWindow
             QAction* m_menu_view_refresh;    /*!< \brief Вид / Обновить     */
             QAction* m_menu_view_zoom_in;    /*!< \brief Вид / Увеличить    */
             QAction* m_menu_view_zoom_out;   /*!< \brief Вид / Уменьшить    */
+            QAction* m_menu_view_preview;    /*!< \brief Вид / Предпросмотр */
           QMenu*     m_menu_help;            /*!< \brief ? / ...            */
             QAction* m_menu_about;           /*!< \brief ? / О программе    */
             QAction* m_menu_about_qt;        /*!< \brief ? / О Qt           */

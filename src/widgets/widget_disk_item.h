@@ -19,8 +19,9 @@ class WidgetDiskItem : public QListWidgetItem
          * \brief Конструктор
          * \param parent Родительский виджет
          * \param item Описатель элемента на диске
+         * \param preview Флаг предпросмотра
          */
-        WidgetDiskItem(QListWidget* parent, const EteraItem& item);
+        WidgetDiskItem(QListWidget* parent, const EteraItem& item, bool preview);
         ~WidgetDiskItem();
 
         /*!
@@ -32,13 +33,20 @@ class WidgetDiskItem : public QListWidgetItem
         /*!
          * \brief Замена описателя элемента
          * \param item Описатель элемента
+         * \param preview Флаг предпросмотра
          */
-        void replaceItem(const EteraItem& item);
+        void replaceItem(const EteraItem& item, bool preview);
 
         /*!
          * \brief Откат текста элемента
          */
         void revertText();
+
+        /*!
+         * \brief Обновление внешнего вида
+         * \param preview Флаг предпросмотра
+         */
+        void update(bool preview);
 
         /*!
          * Перегрузка оператора для сортировки
@@ -51,11 +59,6 @@ class WidgetDiskItem : public QListWidgetItem
          * \brief Описатель объекта диска
          */
         EteraItem m_item;
-
-        /*!
-         * \brief Обновление внешнего вида
-         */
-        void update();
 };
 
 #endif   // _ekstertera_widgets_widget_disk_item_h_
