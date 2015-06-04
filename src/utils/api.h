@@ -294,7 +294,7 @@ class EteraAPI : public QObject
          * \brief Конструктор
          * \param noprogress Не посылать сигналы прогресса операции
          */
-        EteraAPI(bool noprogress = false);
+        EteraAPI(QObject* parent = NULL, bool noprogress = false);
         ~EteraAPI();
 
         /*!
@@ -363,7 +363,7 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение информации о диске
-         * Сигнал onInfo
+         * Сигнал onINFO
          */
         void info();
 
@@ -379,6 +379,7 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение списка объектов на диске
+         * DEPRECATED
          * \param path Путь к объекту или родительской директории
          * \param result Список описателей объектов
          * \param preview Размер превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
@@ -386,6 +387,17 @@ class EteraAPI : public QObject
          * \return Флаг успеха
          */
         bool ls(const QString& path, EteraItemList& result, const QString& preview = "", bool crop = false);
+
+        /*!
+         * \brief Получение списка объектов на диске
+         * Сигнал onLS
+         * \param path Путь к объекту или родительской директории
+         * \param preview Размер превью
+         * \param crop Параметр для обрезания превью
+         * \param offset Смещение
+         * \param limit Количество (для значения 0 используется параметр по умолчанию)
+         */
+        void ls(const QString& path, const QString& preview = "", bool crop = false, quint64 offset = 0, quint64 limit = 0);
 
         /*!
          * \brief Создание директории на диске
@@ -635,6 +647,7 @@ class EteraAPI : public QObject
         void on_about_to_quit();
 
         void on_info_finished();   /*!< \brief Завершение вызова info() */
+        void on_ls_finished();     /*!< \brief Завершение вызова ls()   */
 
     signals:
 
@@ -665,7 +678,20 @@ class EteraAPI : public QObject
          * \param api API
          * \param info Результат
          */
-        void onInfo(EteraAPI* api, const EteraInfo& info);
+        void onINFO(EteraAPI* api, const EteraInfo& info);
+
+        /*!
+         * \brief Сигнал получения списка файлов и директорий
+         * \param api API
+         * \param list Список описателей объектов
+         * \param path Путь
+         * \param preview Размер превью
+         * \param crop Параметр для обрезания превью
+         * \param offset Смещение
+         * \param limit Количество
+         * При limit < list.count() дальнейшие запросы можно прекращать
+         */
+        void onLS(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
 };
 
 #endif   // _ekstertera_api_h_

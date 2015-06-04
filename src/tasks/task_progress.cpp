@@ -13,7 +13,7 @@ EteraTaskProgress::~EteraTaskProgress()
 
 void EteraTaskProgress::init()
 {
-    m_api = new EteraAPI(false);
+    m_api = new EteraAPI(NULL, false);
 
     m_api->setToken(m_token);
 

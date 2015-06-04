@@ -13,7 +13,7 @@ EteraTaskAsync::~EteraTaskAsync()
 
 void EteraTaskAsync::init()
 {
-    m_api = new EteraAPI(true);
+    m_api = new EteraAPI(NULL, true);
 
     m_api->setToken(m_token);
 

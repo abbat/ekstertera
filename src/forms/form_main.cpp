@@ -171,12 +171,12 @@ void FormMain::updateInfoStatus()
     if (token.isEmpty() == true)
         return;
 
-    EteraAPI* api = new EteraAPI();
+    EteraAPI* api = new EteraAPI(this);
 
     api->setToken(token);
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_info_error(EteraAPI*)));
-    connect(api, SIGNAL(onInfo(EteraAPI*, const EteraInfo&)), this, SLOT(task_on_info_success(EteraAPI*, const EteraInfo&)));
+    connect(api, SIGNAL(onINFO(EteraAPI*, const EteraInfo&)), this, SLOT(task_on_info_success(EteraAPI*, const EteraInfo&)));
 
     api->info();
 }

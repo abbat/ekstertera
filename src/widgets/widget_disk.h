@@ -289,8 +289,8 @@ class WidgetDisk : public QTabWidget
 
         void task_on_start(quint64 id, const QString& message, const QVariantMap& args);
 
-        void task_on_ls_error(quint64 id, int code, const QString& error, const QVariantMap& args);
-        void task_on_ls_success(quint64 id, const EteraItemList& list, const QVariantMap& args);
+        void task_on_ls_error(EteraAPI* api);
+        void task_on_ls_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
 
         void task_on_mkdir_error(quint64 id, int code, const QString& error, const QVariantMap& args);
         void task_on_mkdir_success(quint64 id, const EteraItem& item, const QVariantMap& args);

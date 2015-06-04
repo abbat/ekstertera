@@ -204,43 +204,41 @@ void WidgetDisk::task_on_start(quint64 id, const QString& message, const QVarian
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_ls_error(quint64 id, int /*code*/, const QString& error, const QVariantMap& args)
+void WidgetDisk::task_on_ls_error(EteraAPI* api)
 {
-    QString path = args["path"].toString();
+    QString path = api->property("path").toString();
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(path).arg(error));
-
-    m_tasks->removeSimpleTask(id);
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(path).arg(api->lastErrorMessage()));
 
     m_explorer->setCursor(Qt::ArrowCursor);
+
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_ls_success(quint64 id, const EteraItemList& list, const QVariantMap& args)
+void WidgetDisk::task_on_ls_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit)
 {
-    QString path = args["path"].toString();
-
-    m_explorer->clear();
-
     for (int i = 0; i < list.count(); i++)
         new WidgetDiskItem(m_explorer, list[i], m_preview_mode);
 
-    emit onPathChanged(path);
+    if ((quint64)list.count() < limit) {
+        api->deleteLater();
 
-    m_path = path;
+        m_path = path;
 
-    m_tasks->removeSimpleTask(id);
+        m_explorer->setCursor(Qt::ArrowCursor);
 
-    m_explorer->setCursor(Qt::ArrowCursor);
+        emit onPathChanged(path);
+    } else {
+        offset += limit;
+        api->ls(path, preview, crop, offset, limit);
+    }
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::changePath(const QString& path)
 {
     m_explorer->setCursor(Qt::BusyCursor);
-
-    if (m_preview_mode == true)
-        EteraThreadPool::instance()->purge(etpBackground);
 
     m_path = "";
     m_explorer->clear();
@@ -252,13 +250,14 @@ void WidgetDisk::changePath(const QString& path)
     int     size    = EteraIconProvider::instance()->maxIconSize();
     QString preview = QString("%1x%2").arg(size).arg(size);
 
-    EteraTaskLS* ls = new EteraTaskLS(_path, preview, true);
+    EteraAPI* api = new EteraAPI();
 
-    connect(ls, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
-    connect(ls, SIGNAL(onSuccess(quint64, const EteraItemList&, const QVariantMap&)), this, SLOT(task_on_ls_success(quint64, const EteraItemList&, const QVariantMap&)));
-    connect(ls, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_ls_error(quint64, int, const QString&, const QVariantMap&)));
+    api->setToken(EteraSettings::instance()->token());
 
-    EteraThreadPool::instance()->start(ls, etpForeground);
+    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_ls_error(EteraAPI*)));
+    connect(api, SIGNAL(onLS(EteraAPI*, const EteraItemList&, const QString&, const QString&, bool, quint64, quint64)), this, SLOT(task_on_ls_success(EteraAPI*, const EteraItemList&, const QString&, const QString&, bool, quint64, quint64)));
+
+    api->ls(_path, preview, true);
 }
 //----------------------------------------------------------------------------------------------
 

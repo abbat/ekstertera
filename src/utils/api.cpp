@@ -317,7 +317,7 @@ void EteraAPI::cleanup()
 }
 //----------------------------------------------------------------------------------------------
 
-EteraAPI::EteraAPI(bool noprogress) : QObject(NULL)
+EteraAPI::EteraAPI(QObject* parent, bool noprogress) : QObject(parent)
 {
     m_io    = NULL;
     m_reply = NULL;
@@ -573,6 +573,9 @@ bool EteraAPI::makeRequest(const QNetworkRequest& request, int& code, QString& b
 
 bool EteraAPI::startRequest(const QNetworkRequest& request, EteraRequestMethod method, const QString& data, QIODevice* io)
 {
+    m_io    = NULL;
+    m_reply = NULL;
+
     if (g_api_enabled == false)
         return setLastError(1, trUtf8("API не инициализировано"));
 
@@ -608,8 +611,6 @@ bool EteraAPI::startRequest(const QNetworkRequest& request, EteraRequestMethod m
     m_io    = io;
     m_reply = reply;
 
-    connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(on_about_to_quit()));
-
     QObject::connect(reply, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(on_ssl_errors(const QList<QSslError>&)));
 
     if (method == ermGET && io != NULL)
@@ -629,6 +630,7 @@ bool EteraAPI::parseReply(int& code, QString& body)
 
         m_reply->close();
         m_reply->deleteLater();
+        m_reply = NULL;
 
         return setLastError(error, message);
     }
@@ -644,6 +646,7 @@ bool EteraAPI::parseReply(int& code, QString& body)
 
     m_reply->close();
     m_reply->deleteLater();
+    m_reply = NULL;
 
     return true;
 }
@@ -859,7 +862,7 @@ void EteraAPI::on_info_finished()
 
     setLastError(0);
 
-    emit onInfo(this, info);
+    emit onINFO(this, info);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -955,6 +958,102 @@ bool EteraAPI::ls(const QString& path, EteraItemList& result, const QString& pre
     }
 
     return setLastError(0);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::ls(const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit)
+{
+    if (limit == 0)
+        limit = 20;
+
+    EteraArgs args;
+
+    args["path"]   = path;
+    args["limit"]  = QString::number(limit);
+    args["offset"] = QString::number(offset);
+
+    if (preview.isEmpty() == false)
+        args["preview_size"] = preview;
+    if (crop == true)
+        args["preview_crop"] = "true";
+
+    setProperty("path",    path);
+    setProperty("preview", preview);
+    setProperty("crop",    crop);
+    setProperty("offset",  offset);
+    setProperty("limit",   limit);
+
+    if (startSimpleRequest("/resources", args) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_ls_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_ls_finished()
+{
+    QString path    = property("path").toString();
+    QString preview = property("preview").toString();
+    bool    crop    = property("crop").toBool();
+    quint64 offset  = property("offset").toULongLong();
+    quint64 limit   = property("limit").toULongLong();
+
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return;
+
+    if (code != 200) {
+        setLastError(code, body);
+        return;
+    }
+
+    bool ok;
+    QtJson::JsonObject json = QtJson::parse(body, ok).toMap();
+    if (ok == false) {
+        setLastError(1, JSON_PARSE_ERROR);
+        return;
+    }
+
+    EteraItemList list;
+
+    if (json.contains("_embedded") == false) {
+        EteraItem item;
+        if (item.parse(json) == false) {
+            setLastError(1, JSON_PARSE_ERROR);
+            return;
+        }
+
+        list.append(item);
+
+        setLastError(0);
+
+        emit onLS(this, list, path, preview, crop, offset, limit);
+
+        return;
+    }
+
+    json = json["_embedded"].toMap();
+    QVariantList items = json["items"].toList();
+
+    for (QVariantList::const_iterator i = items.constBegin(); i < items.constEnd(); i++) {
+        EteraItem item;
+        if (item.parse((*i).toMap()) == false) {
+            setLastError(1, JSON_PARSE_ERROR);
+            return;
+        }
+
+        list.append(item);
+    }
+
+    limit = json["limit"].toULongLong(&ok);
+    if (ok == false) {
+        setLastError(1, JSON_PARSE_ERROR);
+        return;
+    }
+
+    setLastError(0);
+
+    emit onLS(this, list, path, preview, crop, offset, limit);
 }
 //----------------------------------------------------------------------------------------------
 
