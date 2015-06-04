@@ -363,10 +363,9 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение информации о диске
-         * \param result Информация о диске
-         * \return Флаг успеха
+         * Сигнал onInfo
          */
-        bool info(EteraInfo& result);
+        void info();
 
         /*!
          * \brief Получение информации об объекте на диске
@@ -548,6 +547,7 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Выполнение запроса
+         * DEPRECATED
          * \param request Запрос
          * \param code HTTP-код ответа
          * \param body Тело ответа
@@ -559,7 +559,26 @@ class EteraAPI : public QObject
         bool makeRequest(const QNetworkRequest& request, int& code, QString& body, EteraRequestMethod method = ermGET, const QString& data = "", QIODevice* io = NULL);
 
         /*!
+         * \brief Старт выполнения запроса
+         * \param request Запрос
+         * \param method Метод
+         * \param data Тело для POST/PUT запроса (исключает io)
+         * \param io Тело для POST/PUT запроса (исключает data)
+         * \return false при возникновении ошибки, иначе true
+         */
+        bool startRequest(const QNetworkRequest& request, EteraRequestMethod method = ermGET, const QString& data = "", QIODevice* io = NULL);
+
+        /*!
+         * \brief Разбор результата выполнения запроса
+         * \param code HTTP-код ответа
+         * \param body Тело ответа
+         * \return false при возникновении сетевой ошибки, иначе true
+         */
+        bool parseReply(int& code, QString& body);
+
+        /*!
          * \brief Выполнение простого запроса
+         * DEPRECATED
          * \param code Код ответа
          * \param body Тело ответа
          * \param url Относительный URL
@@ -567,6 +586,14 @@ class EteraAPI : public QObject
          * \return Флаг успеха
          */
         bool makeSimpleRequest(int& code, QString& body, const QString& url, const EteraArgs& args = EteraArgs(), EteraRequestMethod method = ermGET);
+
+        /*!
+         * \brief Старт выполнения простого запроса
+         * \param url Относительный URL
+         * \param args Аргументы запроса
+         * \return Флаг успеха
+         */
+        bool startSimpleRequest(const QString& url, const EteraArgs& args = EteraArgs(), EteraRequestMethod method = ermGET);
 
         /*!
          * \brief Проверка, что URL принадлежит домену yandex
@@ -607,6 +634,8 @@ class EteraAPI : public QObject
          */
         void on_about_to_quit();
 
+        void on_info_finished();   /*!< \brief Завершение вызова info() */
+
     signals:
 
         /*!
@@ -618,9 +647,25 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Сигнал ошибки ssl
+         * DEPRECATED
          * \param error Ошибки
          */
         void onError(const QString& error);
+
+        /*!
+         * \brief Сигнал ошибки
+         * \param api API
+         * \param code Код ошибки
+         * \param error Текст ошибки
+         */
+        void onError(EteraAPI* api);
+
+        /*!
+         * \brief Сигнал получения информации о диске
+         * \param api API
+         * \param info Результат
+         */
+        void onInfo(EteraAPI* api, const EteraInfo& info);
 };
 
 #endif   // _ekstertera_api_h_

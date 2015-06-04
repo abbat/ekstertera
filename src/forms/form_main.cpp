@@ -2,7 +2,6 @@
 //----------------------------------------------------------------------------------------------
 #include "utils/pool.h"
 #include "utils/settings.h"
-#include "tasks/task_info.h"
 //----------------------------------------------------------------------------------------------
 #include "form_settings.h"
 //----------------------------------------------------------------------------------------------
@@ -141,17 +140,27 @@ void FormMain::tray_icon_activated(QSystemTrayIcon::ActivationReason reason)
 }
 //----------------------------------------------------------------------------------------------
 
-void FormMain::task_on_info_success(quint64 /*id*/, const EteraInfo& info, const QVariantMap& /*args*/)
-{
-    m_label_used->setText(EteraAPI::humanBytes(info.used()));
-    m_label_total->setText(EteraAPI::humanBytes(info.total()));
-}
-//----------------------------------------------------------------------------------------------
-
-void FormMain::task_on_info_error(quint64 /*id*/, int /*code*/, const QString& /*error*/, const QVariantMap& /*args*/)
+void FormMain::task_on_info_error(EteraAPI* api)
 {
     m_label_used->setText("");
     m_label_total->setText("");
+
+    m_label_used->setVisible(false);
+    m_label_total->setVisible(false);
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::task_on_info_success(EteraAPI* api, const EteraInfo& info)
+{
+    m_label_used->setText(EteraAPI::humanBytes(info.used()));
+    m_label_total->setText(EteraAPI::humanBytes(info.total()));
+
+    m_label_used->setVisible(true);
+    m_label_total->setVisible(true);
+
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -162,12 +171,14 @@ void FormMain::updateInfoStatus()
     if (token.isEmpty() == true)
         return;
 
-    EteraTaskINFO* info = new EteraTaskINFO();
+    EteraAPI* api = new EteraAPI();
 
-    connect(info, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_info_error(quint64, int, const QString&, const QVariantMap&)));
-    connect(info, SIGNAL(onSuccess(quint64, const EteraInfo&, const QVariantMap&)), this, SLOT(task_on_info_success(quint64, const EteraInfo&, const QVariantMap&)));
+    api->setToken(token);
 
-    EteraThreadPool::instance()->start(info);
+    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_info_error(EteraAPI*)));
+    connect(api, SIGNAL(onInfo(EteraAPI*, const EteraInfo&)), this, SLOT(task_on_info_success(EteraAPI*, const EteraInfo&)));
+
+    api->info();
 }
 //----------------------------------------------------------------------------------------------
 

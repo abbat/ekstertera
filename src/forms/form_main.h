@@ -86,8 +86,8 @@ class FormMain : public FormMainUI
         // обработчики получения информации о диске
         //
 
-        void task_on_info_success(quint64 id, const EteraInfo& info, const QVariantMap& args);
-        void task_on_info_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_info_error(EteraAPI* api);
+        void task_on_info_success(EteraAPI* api, const EteraInfo& info);
 };
 
 #endif   // _ekstertera_forms_form_main_h_

@@ -30,42 +30,43 @@
         <translation>An error occurred when opening the file</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="435"/>
+        <location filename="../utils/api.cpp" line="437"/>
         <source>КБ</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="438"/>
+        <location filename="../utils/api.cpp" line="440"/>
         <source>МБ</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="441"/>
+        <location filename="../utils/api.cpp" line="443"/>
         <source>ГБ</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="444"/>
+        <location filename="../utils/api.cpp" line="446"/>
         <source>ТБ</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="496"/>
+        <location filename="../utils/api.cpp" line="498"/>
+        <location filename="../utils/api.cpp" line="577"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="594"/>
+        <location filename="../utils/api.cpp" line="691"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="726"/>
+        <location filename="../utils/api.cpp" line="823"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="730"/>
+        <location filename="../utils/api.cpp" line="827"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>
@@ -94,14 +95,6 @@
         <location filename="../tasks/task_get.cpp" line="31"/>
         <source>Получение %1</source>
         <translation>Download %1</translation>
-    </message>
-</context>
-<context>
-    <name>EteraTaskINFO</name>
-    <message>
-        <location filename="../tasks/task_info.cpp" line="16"/>
-        <source>Получение информации о диске</source>
-        <translation>Get information about disk</translation>
     </message>
 </context>
 <context>
@@ -268,22 +261,22 @@
 <context>
     <name>FormMain</name>
     <message>
-        <location filename="../forms/form_main.cpp" line="127"/>
+        <location filename="../forms/form_main.cpp" line="126"/>
         <source>О программе</source>
         <translation>About</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="133"/>
+        <location filename="../forms/form_main.cpp" line="132"/>
         <source>О Qt</source>
         <translation>About Qt</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="194"/>
+        <location filename="../forms/form_main.cpp" line="197"/>
         <source>Загрузка файлов на Яндекс.Диск</source>
         <translation>Upload files to Yandex.Disk</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="201"/>
+        <location filename="../forms/form_main.cpp" line="204"/>
         <source>Загрузка файлов с Яндекс.Диска</source>
         <translation>Download files from Yandex.Disk</translation>
     </message>

@@ -12,7 +12,6 @@
 #include "task_mv.h"
 #include "task_put.h"
 #include "task_get.h"
-#include "task_info.h"
 #include "task_stat.h"
 #include "task_mkdir.h"
 #include "task_publish.h"

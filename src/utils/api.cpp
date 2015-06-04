@@ -386,6 +386,7 @@ void EteraAPI::on_ssl_errors(const QList<QSslError>& errors)
         message += errors[i].errorString() + "\n";
 
     emit onError(message);
+    emit onError(this);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -402,9 +403,10 @@ bool EteraAPI::setLastError(int code, const QString& message)
 {
     m_error_code = code;
 
-    if (code != 0)
+    if (code != 0) {
         m_error_message = QString("[%1]: %2").arg(code).arg(message);
-    else {
+        emit onError(this);
+    } else {
         m_async_error   = false;
         m_error_message = OK_MESSAGE;
     }
@@ -569,6 +571,84 @@ bool EteraAPI::makeRequest(const QNetworkRequest& request, int& code, QString& b
 }
 //----------------------------------------------------------------------------------------------
 
+bool EteraAPI::startRequest(const QNetworkRequest& request, EteraRequestMethod method, const QString& data, QIODevice* io)
+{
+    if (g_api_enabled == false)
+        return setLastError(1, trUtf8("API не инициализировано"));
+
+    QNetworkReply* reply;
+
+    switch (method) {
+        case ermGET:
+            reply = m_http.get(request);
+            break;
+
+        case ermPOST:
+            if (io != NULL)
+                reply = m_http.post(request, io);
+            else
+                reply = m_http.post(request, data.toUtf8());
+            break;
+
+        case ermPUT:
+            if (io != NULL)
+                reply = m_http.put(request, io);
+            else
+                reply = m_http.put(request, data.toUtf8());
+            break;
+
+        case ermDELETE:
+            reply = m_http.deleteResource(request);
+            break;
+
+        default:
+            return setLastError(1, "Not implemented");
+    }
+
+    m_io    = io;
+    m_reply = reply;
+
+    connect(QCoreApplication::instance(), SIGNAL(aboutToQuit()), this, SLOT(on_about_to_quit()));
+
+    QObject::connect(reply, SIGNAL(sslErrors(const QList<QSslError>&)), this, SLOT(on_ssl_errors(const QList<QSslError>&)));
+
+    if (method == ermGET && io != NULL)
+        QObject::connect(reply, SIGNAL(readyRead()), this, SLOT(on_ready_read()));
+
+    return true;
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraAPI::parseReply(int& code, QString& body)
+{
+    QVariant http_code = m_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+
+    if (http_code.isValid() == false || http_code.isNull() == true) {
+        QNetworkReply::NetworkError error   = m_reply->error();
+        QString                     message = m_reply->errorString();
+
+        m_reply->close();
+        m_reply->deleteLater();
+
+        return setLastError(error, message);
+    }
+
+    code = http_code.toInt();
+
+    if (code >= 200 && code < 300)
+        body = QString::fromUtf8(m_reply->readAll());
+    else if (code == 301 || code == 302)
+        body = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl().toString();
+    else
+        body = m_reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
+
+    m_reply->close();
+    m_reply->deleteLater();
+
+    return true;
+}
+//----------------------------------------------------------------------------------------------
+
 bool EteraAPI::makeSimpleRequest(int& code, QString& body, const QString& url, const EteraArgs& args, EteraRequestMethod method)
 {
     setLastError(0);
@@ -583,6 +663,23 @@ bool EteraAPI::makeSimpleRequest(int& code, QString& body, const QString& url, c
     }
 
     return makeRequest(request, code, body, method);
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraAPI::startSimpleRequest(const QString& url, const EteraArgs& args, EteraRequestMethod method)
+{
+    setLastError(0);
+
+    QNetworkRequest request;
+    prepareRequest(request, url, args);
+
+    if (method == ermPOST) {
+        // content-type missing in HTTP POST, defaulting to application/x-www-form-urlencoded.
+        request.setHeader(QNetworkRequest::ContentTypeHeader,   "application/json");
+        request.setHeader(QNetworkRequest::ContentLengthHeader, "0");
+    }
+
+    return startRequest(request, method);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -734,21 +831,35 @@ bool EteraAPI::wait(const QString& link)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::info(EteraInfo& result)
+void EteraAPI::info()
+{
+    if (startSimpleRequest("") == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_info_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_info_finished()
 {
     int     code;
     QString body;
 
-    if (makeSimpleRequest(code, body, "") == false)
-        return false;
+    if (parseReply(code, body) == false)
+        return;
 
-    if (code != 200)
-        return setLastError(code, body);
+    if (code != 200) {
+        setLastError(code, body);
+        return;
+    }
 
-    if (result.parse(body) == false)
-        return setLastError(1, JSON_PARSE_ERROR);
+    EteraInfo info;
+    if (info.parse(body) == false) {
+        setLastError(1, JSON_PARSE_ERROR);
+        return;
+    }
 
-    return setLastError(0);
+    setLastError(0);
+
+    emit onInfo(this, info);
 }
 //----------------------------------------------------------------------------------------------
 
