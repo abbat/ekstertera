@@ -1095,8 +1095,6 @@ void WidgetDisk::getRemoteObjects(const QString& path)
         else if (eitem->isFile() == true)
             getRemoteFile(eitem->path(), path + "/" + eitem->name(), fakeid);
     }
-
-    m_tasks->checkWaitTask(fakeid);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1179,33 +1177,35 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_get_dir_error(quint64 id, int /*code*/, const QString& error, const QVariantMap& args)
+void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 {
-    QString source = args["source"].toString();
+    QString path = api->property("path").toString();
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(source).arg(error));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(path).arg(api->lastErrorMessage()));
 
-    m_tasks->removeChildTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_get_dir_success(quint64 id, const EteraItemList& list, const QVariantMap& args)
+void WidgetDisk::task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit)
 {
-    QString source = args["source"].toString();
-    QString target = args["target"].toString();
-    quint64 parent = args["parent"].toULongLong();
-
-    m_tasks->addChildTask(parent, id, trUtf8("Обработка %1").arg(source), args);
+    QString target = api->property("target").toString();
+    quint64 parent = api->property("parent").toULongLong();
 
     for (int i = 0; i < list.count(); i++) {
         EteraItem item = list[i];
         if (item.isDir() == true)
-            getRemoteDir(item.path(), target + "/" + item.name(), id);
+            getRemoteDir(item.path(), target + "/" + item.name(), parent);
         else if (item.isFile() == true)
-            getRemoteFile(item.path(), target + "/" + item.name(), id);
+            getRemoteFile(item.path(), target + "/" + item.name(), parent);
     }
 
-    m_tasks->checkWaitTask(id);
+    if ((quint64)list.count() < limit)
+        api->deleteLater();
+    else {
+        offset += limit;
+        api->ls(path, preview, crop, offset, limit);
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1245,21 +1245,17 @@ void WidgetDisk::getRemoteDir(const QString& source, const QString& target, quin
         }
     }
 
-    EteraTaskLS* ls = new EteraTaskLS(source);
+    EteraAPI* api = new EteraAPI(this);
 
-    ls->addArg("source", source);
-    ls->addArg("target", target);
-    ls->addArg("parent", parent);
+    api->setToken(EteraSettings::instance()->token());
 
-    m_tasks->addWaitTask(parent);
+    api->setProperty("target", target);
+    api->setProperty("parent", parent);
 
-    ls->setSuccessMutex(&m_question_mutex);
+    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_get_dir_error(EteraAPI*)));
+    connect(api, SIGNAL(onLS(EteraAPI*, const EteraItemList&, const QString&, const QString&, bool, quint64, quint64)), this, SLOT(task_on_get_dir_success(EteraAPI*, const EteraItemList&, const QString&, const QString&, bool, quint64, quint64)));
 
-    connect(ls, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
-    connect(ls, SIGNAL(onSuccess(quint64, const EteraItemList&, const QVariantMap&)), this, SLOT(task_on_get_dir_success(quint64, const EteraItemList&, const QVariantMap&)), Qt::BlockingQueuedConnection);
-    connect(ls, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_get_dir_error(quint64, int, const QString&, const QVariantMap&)));
-
-    EteraThreadPool::instance()->start(ls);
+    api->ls(source);
 }
 //----------------------------------------------------------------------------------------------
 
