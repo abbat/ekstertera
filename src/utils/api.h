@@ -369,6 +369,7 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение информации об объекте на диске
+         * DEPRECATED
          * \param path Путь к объекту
          * \param result Описатель объекта
          * \param preview Размер превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
@@ -376,6 +377,15 @@ class EteraAPI : public QObject
          * \return Флаг успеха
          */
         bool stat(const QString& path, EteraItem& result, const QString& preview = "", bool crop = false);
+
+        /*!
+         * \brief Получение информации об объекте на диске
+         * Сигнал OnSTAT
+         * \param path Путь к объекту
+         * \param preview Размер превью
+         * \param crop Параметр для обрезания превью
+         */
+        void stat(const QString& path, const QString& preview = "", bool crop = false);
 
         /*!
          * \brief Получение списка объектов на диске
@@ -459,17 +469,17 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Открыть доступ к объекту
+         * Сигнал onPUBLISH
          * \param path Имя файла или директории на диске
-         * \return Флаг успеха
          */
-        bool publish(const QString& path);
+        void publish(const QString& path);
 
         /*!
          * \brief Закрыть доступ к объекту
+         * Сигнал onUNPUBLISH
          * \param path Имя файла или директории на диске
-         * \return Флаг успеха
          */
-        bool unpublish(const QString& path);
+        void unpublish(const QString& path);
 
     private:
 
@@ -646,8 +656,11 @@ class EteraAPI : public QObject
          */
         void on_about_to_quit();
 
-        void on_info_finished();   /*!< \brief Завершение вызова info() */
-        void on_ls_finished();     /*!< \brief Завершение вызова ls()   */
+        void on_info_finished();        /*!< \brief Завершение вызова info()      */
+        void on_stat_finished();        /*!< \brief Завершение вызова stat()      */
+        void on_ls_finished();          /*!< \brief Завершение вызова ls()        */
+        void on_publish_finished();     /*!< \brief Завершение вызова publish()   */
+        void on_unpublish_finished();   /*!< \brief Завершение вызова unpublish() */
 
     signals:
 
@@ -681,6 +694,13 @@ class EteraAPI : public QObject
         void onINFO(EteraAPI* api, const EteraInfo& info);
 
         /*!
+         * \brief Сигнал получения информации об объекте
+         * \param api API
+         * \param item Результат
+         */
+        void onSTAT(EteraAPI* api, const EteraItem& item);
+
+        /*!
          * \brief Сигнал получения списка файлов и директорий
          * \param api API
          * \param list Список описателей объектов
@@ -692,6 +712,20 @@ class EteraAPI : public QObject
          * При limit < list.count() дальнейшие запросы можно прекращать
          */
         void onLS(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
+
+        /*!
+         * \brief Сигнал открытия доступа к объекту
+         * \param api API
+         * \param path Путь
+         */
+        void onPUBLISH(EteraAPI* api, const QString& path);
+
+        /*!
+         * \brief Сигнал закрытия доступа к объекту
+         * \param api API
+         * \param path Путь
+         */
+        void onUNPUBLISH(EteraAPI* api, const QString& path);
 };
 
 #endif   // _ekstertera_api_h_

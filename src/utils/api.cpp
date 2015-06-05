@@ -895,6 +895,54 @@ bool EteraAPI::stat(const QString& path, EteraItem& result, const QString& previ
 }
 //----------------------------------------------------------------------------------------------
 
+void EteraAPI::stat(const QString& path, const QString& preview, bool crop)
+{
+    EteraArgs args;
+
+    args["path"]   = path;
+    args["offset"] = "0";
+    args["limit"]  = "0";
+
+    if (preview.isEmpty() == false)
+        args["preview_size"] = preview;
+    if (crop == true)
+        args["preview_crop"] = "true";
+
+    setProperty("path",    path);
+    setProperty("preview", preview);
+    setProperty("crop",    crop);
+
+    if (startSimpleRequest("/resources", args) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_stat_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_stat_finished()
+{
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return;
+
+    if (code != 200) {
+        setLastError(code, body);
+        return;
+    }
+
+    EteraItem item;
+
+    if (item.parse(body) == false) {
+        setLastError(1, JSON_PARSE_ERROR);
+        return;
+    }
+
+    setLastError(0);
+
+    emit onSTAT(this, item);
+}
+//----------------------------------------------------------------------------------------------
+
 bool EteraAPI::ls(const QString& path, EteraItemList& result, const QString& preview, bool crop)
 {
     quint64 offset = 0;
@@ -1273,41 +1321,70 @@ bool EteraAPI::get(const QUrl& url, QIODevice* target)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::publish(const QString& path)
+void EteraAPI::publish(const QString& path)
 {
     EteraArgs args;
 
     args["path"] = path;
 
-    int     code;
-    QString body;
+    setProperty("path", path);
 
-    if (makeSimpleRequest(code, body, "/resources/publish", args, ermPUT) == false)
-        return false;
-
-    if (code != 200)
-        return setLastError(code, body);
-
-    return setLastError(0);
+    if (startSimpleRequest("/resources/publish", args, ermPUT) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_publish_finished()));
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::unpublish(const QString& path)
+void EteraAPI::on_publish_finished()
+{
+    QString path = property("path").toString();
+
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return;
+
+    if (code != 200) {
+        setLastError(code, body);
+        return;
+    }
+
+    setLastError(0);
+
+    emit onPUBLISH(this, path);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::unpublish(const QString& path)
 {
     EteraArgs args;
 
     args["path"] = path;
 
-    int     code;
-    QString body;
+    setProperty("path", path);
 
-    if (makeSimpleRequest(code, body, "/resources/unpublish", args, ermPUT) == false)
-        return false;
-
-    if (code != 200)
-        return setLastError(code, body);
-
-    return setLastError(0);
+    if (startSimpleRequest("/resources/unpublish", args, ermPUT) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_unpublish_finished()));
 }
 //----------------------------------------------------------------------------------------------
 
+void EteraAPI::on_unpublish_finished()
+{
+    QString path = property("path").toString();
+
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return;
+
+    if (code != 200) {
+        setLastError(code, body);
+        return;
+    }
+
+    setLastError(0);
+
+    emit onUNPUBLISH(this, path);
+}
+//----------------------------------------------------------------------------------------------

@@ -218,6 +218,11 @@ void WidgetDisk::task_on_ls_error(EteraAPI* api)
 
 void WidgetDisk::task_on_ls_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit)
 {
+    if (path != m_required_path) {
+        api->deleteLater();
+        return;
+    }
+
     for (int i = 0; i < list.count(); i++)
         new WidgetDiskItem(m_explorer, list[i], m_preview_mode);
 
@@ -241,11 +246,15 @@ void WidgetDisk::changePath(const QString& path)
     m_explorer->setCursor(Qt::BusyCursor);
 
     m_path = "";
+    m_required_path = path;
+
     m_explorer->clear();
 
     QString _path = path;
-    if (_path.endsWith("/") == false)
+    if (_path.endsWith("/") == false) {
         _path += "/";
+        m_required_path += "/";
+    }
 
     int     size    = EteraIconProvider::instance()->maxIconSize();
     QString preview = QString("%1x%2").arg(size).arg(size);
@@ -1284,45 +1293,67 @@ bool WidgetDisk::removeDir(QDir dir)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_share_error(quint64 id, int /*code*/, const QString& error, const QVariantMap& args)
+void WidgetDisk::task_on_publish_error(EteraAPI* api)
 {
-    QString path = args["path"].toString();
+    QString path = api->property("path").toString();
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка открытия доступа к %1:\n%2").arg(path).arg(error));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка открытия доступа к %1:\n%2").arg(path).arg(api->lastErrorMessage()));
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_share_success(quint64 id, const EteraItem& item, const QVariantMap& /*args*/)
+void WidgetDisk::task_on_publish_success(EteraAPI* api, const QString& path)
+{
+    WidgetDiskItem* witem = findByPath(path);
+
+    if (witem == NULL)
+        api->deleteLater();
+    else
+        api->stat(path);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_publish_success(EteraAPI* api, const EteraItem& item)
 {
     WidgetDiskItem* witem = findByPath(item.path());
 
     if (witem != NULL)
         witem->replaceItem(item, m_preview_mode);
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_revoke_error(quint64 id, int /*code*/, const QString& error, const QVariantMap& args)
+void WidgetDisk::task_on_unpublish_error(EteraAPI* api)
 {
-    QString path = args["path"].toString();
+    QString path = api->property("path").toString();
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка закрытия доступа к %1:\n%2").arg(path).arg(error));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка закрытия доступа к %1:\n%2").arg(path).arg(api->lastErrorMessage()));
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_revoke_success(quint64 id, const EteraItem& item, const QVariantMap& /*args*/)
+void WidgetDisk::task_on_unpublish_success(EteraAPI* api, const QString& path)
+{
+    WidgetDiskItem* witem = findByPath(path);
+
+    if (witem == NULL)
+        api->deleteLater();
+    else
+        api->stat(path);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_unpublish_success(EteraAPI* api, const EteraItem& item)
 {
     WidgetDiskItem* witem = findByPath(item.path());
 
     if (witem != NULL)
         witem->replaceItem(item, m_preview_mode);
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1339,22 +1370,22 @@ void WidgetDisk::shareObjects(bool share)
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
         const EteraItem* eitem = witem->item();
 
+        EteraAPI* api = new EteraAPI(this);
+
+        api->setToken(EteraSettings::instance()->token());
+
         if (share == true) {
-            EteraTaskPUBLISH* publish = new EteraTaskPUBLISH(eitem->path());
+            connect(api, SIGNAL(onPUBLISH(EteraAPI*, const QString&)), this, SLOT(task_on_publish_success(EteraAPI*, const QString&)));
+            connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_publish_success(EteraAPI*, const EteraItem&)));
+            connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_publish_error(EteraAPI*)));
 
-            connect(publish, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
-            connect(publish, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_revoke_success(quint64, const EteraItem&, const QVariantMap&)));
-            connect(publish, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_revoke_error(quint64, int, const QString&, const QVariantMap&)));
-
-            EteraThreadPool::instance()->start(publish);
+            api->publish(eitem->path());
         } else {
-            EteraTaskUNPUBLISH* unpublish = new EteraTaskUNPUBLISH(eitem->path());
+            connect(api, SIGNAL(onUNPUBLISH(EteraAPI*, const QString&)), this, SLOT(task_on_unpublish_success(EteraAPI*, const QString&)));
+            connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_unpublish_success(EteraAPI*, const EteraItem&)));
+            connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_unpublish_error(EteraAPI*)));
 
-            connect(unpublish, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
-            connect(unpublish, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_revoke_success(quint64, const EteraItem&, const QVariantMap&)));
-            connect(unpublish, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_revoke_error(quint64, int, const QString&, const QVariantMap&)));
-
-            EteraThreadPool::instance()->start(unpublish);
+            api->unpublish(eitem->path());
         }
     }
 }

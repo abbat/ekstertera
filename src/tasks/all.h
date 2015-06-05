@@ -14,7 +14,5 @@
 #include "task_get.h"
 #include "task_stat.h"
 #include "task_mkdir.h"
-#include "task_publish.h"
-#include "task_unpublish.h"
 
 #endif   // _ekstertera_tasks_all_h_
