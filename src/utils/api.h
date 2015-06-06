@@ -389,17 +389,6 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение списка объектов на диске
-         * DEPRECATED
-         * \param path Путь к объекту или родительской директории
-         * \param result Список описателей объектов
-         * \param preview Размер превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
-         * \param crop Параметр для обрезания превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
-         * \return Флаг успеха
-         */
-        bool ls(const QString& path, EteraItemList& result, const QString& preview = "", bool crop = false);
-
-        /*!
-         * \brief Получение списка объектов на диске
          * Сигнал onLS
          * \param path Путь к объекту или родительской директории
          * \param preview Размер превью
@@ -453,6 +442,7 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение файла с диска
+         * DEPRECATED
          * \param source Имя файла на диске
          * \param target Имя локального файла
          * \return Флаг успеха
@@ -461,11 +451,19 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение файла с диска
+         * DEPRECATED
          * \param url Ссылка
          * \param target Буфер для записи
          * \return Флаг успеха
          */
         bool get(const QUrl& url, QIODevice* target);
+
+        /*!
+         * \brief Загрузка url с сервиса
+         * Сигнал onGET, с параметром QByteArray
+         * \param url Ссылка
+         */
+        void get(const QUrl& url);
 
         /*!
          * \brief Открыть доступ к объекту
@@ -498,8 +496,9 @@ class EteraAPI : public QObject
 
         QNetworkAccessManager m_http;   /*!< \brief Транспорт HTTPS */
 
-        QNetworkReply* m_reply;   /*!< \brief Переменная для временного хранения текущего ответа */
-        QIODevice*     m_io;      /*!< \brief Переменная для временного хранения текущей цели    */
+        QNetworkReply* m_reply;    /*!< \brief Переменная для временного хранения текущего ответа */
+        QIODevice*     m_io;       /*!< \brief Переменная для временного хранения текущей цели    */
+        QBuffer*       m_io_buf;   /*!< \brief Переменная для временного хранения текущего буфера */
 
         /*!
          * \brief Сообщение OK
@@ -659,6 +658,7 @@ class EteraAPI : public QObject
         void on_info_finished();        /*!< \brief Завершение вызова info()      */
         void on_stat_finished();        /*!< \brief Завершение вызова stat()      */
         void on_ls_finished();          /*!< \brief Завершение вызова ls()        */
+        void on_get_finished();         /*!< \brief Завершение вызова get()       */
         void on_publish_finished();     /*!< \brief Завершение вызова publish()   */
         void on_unpublish_finished();   /*!< \brief Завершение вызова unpublish() */
 
@@ -712,6 +712,14 @@ class EteraAPI : public QObject
          * При limit < list.count() дальнейшие запросы можно прекращать
          */
         void onLS(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
+
+        /*!
+         * \brief Сигнал загрузки url с сервиса
+         * \param api API
+         * \param url Url
+         * \param data Данные
+         */
+        void onGET(EteraAPI* api, const QUrl& url, const QByteArray& data);
 
         /*!
          * \brief Сигнал открытия доступа к объекту

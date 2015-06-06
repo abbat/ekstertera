@@ -319,8 +319,9 @@ void EteraAPI::cleanup()
 
 EteraAPI::EteraAPI(QObject* parent, bool noprogress) : QObject(parent)
 {
-    m_io    = NULL;
-    m_reply = NULL;
+    m_io     = NULL;
+    m_reply  = NULL;
+    m_io_buf = NULL;
 
     m_user_agent = QString("ekstertera/%1").arg(ETERA_VERSION);
     m_base_url   = "https://cloud-api.yandex.net/v1/disk";
@@ -338,6 +339,8 @@ EteraAPI::EteraAPI(QObject* parent, bool noprogress) : QObject(parent)
 
 EteraAPI::~EteraAPI()
 {
+    if (m_io_buf != NULL)
+        delete m_io_buf;
 }
 //----------------------------------------------------------------------------------------------
 
@@ -386,7 +389,7 @@ void EteraAPI::on_ssl_errors(const QList<QSslError>& errors)
         message += errors[i].errorString() + "\n";
 
     emit onError(message);
-    emit onError(this);
+    setLastError(1, message);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -405,6 +408,12 @@ bool EteraAPI::setLastError(int code, const QString& message)
 
     if (code != 0) {
         m_error_message = QString("[%1]: %2").arg(code).arg(message);
+
+        if (m_io_buf != NULL) {
+            delete m_io_buf;
+            m_io_buf = NULL;
+        }
+
         emit onError(this);
     } else {
         m_async_error   = false;
@@ -943,72 +952,6 @@ void EteraAPI::on_stat_finished()
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::ls(const QString& path, EteraItemList& result, const QString& preview, bool crop)
-{
-    quint64 offset = 0;
-
-    EteraArgs args;
-
-    args["path"]   = path;
-    args["offset"] = QString::number(offset);
-    args["limit"]  = QString::number(m_limit);
-
-    if (preview.isEmpty() == false)
-        args["preview_size"] = preview;
-    if (crop == true)
-        args["preview_crop"] = "true";
-
-    while (true) {
-        int     code;
-        QString body;
-
-        if (makeSimpleRequest(code, body, "/resources", args) == false)
-            return false;
-
-        if (code != 200)
-            return setLastError(code, body);
-
-        bool ok;
-        QtJson::JsonObject json = QtJson::parse(body, ok).toMap();
-        if (ok == false)
-            return setLastError(1, JSON_PARSE_ERROR);
-
-        if (json.contains("_embedded") == false) {
-            EteraItem item;
-            if (item.parse(json) == false)
-                return setLastError(1, JSON_PARSE_ERROR);
-
-            result.append(item);
-
-            return setLastError(0);
-        }
-
-        json = json["_embedded"].toMap();
-        QVariantList items = json["items"].toList();
-
-        for (QVariantList::const_iterator i = items.constBegin(); i < items.constEnd(); i++) {
-            EteraItem item;
-            if (item.parse((*i).toMap()) == false)
-                return setLastError(1, JSON_PARSE_ERROR);
-
-            result.append(item);
-        }
-
-        if ((quint64)items.count() != m_limit)
-            return setLastError(0);
-
-        quint64 limit = json["limit"].toULongLong(&ok);
-        if (ok == false)
-            return setLastError(1, JSON_PARSE_ERROR);
-
-        offset += limit;
-        args["offset"] = QString::number(offset);
-    }
-
-    return setLastError(0);
-}
-//----------------------------------------------------------------------------------------------
-
 void EteraAPI::ls(const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit)
 {
     if (limit == 0)
@@ -1318,6 +1261,59 @@ bool EteraAPI::get(const QUrl& url, QIODevice* target)
     }
 
     return setLastError(code, body);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::get(const QUrl& url)
+{
+    QNetworkRequest request(url);
+    setDefaultHeaders(request, 0, true, true);
+
+    if (m_io_buf == NULL) {
+        m_io_buf = new QBuffer();
+        m_io_buf->open(QIODevice::WriteOnly | QIODevice::Truncate);
+    }
+
+    setProperty("url", url);
+
+    if (startRequest(request, ermGET, "", m_io_buf) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_get_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_get_finished()
+{
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return;
+
+    if (code == 301 || code == 302) {
+        QUrl _url = QUrl::fromEncoded(body.toUtf8());
+        if (checkYandexDomain(_url) == false) {
+            setLastError(1, MALFORMED_LINK_URL);
+            return;
+        }
+
+        get(_url);
+
+    } else if (code == 200) {
+        m_io_buf->close();
+
+        QBuffer* tmp = m_io_buf;
+        m_io_buf = NULL;
+
+        setLastError(0);
+
+        emit onGET(this, property("url").toUrl(), tmp->data());
+
+        delete tmp;
+
+        return;
+    }
+
+    setLastError(code, body);
 }
 //----------------------------------------------------------------------------------------------
 
