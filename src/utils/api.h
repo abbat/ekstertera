@@ -231,7 +231,7 @@ class EteraItem
          * \brief Ссылка на превьюшку объекта
          * \return Ссылка на превьюшку объекта
          */
-        QString preview() const { return m_preview; }
+        QUrl preview() const { return m_preview; }
 
         /*!
          * \brief Публичный ключ
@@ -266,7 +266,7 @@ class EteraItem
         QString            m_media_string;   /*!< \brief Тип медиа           */
         EteraItemMediaType m_media_type;     /*!< \brief Тип медиа           */
         QString            m_mime_type;      /*!< \brief MIME                */
-        QString            m_preview;        /*!< \brief Ссылка на превьюшку */
+        QUrl               m_preview;        /*!< \brief Ссылка на превьюшку */
 
         //
         // поля общих ресурсов

@@ -184,15 +184,23 @@ class EteraIconProvider : public QObject
         /*!
          * \brief Кэш ожидающих превью
          */
-        typedef QMap<QUrl, WidgetDiskItem*> EteraPreviewWaitCache;
+        typedef QMultiMap<QUrl, WidgetDiskItem*> EteraPreviewWaitCache;
 
-        EteraPreviewWaitCache m_preview_wait;         /*!< \brief Карта ожидающих превью           */
-        EteraPreviewCache     m_preview_cache;        /*!< \brief Карта иконок по превью           */
-        EteraPreviewCache     m_preview_cache_link;   /*!< \brief Карта публичных иконок по превью */
+        QSet<QUrl>            m_preview_queue;        /*!< \brief Очередь ожидающих начала загрузки превью */
+        EteraPreviewWaitCache m_preview_wait;         /*!< \brief Карта ожидающих превью элементов         */
+        EteraPreviewCache     m_preview_cache;        /*!< \brief Карта иконок по превью                   */
+        EteraPreviewCache     m_preview_cache_link;   /*!< \brief Карта публичных иконок по превью         */
 
+        quint64 m_preview_queue_size;         /*!< \brief Размер очереди ожидания         */
         quint64 m_preview_cache_size;         /*!< \brief Размер иконок превью            */
         quint64 m_preview_cache_link_size;    /*!< \brief Размер публичных иконок превью  */
         quint64 m_preview_cache_size_limit;   /*!< \brief Максимальный размер кэша превью */
+
+        /*!
+         * \brief Загрузка следующего превью из очереди
+         * \param api API
+         */
+        void loadNextPreview(EteraAPI* api);
 
         /*!
          * \brief Очистка кэша превью
@@ -217,8 +225,8 @@ class EteraIconProvider : public QObject
 
     private slots:
 
-        void task_on_get_preview_success(quint64 id, const QVariantMap& args);
-        void task_on_get_preview_error(quint64 id, int code, const QString& error, const QVariantMap& args);
+        void task_on_get_preview_error(EteraAPI* api);
+        void task_on_get_preview_success(EteraAPI* api, const QUrl& url, const QByteArray& data);
 };
 
 #endif   // _ekstertera_icon_h_

@@ -106,7 +106,7 @@ bool EteraItem::parse(const QtJson::JsonObject& json)
 
     m_md5       = json["md5"].toString();
     m_mime_type = json["mime_type"].toString();
-    m_preview   = json["preview"].toString();
+    m_preview   = QUrl::fromEncoded(json["preview"].toString().toUtf8());
 
     m_size = json["size"].toULongLong(&ok);
     if (ok == false)

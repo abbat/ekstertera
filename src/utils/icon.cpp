@@ -1,7 +1,6 @@
 #include "icon.h"
 //----------------------------------------------------------------------------------------------
-#include "pool.h"
-#include "tasks/all.h"
+#include "settings.h"
 //----------------------------------------------------------------------------------------------
 static EteraIconProvider* g_icon_provider = NULL;
 //----------------------------------------------------------------------------------------------
@@ -101,6 +100,7 @@ EteraIconProvider::EteraIconProvider() : QObject()
         map++;
     }
 
+    m_preview_queue_size       = 0;
     m_preview_cache_size       = 0;
     m_preview_cache_link_size  = 0;
     m_preview_cache_size_limit = 100 * 1024 * 1024; // TODO: сделать настраиваемым, 100MB ~> 3 тыс. превьюшек
@@ -361,7 +361,7 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
 
     const EteraItem* eitem = item->item();
 
-    QString preview = eitem->preview();
+    QUrl preview = eitem->preview();
 
     if (eitem->isPublic() == true) {
         EteraPreviewCacheItem* citem = m_preview_cache_link.value(preview, NULL);
@@ -402,14 +402,23 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
 
     item->setIcon(icon(eitem));
 
-    m_preview_wait[preview] = item;
+    m_preview_wait.insert(preview, item);
 
-    EteraTaskGET* get = new EteraTaskGET(preview, "");
+    if (m_preview_queue_size >= (quint64)QThread::idealThreadCount()) {
+        m_preview_queue.insert(preview);
+        return false;
+    }
 
-    connect(get, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_get_preview_success(quint64, const QVariantMap&)));
-    connect(get, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_get_preview_error(quint64, int, const QString&, const QVariantMap&)));
+    m_preview_queue_size++;
 
-    EteraThreadPool::instance()->start(get, etpBackground);
+    EteraAPI* api = new EteraAPI(this);
+
+    api->setToken(EteraSettings::instance()->token());
+
+    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_get_preview_error(EteraAPI*)));
+    connect(api, SIGNAL(onGET(EteraAPI*, const QUrl&, const QByteArray&)), this, SLOT(task_on_get_preview_success(EteraAPI*, const QUrl&, const QByteArray&)));
+
+    api->get(preview);
 
     return false;
 }
@@ -417,23 +426,23 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
 
 void EteraIconProvider::cancelPreview(const WidgetDiskItem* item)
 {
-    QString preview = item->item()->preview();
-    if (m_preview_wait.contains(preview) == true)
-        m_preview_wait.remove(preview);
+    QUrl preview = item->item()->preview();
+    m_preview_wait.remove(preview, const_cast<WidgetDiskItem*>(item));
+
+    if (m_preview_wait.count(preview) == 0)
+        m_preview_queue.remove(preview);
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraIconProvider::task_on_get_preview_success(quint64 /*id*/, const QVariantMap& args)
+void EteraIconProvider::task_on_get_preview_success(EteraAPI* api, const QUrl& url, const QByteArray& data)
 {
-    QDateTime  now    = QDateTime::currentDateTime();
-    QString    source = args["source"].toString();
-    QByteArray target = args["target"].toByteArray();
+    m_preview_queue_size--;
 
     QPixmap pixmap;
-    pixmap.loadFromData(target);
+    pixmap.loadFromData(data);
 
     if (pixmap.isNull() == true) {
-        m_preview_wait.remove(source);
+        m_preview_wait.remove(url);
         return;
     }
 
@@ -445,15 +454,15 @@ void EteraIconProvider::task_on_get_preview_success(quint64 /*id*/, const QVaria
     EteraPreviewCacheItem* citem = new EteraPreviewCacheItem();
 
     citem->Icon  = icon;
-    citem->Size  = target.size();
-    citem->ATime = now;
+    citem->Size  = data.size();
+    citem->ATime = QDateTime::currentDateTime();
 
-    m_preview_cache[source] = citem;
+    m_preview_cache[url]  = citem;
     m_preview_cache_size += citem->Size;
 
-    WidgetDiskItem* item = m_preview_wait.value(source, NULL);
-    if (item != NULL) {
-        m_preview_wait.remove(source);
+    EteraPreviewWaitCache::const_iterator i = m_preview_wait.constFind(url);
+    while (i != m_preview_wait.end() && i.key() == url) {
+        WidgetDiskItem* item = *i;
 
         if (item->item()->isPublic() == false)
             item->setIcon(citem->Icon);
@@ -462,27 +471,53 @@ void EteraIconProvider::task_on_get_preview_success(quint64 /*id*/, const QVaria
 
             litem->Icon  = addLinkIcon(citem->Icon);
             litem->Size  = citem->Size;
-            litem->ATime = now;
+            litem->ATime = citem->ATime;
 
-            m_preview_cache_link[source] = litem;
+            m_preview_cache_link[url]  = litem;
             m_preview_cache_link_size += litem->Size;
 
             item->setIcon(litem->Icon);
         }
+
+        m_preview_wait.remove(url, item);
+        ++i;
     }
 
     if (m_preview_cache_size + m_preview_cache_link_size > m_preview_cache_size_limit)
         gcPreviewCache();
+
+    loadNextPreview(api);
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraIconProvider::task_on_get_preview_error(quint64 /*id*/, int /*code*/, const QString& /*error*/, const QVariantMap& args)
+void EteraIconProvider::task_on_get_preview_error(EteraAPI* api)
 {
-    QString source = args["source"].toString();
-    m_preview_wait.remove(source);
+    m_preview_queue_size--;
+
+    QUrl url = api->property("url").toUrl();
+
+    m_preview_wait.remove(url);
 
     if (m_preview_cache_size + m_preview_cache_link_size > m_preview_cache_size_limit)
         gcPreviewCache();
+
+    loadNextPreview(api);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraIconProvider::loadNextPreview(EteraAPI* api)
+{
+    if (m_preview_queue.count() == 0)
+        api->deleteLater();
+    else {
+        m_preview_queue_size++;
+
+        QSet<QUrl>::const_iterator i = m_preview_queue.constBegin();
+        QUrl preview = *i;
+        m_preview_queue.remove(preview);
+
+        api->get(preview);
+    }
 }
 //----------------------------------------------------------------------------------------------
 

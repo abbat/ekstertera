@@ -10,6 +10,7 @@
 // стандартные заголовочные файлы Qt
 //
 
+#include <QSet>
 #include <QDir>
 #include <QUuid>
 #include <QMenu>
@@ -25,6 +26,7 @@
 #include <QPainter>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QMultiMap>
 #include <QCheckBox>
 #include <QComboBox>
 #include <QLineEdit>
