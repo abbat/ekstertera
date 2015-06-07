@@ -124,7 +124,7 @@ struct QMimeBinaryProvider::CacheFile
 };
 
 QMimeBinaryProvider::CacheFile::CacheFile(const QString &fileName)
-    : file(fileName), m_valid(false)
+    : file(fileName), data(NULL), m_valid(false)
 {
     load();
 }
