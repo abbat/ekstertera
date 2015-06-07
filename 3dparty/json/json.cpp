@@ -253,8 +253,7 @@ namespace QtJson {
         nextToken(json, index);
 
         // Loop through all of the key/value pairs of the object
-        bool done = false;
-        while (!done) {
+        while (true) {
             // Get the upcoming token
             token = lookAhead(json, index);
 
@@ -295,9 +294,6 @@ namespace QtJson {
                 map[name] = value;
             }
         }
-
-        // Return the map successfully
-        return QVariant(map);
     }
 
     /**
