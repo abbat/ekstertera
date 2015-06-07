@@ -411,11 +411,11 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Удаление объекта на диске
+         * Сигнал onRM
          * \param path Путь к объекту
          * \param permanently Флаг полного удаления (false - удаление в корзину)
-         * \return Флаг успеха
          */
-        bool rm(const QString& path, bool permanently);
+        void rm(const QString& path, bool permanently);
 
         /*!
          * \brief Копирование объекта на диске
@@ -669,6 +669,8 @@ class EteraAPI : public QObject
         void on_stat_finished();        /*!< \brief Завершение вызова stat()           */
         void on_ls_finished();          /*!< \brief Завершение вызова ls()             */
         void on_mkdir_finished();       /*!< \brief Завершение вызова mkdir()          */
+        void on_rm_finished();          /*!< \brief Завершение вызова rm()             */
+        void on_rm_wait_finished();     /*!< \brief Завершение ожидания вызова rm()    */
         void on_cp_finished();          /*!< \brief Завершение вызова cp()             */
         void on_cp_wait_finished();     /*!< \brief Завершение ожидания вызова cp()    */
         void on_mv_finished();          /*!< \brief Завершение вызова mv()             */
@@ -744,6 +746,13 @@ class EteraAPI : public QObject
          * \param path Путь
          */
         void onMKDIR(EteraAPI* api, const QString& path);
+
+        /*!
+         * \brief Сигнал удаления объекта
+         * \param api API
+         * \param path Путь
+         */
+        void onRM(EteraAPI* api, const QString& path);
 
         /*!
          * \brief Сигнал копирования объекта

@@ -561,17 +561,17 @@ void WidgetDisk::menu_paste_triggered()
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_rm_error(quint64 id, int code, const QString& error, bool async, const QVariantMap& args)
+void WidgetDisk::task_on_rm_error(EteraAPI* api)
 {
-    QString path = args["path"].toString();
+    QString path = api->property("path").toString();
 
     // Если объект не существует, то и удалять нечего
-    if (code != 404)
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка удаления %1:\n%2").arg(path).arg(error));
+    if (api->lastErrorCode() != 404)
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка удаления %1:\n%2").arg(path).arg(api->lastErrorMessage()));
 
     // если ошибка во время ожидания операции, то скорее всего объект будет удален
     // если объект был удален ранее, то его нужно удалить из виджета
-    if (async == true || code == 404) {
+    if (async == true || api->lastErrorCode() == 404) {
         // удаление из виджета
         removeByPath(path);
 
@@ -581,14 +581,12 @@ void WidgetDisk::task_on_rm_error(quint64 id, int code, const QString& error, bo
         clipboard->removeByPath(path);
     }
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater()
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_rm_success(quint64 id, const QVariantMap& args)
+void WidgetDisk::task_on_rm_success(EteraAPI* api, const QString& path)
 {
-    QString path = args["path"].toString();
-
     // удаление из виджета
     removeByPath(path);
 
@@ -597,7 +595,7 @@ void WidgetDisk::task_on_rm_success(quint64 id, const QVariantMap& args)
 
     clipboard->removeByPath(path);
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -615,13 +613,14 @@ void WidgetDisk::menu_delete_triggered()
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
         const EteraItem* eitem = witem->item();
 
-        EteraTaskRM* rm = new EteraTaskRM(eitem->path(), true);
+        EteraAPI* api = new EteraAPI(this);
 
-        connect(rm, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
-        connect(rm, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_rm_success(quint64, const QVariantMap&)));
-        connect(rm, SIGNAL(onError(quint64, int, const QString&, bool, const QVariantMap&)), this, SLOT(task_on_rm_error(quint64, int, const QString&, bool, const QVariantMap&)));
+        api->setToken(EteraSettings::instance()->token());
 
-        EteraThreadPool::instance()->start(rm);
+        connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_rm_error(EteraAPI*)));
+        connect(api, SIGNAL(onRM(EteraAPI*, const QString&)), this, SLOT(task_on_rm_success(EteraAPI*, const QString&)));
+
+        api->rm(eitem->path(), true);
     }
 }
 //----------------------------------------------------------------------------------------------

@@ -1126,7 +1126,7 @@ void EteraAPI::on_mkdir_finished()
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::rm(const QString& path, bool permanently)
+void EteraAPI::rm(const QString& path, bool permanently)
 {
     EteraArgs args;
 
@@ -1135,20 +1135,53 @@ bool EteraAPI::rm(const QString& path, bool permanently)
     if (permanently == true)
         args["permanently"] = "true";
 
+    setProperty("path",        path);
+    setProperty("permanently", permanently);
+
+    if (startSimpleRequest("/resources", args, ermDELETE) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_rm_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_rm_finished()
+{
+    QString path = property("path").toString();
+
     int     code;
     QString body;
 
-    if (makeSimpleRequest(code, body, "/resources", args, ermDELETE) == false)
-        return false;
+    if (parseReply(code, body) == false)
+        return;
 
-    if (code == 204)
+    if (code == 204) {
         // 204 No content (ресурс успешно удален)
-        return setLastError(0);
-    else if (code == 202)
-        // 202 Accepted (удаление папки начато)
-        return wait(body);
+        setLastError(0);
 
-    return setLastError(code, body);
+        emit onRM(this, path);
+    } else if (code == 202) {
+        // 202 Accepted (удаление папки начато)
+        if (startWait(body) == true)
+            connect(m_reply, SIGNAL(finished()), this, SLOT(on_rm_wait_finished()));
+    } else
+        setLastError(code, body);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_rm_wait_finished()
+{
+    bool wait;
+    if (parseWait(wait) == false)
+        return;
+
+    if (wait == true) {
+        QString link = property("link").toString();
+        if (startWait(link) == true)
+            connect(m_reply, SIGNAL(finished()), this, SLOT(on_rm_wait_finished()));
+    } else {
+        QString path = property("path").toString();
+
+        emit onRM(this, path);
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1184,7 +1217,7 @@ void EteraAPI::on_cp_finished()
 
     if (code == 201) {
         // 201 Created (ресурс успешно скопирован)
-        setLastError(0, 0);
+        setLastError(0);
 
         emit onCP(this, source, target);
     } else if (code == 202) {
@@ -1247,7 +1280,7 @@ void EteraAPI::on_mv_finished()
 
     if (code == 201) {
         // 201 Created (ресурс успешно перемещен)
-        setLastError(0, 0);
+        setLastError(0);
 
         emit onMV(this, source, target);
     } else if (code == 202) {
