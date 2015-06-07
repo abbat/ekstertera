@@ -133,6 +133,7 @@ void WidgetTasks::removeChildTask(quint64 id)
 
     delete titem->Item;
     delete titem;
+
     m_tasks.remove(id);
 
     if (parent != 0) {

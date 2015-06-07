@@ -1184,7 +1184,12 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
     connect(api, SIGNAL(onProgress(EteraAPI*, qint64, qint64)), this, SLOT(task_on_get_file_progress(EteraAPI*, qint64, qint64)));
     connect(api, SIGNAL(onGET(EteraAPI*, const QUrl&, QIODevice*)), this, SLOT(task_on_get_file_success(EteraAPI*, const QUrl&, QIODevice*)));
 
-    m_tasks->addChildTask(parent, id, source);
+    // TODO: Fix me
+    QVariantMap args;
+    args["parent"] = parent;
+
+    m_tasks->addWaitTask(parent);
+    m_tasks->addChildTask(parent, id, source, args);
 
     api->get(source, target);
 }

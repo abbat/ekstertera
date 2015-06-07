@@ -30,43 +30,43 @@
         <translation>An error occurred when opening the file</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="438"/>
+        <location filename="../utils/api.cpp" line="440"/>
         <source>КБ</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="441"/>
+        <location filename="../utils/api.cpp" line="443"/>
         <source>МБ</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="444"/>
+        <location filename="../utils/api.cpp" line="446"/>
         <source>ГБ</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="447"/>
+        <location filename="../utils/api.cpp" line="449"/>
         <source>ТБ</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="499"/>
-        <location filename="../utils/api.cpp" line="581"/>
+        <location filename="../utils/api.cpp" line="501"/>
+        <location filename="../utils/api.cpp" line="583"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="695"/>
+        <location filename="../utils/api.cpp" line="697"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="827"/>
+        <location filename="../utils/api.cpp" line="829"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="831"/>
+        <location filename="../utils/api.cpp" line="833"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>
@@ -486,22 +486,22 @@
         <location filename="../widgets/widget_disk.cpp" line="748"/>
         <location filename="../widgets/widget_disk.cpp" line="896"/>
         <location filename="../widgets/widget_disk.cpp" line="961"/>
-        <location filename="../widgets/widget_disk.cpp" line="1112"/>
-        <location filename="../widgets/widget_disk.cpp" line="1156"/>
-        <location filename="../widgets/widget_disk.cpp" line="1160"/>
-        <location filename="../widgets/widget_disk.cpp" line="1184"/>
-        <location filename="../widgets/widget_disk.cpp" line="1217"/>
-        <location filename="../widgets/widget_disk.cpp" line="1244"/>
-        <location filename="../widgets/widget_disk.cpp" line="1275"/>
-        <location filename="../widgets/widget_disk.cpp" line="1285"/>
-        <location filename="../widgets/widget_disk.cpp" line="1297"/>
-        <location filename="../widgets/widget_disk.cpp" line="1329"/>
+        <location filename="../widgets/widget_disk.cpp" line="1114"/>
+        <location filename="../widgets/widget_disk.cpp" line="1165"/>
+        <location filename="../widgets/widget_disk.cpp" line="1169"/>
+        <location filename="../widgets/widget_disk.cpp" line="1202"/>
+        <location filename="../widgets/widget_disk.cpp" line="1235"/>
+        <location filename="../widgets/widget_disk.cpp" line="1262"/>
+        <location filename="../widgets/widget_disk.cpp" line="1293"/>
+        <location filename="../widgets/widget_disk.cpp" line="1303"/>
+        <location filename="../widgets/widget_disk.cpp" line="1315"/>
+        <location filename="../widgets/widget_disk.cpp" line="1347"/>
         <source>Ошибка!</source>
         <translation>Error!</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="211"/>
-        <location filename="../widgets/widget_disk.cpp" line="1184"/>
+        <location filename="../widgets/widget_disk.cpp" line="1202"/>
         <source>Ошибка чтения %1:
 %2</source>
         <translation>Error read %1:
@@ -637,22 +637,22 @@ Target already exists</translation>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="778"/>
         <location filename="../widgets/widget_disk.cpp" line="817"/>
-        <location filename="../widgets/widget_disk.cpp" line="1140"/>
-        <location filename="../widgets/widget_disk.cpp" line="1231"/>
+        <location filename="../widgets/widget_disk.cpp" line="1149"/>
+        <location filename="../widgets/widget_disk.cpp" line="1249"/>
         <source>Файл уже существует!</source>
         <translation>File already exists!</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="778"/>
         <location filename="../widgets/widget_disk.cpp" line="817"/>
-        <location filename="../widgets/widget_disk.cpp" line="1140"/>
-        <location filename="../widgets/widget_disk.cpp" line="1231"/>
+        <location filename="../widgets/widget_disk.cpp" line="1149"/>
+        <location filename="../widgets/widget_disk.cpp" line="1249"/>
         <source>Файл %1 уже существует, перезаписать?</source>
         <translation>File %1 already exists, overwrite?</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="896"/>
-        <location filename="../widgets/widget_disk.cpp" line="1112"/>
+        <location filename="../widgets/widget_disk.cpp" line="1114"/>
         <source>Ошибка загрузки %1 в %2:
 %3</source>
         <translation>Error upload %1 to %2:
@@ -664,32 +664,32 @@ Target already exists</translation>
         <translation>Download from Disk</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1156"/>
-        <location filename="../widgets/widget_disk.cpp" line="1244"/>
-        <location filename="../widgets/widget_disk.cpp" line="1275"/>
-        <location filename="../widgets/widget_disk.cpp" line="1285"/>
+        <location filename="../widgets/widget_disk.cpp" line="1165"/>
+        <location filename="../widgets/widget_disk.cpp" line="1262"/>
+        <location filename="../widgets/widget_disk.cpp" line="1293"/>
+        <location filename="../widgets/widget_disk.cpp" line="1303"/>
         <source>Ошибка удаления %1</source>
         <translation>Error delete %1</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1160"/>
+        <location filename="../widgets/widget_disk.cpp" line="1169"/>
         <source>Неизвестный объект %1</source>
         <translation>Unknown object %1</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1217"/>
+        <location filename="../widgets/widget_disk.cpp" line="1235"/>
         <source>Ошибка создания %1</source>
         <translation>Error create %1</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1297"/>
+        <location filename="../widgets/widget_disk.cpp" line="1315"/>
         <source>Ошибка открытия доступа к %1:
 %2</source>
         <translation>Error publish %1:
 %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1329"/>
+        <location filename="../widgets/widget_disk.cpp" line="1347"/>
         <source>Ошибка закрытия доступа к %1:
 %2</source>
         <translation>Error unpublish %1:
