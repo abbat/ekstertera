@@ -298,8 +298,11 @@ class WidgetDisk : public QTabWidget
         void task_on_ls_error(EteraAPI* api);
         void task_on_ls_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
 
-        void task_on_mkdir_error(quint64 id, int code, const QString& error, const QVariantMap& args);
-        void task_on_mkdir_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+        void task_on_mkdir_stat_error(EteraAPI* api);
+        void task_on_mkdir_stat_success(EteraAPI* api, const EteraItem& item);
+
+        void task_on_mkdir_error(EteraAPI* api);
+        void task_on_mkdir_success(EteraAPI* api, const QString& path);
 
         void task_on_rm_error(quint64 id, int code, const QString& error, bool async, const QVariantMap& args);
         void task_on_rm_success(quint64 id, const QVariantMap& args);
@@ -340,8 +343,11 @@ class WidgetDisk : public QTabWidget
         void task_on_put_file_error(quint64 id, int code, const QString& error, const QVariantMap& args);
         void task_on_put_file_success(quint64 id, const EteraItem& item, const QVariantMap& args);
 
-        void task_on_put_dir_error(quint64 id, int code, const QString& error, const QVariantMap& args);
-        void task_on_put_dir_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+        void task_on_put_dir_stat_error(EteraAPI* api);
+        void task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& item);
+
+        void task_on_put_dir_error(EteraAPI* api);
+        void task_on_put_dir_success(EteraAPI* api, const QString& path);
 
         void task_on_get_file_error(EteraAPI* api);
         void task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total);

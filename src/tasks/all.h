@@ -9,6 +9,5 @@
 #include "task_rm.h"
 #include "task_put.h"
 #include "task_stat.h"
-#include "task_mkdir.h"
 
 #endif   // _ekstertera_tasks_all_h_

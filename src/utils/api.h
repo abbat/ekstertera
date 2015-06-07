@@ -404,10 +404,10 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Создание директории на диске
+         * Сигнал onMKDIR
          * \param path Путь к директории
-         * \return Флаг успеха
          */
-        bool mkdir(const QString& path);
+        void mkdir(const QString& path);
 
         /*!
          * \brief Удаление объекта на диске
@@ -668,6 +668,7 @@ class EteraAPI : public QObject
         void on_info_finished();        /*!< \brief Завершение вызова info()           */
         void on_stat_finished();        /*!< \brief Завершение вызова stat()           */
         void on_ls_finished();          /*!< \brief Завершение вызова ls()             */
+        void on_mkdir_finished();       /*!< \brief Завершение вызова mkdir()          */
         void on_cp_finished();          /*!< \brief Завершение вызова cp()             */
         void on_cp_wait_finished();     /*!< \brief Завершение ожидания вызова cp()    */
         void on_mv_finished();          /*!< \brief Завершение вызова mv()             */
@@ -736,6 +737,13 @@ class EteraAPI : public QObject
          * При limit < list.count() дальнейшие запросы можно прекращать
          */
         void onLS(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
+
+        /*!
+         * \brief Сигнал создания директории
+         * \param api API
+         * \param path Путь
+         */
+        void onMKDIR(EteraAPI* api, const QString& path);
 
         /*!
          * \brief Сигнал копирования объекта

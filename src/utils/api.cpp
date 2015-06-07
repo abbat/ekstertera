@@ -1096,22 +1096,33 @@ void EteraAPI::on_ls_finished()
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::mkdir(const QString& path)
+void EteraAPI::mkdir(const QString& path)
 {
     EteraArgs args;
 
     args["path"] = path;
 
+    setProperty("path", path);
+
+    if (startSimpleRequest("/resources", args, ermPUT) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_mkdir_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_mkdir_finished()
+{
+    QString path = property("path").toString();
+
     int     code;
     QString body;
 
-    if (makeSimpleRequest(code, body, "/resources", args, ermPUT) == false)
-        return false;
+    if (parseReply(code, body) == false)
+        return;
 
-    if (code != 201)
-        return setLastError(code, body);
-
-    return setLastError(0);
+    if (code == 201)
+        emit onMKDIR(this, path);
+    else
+        setLastError(code, body);
 }
 //----------------------------------------------------------------------------------------------
 
