@@ -281,6 +281,10 @@ class EteraItem
  */
 typedef QList<EteraItem> EteraItemList;
 
+// работа с QVariant
+Q_DECLARE_METATYPE(QBuffer*);
+Q_DECLARE_METATYPE(QIODevice*);
+
 /*!
  * \brief Работа с API Диска
  */
@@ -442,28 +446,19 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение файла с диска
-         * DEPRECATED
          * \param source Имя файла на диске
          * \param target Имя локального файла
-         * \return Флаг успеха
          */
-        bool get(const QString& source, const QString& target);
-
-        /*!
-         * \brief Получение файла с диска
-         * DEPRECATED
-         * \param url Ссылка
-         * \param target Буфер для записи
-         * \return Флаг успеха
-         */
-        bool get(const QUrl& url, QIODevice* target);
+        void get(const QString& source, const QString& target);
 
         /*!
          * \brief Загрузка url с сервиса
-         * Сигнал onGET, с параметром QByteArray
+         * Сигнал onGET
          * \param url Ссылка
+         * \param device Устройство записи
+         * При device == NULL будет создан QBuffer
          */
-        void get(const QUrl& url);
+        void get(const QUrl& url, QIODevice* device = NULL);
 
         /*!
          * \brief Открыть доступ к объекту
@@ -498,7 +493,6 @@ class EteraAPI : public QObject
 
         QNetworkReply* m_reply;    /*!< \brief Переменная для временного хранения текущего ответа */
         QIODevice*     m_io;       /*!< \brief Переменная для временного хранения текущей цели    */
-        QBuffer*       m_io_buf;   /*!< \brief Переменная для временного хранения текущего буфера */
 
         /*!
          * \brief Сообщение OK
@@ -656,21 +650,31 @@ class EteraAPI : public QObject
          */
         void on_about_to_quit();
 
-        void on_info_finished();        /*!< \brief Завершение вызова info()      */
-        void on_stat_finished();        /*!< \brief Завершение вызова stat()      */
-        void on_ls_finished();          /*!< \brief Завершение вызова ls()        */
-        void on_get_finished();         /*!< \brief Завершение вызова get()       */
-        void on_publish_finished();     /*!< \brief Завершение вызова publish()   */
-        void on_unpublish_finished();   /*!< \brief Завершение вызова unpublish() */
+        void on_info_finished();        /*!< \brief Завершение вызова info()           */
+        void on_stat_finished();        /*!< \brief Завершение вызова stat()           */
+        void on_ls_finished();          /*!< \brief Завершение вызова ls()             */
+        void on_get_file_finished();    /*!< \brief Завершение вызова get() для файла  */
+        void on_get_url_finished();     /*!< \brief Завершение вызова get() для ссылки */
+        void on_publish_finished();     /*!< \brief Завершение вызова publish()        */
+        void on_unpublish_finished();   /*!< \brief Завершение вызова unpublish()      */
 
     signals:
 
         /*!
          * \brief Сигнал прогресса операции
+         * DEPRECATED
          * \param done Выполнено
          * \param total Всего
          */
         void onProgress(qint64 done, qint64 total);
+
+        /*!
+         * \brief Сигнал прогресса операции
+         * \param api API
+         * \param done Выполнено
+         * \param total Всего
+         */
+        void onProgress(EteraAPI* api, qint64 done, qint64 total);
 
         /*!
          * \brief Сигнал ошибки ssl
@@ -718,9 +722,9 @@ class EteraAPI : public QObject
          * \brief Сигнал загрузки url с сервиса
          * \param api API
          * \param url Url
-         * \param data Данные
+         * \param device Устройство с данными
          */
-        void onGET(EteraAPI* api, const QUrl& url, const QByteArray& data);
+        void onGET(EteraAPI* api, const QUrl& url, QIODevice* device);
 
         /*!
          * \brief Сигнал открытия доступа к объекту

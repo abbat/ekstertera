@@ -319,9 +319,8 @@ void EteraAPI::cleanup()
 
 EteraAPI::EteraAPI(QObject* parent, bool noprogress) : QObject(parent)
 {
-    m_io     = NULL;
-    m_reply  = NULL;
-    m_io_buf = NULL;
+    m_io    = NULL;
+    m_reply = NULL;
 
     m_user_agent = QString("ekstertera/%1").arg(ETERA_VERSION);
     m_base_url   = "https://cloud-api.yandex.net/v1/disk";
@@ -339,8 +338,6 @@ EteraAPI::EteraAPI(QObject* parent, bool noprogress) : QObject(parent)
 
 EteraAPI::~EteraAPI()
 {
-    if (m_io_buf != NULL)
-        delete m_io_buf;
 }
 //----------------------------------------------------------------------------------------------
 
@@ -366,18 +363,20 @@ void EteraAPI::on_about_to_quit()
 
 void EteraAPI::on_download_progress(qint64 done, qint64 total)
 {
-    if (g_api_enabled == true)
+    if (g_api_enabled == true) {
         emit onProgress(done, total);
-    else
+        emit onProgress(this, done, total);
+    } else
         m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
 
 void EteraAPI::on_upload_progress(qint64 done, qint64 total)
 {
-    if (g_api_enabled == true)
+    if (g_api_enabled == true) {
         emit onProgress(done, total);
-    else
+        emit onProgress(this, done, total);
+    } else
         m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
@@ -408,11 +407,6 @@ bool EteraAPI::setLastError(int code, const QString& message)
 
     if (code != 0) {
         m_error_message = QString("[%1]: %2").arg(code).arg(message);
-
-        if (m_io_buf != NULL) {
-            delete m_io_buf;
-            m_io_buf = NULL;
-        }
 
         emit onError(this);
     } else {
@@ -1195,94 +1189,86 @@ bool EteraAPI::put(const QString& source, const QString& target, bool overwrite)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::get(const QString& source, const QString& target)
+void EteraAPI::get(const QString& source, const QString& target)
 {
     EteraArgs args;
 
     args["path"] = source;
 
+    setProperty("source", source);
+    setProperty("target", target);
+    setProperty("device", QVariant::fromValue<QIODevice*>(NULL));
+
+    if (startSimpleRequest("/resources/download", args, ermGET) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_get_file_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_get_file_finished()
+{
+    QString source = property("source").toString();
+    QString target = property("target").toString();
+
     int     code;
     QString body;
 
-    if (makeSimpleRequest(code, body, "/resources/download", args, ermGET) == false)
-        return false;
+    if (parseReply(code, body) == false)
+        return;
 
-    if (code != 200)
-        return setLastError(code, body);
+    if (code != 200) {
+        setLastError(code, body);
+        return;
+    }
 
     QUrl               url;
     EteraRequestMethod method;
 
     if (parseLink(body, url, method) == false)
-        return false;
+        return;
 
-    if (method != ermGET)
-        return setLastError(1, UNSUPPORTED_LINK_METHOD);
-
-    QFile file(target);
-    if (file.open(QIODevice::WriteOnly | QIODevice::Truncate) == false)
-         return setLastError(file.error(), FILE_OPEN_ERROR);
-
-    if (get(url, &file) == false) {
-        file.remove();
-        return false;
+    if (method != ermGET) {
+        setLastError(1, UNSUPPORTED_LINK_METHOD);
+        return;
     }
 
-    return true;
+    QFile* device = new QFile(target, this);
+
+    setProperty("device", QVariant::fromValue<QIODevice*>(device));
+
+    if (device->open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
+        setLastError(device->error(), FILE_OPEN_ERROR);
+        return;
+    }
+
+    get(url, device);
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::get(const QUrl& url, QIODevice* target)
+void EteraAPI::get(const QUrl& url, QIODevice* device)
 {
     QNetworkRequest request(url);
     setDefaultHeaders(request, 0, true, true);
 
-    int     code;
-    QString body;
-
-    while (true) {
-        if (makeRequest(request, code, body, ermGET, "", target) == false)
-            return false;
-
-        if (code == 200)
-            return setLastError(0);
-
-        if (code == 301 || code == 302) {
-            QUrl _url = QUrl::fromEncoded(body.toUtf8());
-            if (checkYandexDomain(_url) == false)
-                return setLastError(1, MALFORMED_LINK_URL);
-
-            request.setUrl(_url);
-
-            continue;
-        }
-
-        break;
+    if (device == NULL) {
+        device = new QBuffer(this);
+        device->open(QIODevice::WriteOnly | QIODevice::Truncate);
     }
 
-    return setLastError(code, body);
+    setProperty("url",    url);
+    setProperty("device", QVariant::fromValue<QIODevice*>(device));
+
+    if (startRequest(request, ermGET, "", device) == true) {
+        connect(m_reply, SIGNAL(finished()),                       this, SLOT(on_get_url_finished()));
+        connect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), this, SLOT(on_download_progress(qint64, qint64)));
+        connect(m_reply, SIGNAL(uploadProgress(qint64, qint64)),   this, SLOT(on_upload_progress(qint64, qint64)));
+    }
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::get(const QUrl& url)
+void EteraAPI::on_get_url_finished()
 {
-    QNetworkRequest request(url);
-    setDefaultHeaders(request, 0, true, true);
+    QIODevice* device = qvariant_cast<QIODevice*>(property("device"));
 
-    if (m_io_buf == NULL) {
-        m_io_buf = new QBuffer();
-        m_io_buf->open(QIODevice::WriteOnly | QIODevice::Truncate);
-    }
-
-    setProperty("url", url);
-
-    if (startRequest(request, ermGET, "", m_io_buf) == true)
-        connect(m_reply, SIGNAL(finished()), this, SLOT(on_get_finished()));
-}
-//----------------------------------------------------------------------------------------------
-
-void EteraAPI::on_get_finished()
-{
     int     code;
     QString body;
 
@@ -1296,24 +1282,15 @@ void EteraAPI::on_get_finished()
             return;
         }
 
-        get(_url);
-
+        get(_url, device);
     } else if (code == 200) {
-        m_io_buf->close();
-
-        QBuffer* tmp = m_io_buf;
-        m_io_buf = NULL;
+        device->close();
 
         setLastError(0);
 
-        emit onGET(this, property("url").toUrl(), tmp->data());
-
-        delete tmp;
-
-        return;
-    }
-
-    setLastError(code, body);
+        emit onGET(this, property("url").toUrl(), device);
+    } else
+        setLastError(code, body);
 }
 //----------------------------------------------------------------------------------------------
 

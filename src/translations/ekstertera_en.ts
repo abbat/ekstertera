@@ -5,68 +5,68 @@
 <context>
     <name>EteraAPI</name>
     <message>
-        <location filename="../utils/api.cpp" line="349"/>
+        <location filename="../utils/api.cpp" line="346"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="350"/>
+        <location filename="../utils/api.cpp" line="347"/>
         <source>Ошибка разбора JSON</source>
         <translation>JSON parse error</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="351"/>
+        <location filename="../utils/api.cpp" line="348"/>
         <source>Неподдерживаемый URL объекта Link</source>
         <translation>Malformed URL of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="352"/>
+        <location filename="../utils/api.cpp" line="349"/>
         <source>Неподдерживаемый метод объекта Link</source>
         <translation>Unsupported method of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="353"/>
+        <location filename="../utils/api.cpp" line="350"/>
         <source>Ошибка открытия файла</source>
         <translation>An error occurred when opening the file</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="446"/>
+        <location filename="../utils/api.cpp" line="438"/>
         <source>КБ</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="449"/>
+        <location filename="../utils/api.cpp" line="441"/>
         <source>МБ</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="452"/>
+        <location filename="../utils/api.cpp" line="444"/>
         <source>ГБ</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="455"/>
+        <location filename="../utils/api.cpp" line="447"/>
         <source>ТБ</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="507"/>
-        <location filename="../utils/api.cpp" line="589"/>
+        <location filename="../utils/api.cpp" line="499"/>
+        <location filename="../utils/api.cpp" line="581"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="703"/>
+        <location filename="../utils/api.cpp" line="695"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="835"/>
+        <location filename="../utils/api.cpp" line="827"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="839"/>
+        <location filename="../utils/api.cpp" line="831"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>
@@ -82,19 +82,6 @@
         <location filename="../tasks/task_cp.cpp" line="30"/>
         <source>Чтение информации о %1</source>
         <translation>Read %1</translation>
-    </message>
-</context>
-<context>
-    <name>EteraTaskGET</name>
-    <message>
-        <location filename="../tasks/task_get.cpp" line="29"/>
-        <source>Сохранение %1 в %2</source>
-        <translation>Download %1 to %2</translation>
-    </message>
-    <message>
-        <location filename="../tasks/task_get.cpp" line="31"/>
-        <source>Получение %1</source>
-        <translation>Download %1</translation>
     </message>
 </context>
 <context>

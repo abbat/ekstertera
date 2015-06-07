@@ -1098,25 +1098,34 @@ void WidgetDisk::getRemoteObjects(const QString& path)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_get_file_progress(quint64 id, qint64 done, qint64 total)
+void WidgetDisk::task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total)
 {
+    quint64 id = api->property("id").toULongLong();
     m_tasks->setProgress(id, done, total);
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_get_file_error(quint64 id, int /*code*/, const QString& error, const QVariantMap& args)
+void WidgetDisk::task_on_get_file_error(EteraAPI* api)
 {
-    QString source = args["source"].toString();
-    QString target = args["target"].toString();
+    quint64 id     = api->property("id").toULongLong();
+    QString source = api->property("source").toString();
+    QString target = api->property("target").toString();
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(source).arg(target).arg(error));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
+
+    api->deleteLater();
 
     m_tasks->removeChildTask(id);
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_get_file_success(quint64 id, const QVariantMap& /*args*/)
+void WidgetDisk::task_on_get_file_success(EteraAPI* api, const QUrl& /*url*/, QIODevice* device)
 {
+    quint64 id = api->property("id").toULongLong();
+
+    device->deleteLater();
+    api->deleteLater();
+
     m_tasks->removeChildTask(id);
 }
 //----------------------------------------------------------------------------------------------
@@ -1162,18 +1171,22 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
         }
     }
 
-    EteraTaskGET* get = new EteraTaskGET(source, target);
+    quint64 id = EteraTask::nextID();
 
-    get->addArg("parent", parent);
+    EteraAPI* api = new EteraAPI(this);
 
-    m_tasks->addWaitTask(parent);
+    api->setToken(EteraSettings::instance()->token());
 
-    connect(get, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
-    connect(get, SIGNAL(onProgress(quint64, qint64, qint64)), this, SLOT(task_on_get_file_progress(quint64, qint64, qint64)));
-    connect(get, SIGNAL(onSuccess(quint64, const QVariantMap&)), this, SLOT(task_on_get_file_success(quint64, const QVariantMap&)));
-    connect(get, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_get_file_error(quint64, int, const QString&, const QVariantMap&)));
+    api->setProperty("id",     id);
+    api->setProperty("parent", parent);
 
-    EteraThreadPool::instance()->start(get);
+    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_get_file_error(EteraAPI*)));
+    connect(api, SIGNAL(onProgress(EteraAPI*, qint64, qint64)), this, SLOT(task_on_get_file_progress(EteraAPI*, qint64, qint64)));
+    connect(api, SIGNAL(onGET(EteraAPI*, const QUrl&, QIODevice*)), this, SLOT(task_on_get_file_success(EteraAPI*, const QUrl&, QIODevice*)));
+
+    m_tasks->addChildTask(parent, id, source);
+
+    api->get(source, target);
 }
 //----------------------------------------------------------------------------------------------
 
