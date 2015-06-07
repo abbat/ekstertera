@@ -1,0 +1,28 @@
+language: cpp
+
+compiler:
+  - gcc
+
+install:
+  - sudo apt-get -y install libqt4-dev libqtwebkit-dev
+
+script:
+  - ./build.linux.sh
+
+env:
+  global:
+    - secure: ""
+
+addons:
+  coverity_scan:
+    project:
+      name: "abbat/ekstertera"
+      description: "Build submitted via Travis CI"
+    notification_email: antonbatenev@yandex.ru
+    build_command_prepend: true
+    build_command: ./build.linux.sh
+    branch_pattern: master
+
+branches:
+  only:
+    - master

@@ -1212,6 +1212,7 @@ void WidgetDisk::task_on_get_dir_success(EteraAPI* api, const EteraItemList& lis
 void WidgetDisk::getRemoteDir(const QString& source, const QString& target, quint64 parent)
 {
     QFileInfo info(target);
+
     if (info.exists() == false && info.dir().mkdir(info.absoluteFilePath()) == false) {
         QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1").arg(info.absoluteFilePath()));
         return;
