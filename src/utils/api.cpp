@@ -837,6 +837,60 @@ bool EteraAPI::wait(const QString& link)
 }
 //----------------------------------------------------------------------------------------------
 
+bool EteraAPI::startWait(const QString& link)
+{
+    QUrl               url;
+    EteraRequestMethod method;
+
+    if (parseLink(link, url, method) == false)
+        return false;
+
+    if (method != ermGET)
+        return setLastError(1, UNSUPPORTED_LINK_METHOD);
+
+    QNetworkRequest request(url);
+    setDefaultHeaders(request);
+
+    setProperty("link", link);
+
+    if (startRequest(request, method) == false)
+        return false;
+
+    return true;
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraAPI::parseWait(bool& wait)
+{
+    wait = false;
+
+    bool    ok;
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return false;
+
+    if (code != 200)
+        return setLastError(code, body);
+
+    QtJson::JsonObject json = QtJson::parse(body, ok).toMap();
+    if (ok == false)
+        return setLastError(1, JSON_PARSE_ERROR);
+
+    QString status = json["status"].toString().toLower();
+    if (status == "in-progress") {
+        wait = true;
+        return true;
+    } else if (status == "failure")
+        return setLastError(1, trUtf8("Операцию завершить не удалось, попробуйте повторить запрос позже"));
+    else if (status == "success")
+        return true;
+
+    return setLastError(1, trUtf8("Неизвестный статус операции"));
+}
+//----------------------------------------------------------------------------------------------
+
 void EteraAPI::info()
 {
     if (startSimpleRequest("") == true)
@@ -1087,7 +1141,7 @@ bool EteraAPI::rm(const QString& path, bool permanently)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
+void EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
 {
     EteraArgs args;
 
@@ -1097,24 +1151,60 @@ bool EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
     if (overwrite == true)
         args["overwrite"] = "true";
 
-    int     code;
-    QString body;
+    setProperty("source",    source);
+    setProperty("target",    target);
+    setProperty("overwrite", overwrite);
 
-    if (makeSimpleRequest(code, body, "/resources/copy", args, ermPOST) == false)
-        return false;
-
-    if (code == 201)
-        // 201 Created (ресурс успешно скопирован)
-        return setLastError(0);
-    else if (code == 202)
-        // 202 Accepted (копирование папки начато)
-        return wait(body);
-
-    return setLastError(code, body);
+    if (startSimpleRequest("/resources/copy", args, ermPOST) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_cp_finished()));
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
+void EteraAPI::on_cp_finished()
+{
+    QString source = property("source").toString();
+    QString target = property("target").toString();
+
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return;
+
+    if (code == 201) {
+        // 201 Created (ресурс успешно скопирован)
+        setLastError(0, 0);
+
+        emit onCP(this, source, target);
+    } else if (code == 202) {
+        // 202 Accepted (копирование папки начато)
+        if (startWait(body) == true)
+            connect(m_reply, SIGNAL(finished()), this, SLOT(on_cp_wait_finished()));
+    } else
+        setLastError(code, body);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_cp_wait_finished()
+{
+    bool wait;
+    if (parseWait(wait) == false)
+        return;
+
+    if (wait == true) {
+        QString link = property("link").toString();
+        if (startWait(link) == true)
+            connect(m_reply, SIGNAL(finished()), this, SLOT(on_cp_wait_finished()));
+    } else {
+        QString source = property("source").toString();
+        QString target = property("target").toString();
+
+        emit onCP(this, source, target);
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
 {
     EteraArgs args;
 
@@ -1124,21 +1214,56 @@ bool EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
     if (overwrite == true)
         args["overwrite"] = "true";
 
+    setProperty("source",    source);
+    setProperty("target",    target);
+    setProperty("overwrite", overwrite);
+
+    if (startSimpleRequest("/resources/move", args, ermPOST) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_mv_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_mv_finished()
+{
+    QString source = property("source").toString();
+    QString target = property("target").toString();
+
     int     code;
     QString body;
 
-    if (makeSimpleRequest(code, body, "/resources/move", args, ermPOST) == false)
-        return false;
+    if (parseReply(code, body) == false)
+        return;
 
-    if (code == 201)
+    if (code == 201) {
         // 201 Created (ресурс успешно перемещен)
-        return setLastError(0);
-    else if (code == 202) {
-        // 202 Accepted (перемещение папки начато)
-        return wait(body);
-    }
+        setLastError(0, 0);
 
-    return setLastError(code, body);
+        emit onMV(this, source, target);
+    } else if (code == 202) {
+        // 202 Accepted (перемещение папки начато)
+        if (startWait(body) == true)
+            connect(m_reply, SIGNAL(finished()), this, SLOT(on_mv_wait_finished()));
+    } else
+        setLastError(code, body);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_mv_wait_finished()
+{
+    bool wait;
+    if (parseWait(wait) == false)
+        return;
+
+    if (wait == true) {
+        QString link = property("link").toString();
+        if (startWait(link) == true)
+            connect(m_reply, SIGNAL(finished()), this, SLOT(on_mv_wait_finished()));
+    } else {
+        QString source = property("source").toString();
+        QString target = property("target").toString();
+
+        emit onMV(this, source, target);
+    }
 }
 //----------------------------------------------------------------------------------------------
 

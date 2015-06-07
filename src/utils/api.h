@@ -419,21 +419,21 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Копирование объекта на диске
+         * Сигнал onCP
          * \param source Исходный путь
          * \param target Путь назначения
          * \param overwrite Флаг перезаписи (false - перезапись запрещена)
-         * \return Флаг успеха
          */
-        bool cp(const QString& source, const QString& target, bool overwrite);
+        void cp(const QString& source, const QString& target, bool overwrite);
 
         /*!
          * \brief Перемещение объекта
+         * Сигнал onMV
          * \param source Исходный путь
          * \param target Путь назначения
          * \param overwrite Флаг перезаписи (false - перезапись запрещена)
-         * \return Флаг успеха
          */
-        bool mv(const QString& source, const QString& target, bool overwrite);
+        void mv(const QString& source, const QString& target, bool overwrite);
 
         /*!
          * \brief Загрузка локального файла на диск
@@ -628,10 +628,25 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Ожидание асинхронной операции
+         * DEPRECATED
          * \param link Тело объекта Link
          * \return Флаг успеха
          */
         bool wait(const QString& link);
+
+        /*!
+         * \brief Старт запроса на ожидание асинхронной операции
+         * \param link Тело объекта Link
+         * \return Флаг успеха
+         */
+        bool startWait(const QString& link);
+
+        /*!
+         * \brief Проверка результата запроса на ожидание асинхронной операции
+         * \param wait Флаг необходимости повторного запроса startWait
+         * \return true в случае, если операция завершена, false в случае ошибки
+         */
+        bool parseWait(bool& wait);
 
     private slots:
 
@@ -653,6 +668,10 @@ class EteraAPI : public QObject
         void on_info_finished();        /*!< \brief Завершение вызова info()           */
         void on_stat_finished();        /*!< \brief Завершение вызова stat()           */
         void on_ls_finished();          /*!< \brief Завершение вызова ls()             */
+        void on_cp_finished();          /*!< \brief Завершение вызова cp()             */
+        void on_cp_wait_finished();     /*!< \brief Завершение ожидания вызова cp()    */
+        void on_mv_finished();          /*!< \brief Завершение вызова mv()             */
+        void on_mv_wait_finished();     /*!< \brief Завершение ожидания вызова mv()    */
         void on_get_file_finished();    /*!< \brief Завершение вызова get() для файла  */
         void on_get_url_finished();     /*!< \brief Завершение вызова get() для ссылки */
         void on_publish_finished();     /*!< \brief Завершение вызова publish()        */
@@ -717,6 +736,22 @@ class EteraAPI : public QObject
          * При limit < list.count() дальнейшие запросы можно прекращать
          */
         void onLS(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
+
+        /*!
+         * \brief Сигнал копирования объекта
+         * \param api API
+         * \param source Источник
+         * \param target Приемник
+         */
+        void onCP(EteraAPI* api, const QString& source, const QString& target);
+
+        /*!
+         * \brief Сигнал перемещения объекта
+         * \param api API
+         * \param source Источник
+         * \param target Приемник
+         */
+        void onMV(EteraAPI* api, const QString& source, const QString& target);
 
         /*!
          * \brief Сигнал загрузки url с сервиса
