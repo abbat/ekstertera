@@ -484,7 +484,7 @@ void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, c
     QUrlQuery query;
 #endif
 
-    for (EteraArgs::const_iterator i = args.constBegin(); i != args.constEnd(); i++)
+    for (EteraArgs::const_iterator i = args.constBegin(); i != args.constEnd(); ++i)
 #if QT_VERSION < 0x050000
         url.addQueryItem(i.key(), i.value());
 #else
@@ -1026,7 +1026,7 @@ void EteraAPI::on_ls_finished()
     json = json["_embedded"].toMap();
     QVariantList items = json["items"].toList();
 
-    for (QVariantList::const_iterator i = items.constBegin(); i < items.constEnd(); i++) {
+    for (QVariantList::const_iterator i = items.constBegin(); i < items.constEnd(); ++i) {
         EteraItem item;
         if (item.parse((*i).toMap()) == false) {
             setLastError(1, JSON_PARSE_ERROR);
