@@ -8,6 +8,5 @@
 
 #include "task_rm.h"
 #include "task_put.h"
-#include "task_stat.h"
 
 #endif   // _ekstertera_tasks_all_h_
