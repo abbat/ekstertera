@@ -11,7 +11,7 @@ script:
 
 env:
   global:
-    - secure: ""
+    - secure: "TbKqfr7dR1C5OSELNEhcj9qz0rSs1TftrV75v7HIM5+koUj8qFWTE74WRZ0Z7XF4+BNpuyGDr5gKNidRTGGtUzJK/2rCfeKupyRhq1S7jlnboLV68eHLMcFZ5YMEMvUxAgwKszPUbcVTkUDFGILTlTRu1fFd+KISVG8LxOEOIQA="
 
 addons:
   coverity_scan:
