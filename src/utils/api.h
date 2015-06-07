@@ -652,6 +652,7 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Обработка сигнала выхода из приложения
+         * DEPRECATED
          */
         void on_about_to_quit();
 
