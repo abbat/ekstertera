@@ -3,7 +3,6 @@
 #include "widget_disk_item_delegate.h"
 //----------------------------------------------------------------------------------------------
 #include "tasks/task.h"
-#include "utils/pool.h"
 #include "utils/icon.h"
 #include "utils/settings.h"
 #include "utils/clipboard.h"
@@ -1638,7 +1637,7 @@ void WidgetDisk::setPreviewMode(bool mode)
     m_preview_mode = mode;
 
     if (m_preview_mode == false)
-        EteraThreadPool::instance()->purge(etpBackground);
+        EteraIconProvider::instance()->cancelPreview();
 
     for (int i = 0; i < m_explorer->count(); i++) {
         WidgetDiskItem* item = static_cast<WidgetDiskItem*>(m_explorer->item(i));

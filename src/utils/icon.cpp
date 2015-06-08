@@ -424,6 +424,13 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
 }
 //----------------------------------------------------------------------------------------------
 
+void EteraIconProvider::cancelPreview()
+{
+    m_preview_wait.clear();
+    m_preview_queue.clear();
+}
+//----------------------------------------------------------------------------------------------
+
 void EteraIconProvider::cancelPreview(const WidgetDiskItem* item)
 {
     QUrl preview = item->item()->preview();

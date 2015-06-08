@@ -51,6 +51,11 @@ class EteraIconProvider : public QObject
         bool preview(WidgetDiskItem* item);
 
         /*!
+         * \brief Отмена ожидания загрузки превью для всей очереди
+         */
+        void cancelPreview();
+
+        /*!
          * \brief Отмена ожидания загрузки превью
          * \param item Описатель элемента
          */

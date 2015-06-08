@@ -4,7 +4,6 @@
  */
 //----------------------------------------------------------------------------------------------
 #include "utils/icon.h"
-#include "utils/pool.h"
 #include "utils/settings.h"
 #include "utils/clipboard.h"
 #include "utils/translator.h"
@@ -39,10 +38,10 @@ int main (int argc, char* argv[])
     EteraTranslator::init();
     // инициализация буфера обмена
     EteraClipboard::init();
+    // инициализация api
+    EteraAPI::init();
     // инициализация провайдера иконок
     EteraIconProvider::init();
-    // инициализация пула асинхронных задач и api
-    EteraThreadPool::init();
 
     // главная форма
     FormMain* form = new FormMain();
@@ -54,10 +53,10 @@ int main (int argc, char* argv[])
 
     delete form;
 
-    // очистка ресурсов пула асинхронных задач и api
-    EteraThreadPool::cleanup();
     // очистка ресурсов провайдера иконок
     EteraIconProvider::cleanup();
+    // очистка ресурсов api
+    EteraAPI::cleanup();
     // очистка ресурсов буфера обмена
     EteraClipboard::cleanup();
     // очистка ресурсов локализации
