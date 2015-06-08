@@ -2,7 +2,7 @@
 //----------------------------------------------------------------------------------------------
 #include "widget_disk_item_delegate.h"
 //----------------------------------------------------------------------------------------------
-#include "tasks/all.h"
+#include "tasks/task.h"
 #include "utils/pool.h"
 #include "utils/icon.h"
 #include "utils/settings.h"
@@ -986,21 +986,45 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_put_file_progress(quint64 id, qint64 done, qint64 total)
+void WidgetDisk::task_on_put_stat_error(EteraAPI* api)
 {
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_put_stat_success(EteraAPI* api, const EteraItem& item)
+{
+    if (item.parentPath() == m_path) {
+        WidgetDiskItem* witem = findByPath(item.path());
+
+        if (witem == NULL)
+            m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
+        else
+            witem->replaceItem(item, m_preview_mode);
+    }
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 total)
+{
+    quint64 id = api->property("id").toULongLong();
+
     m_tasks->setProgress(id, done, total);
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_put_file_error(quint64 id, int code, const QString& error, const QVariantMap& args)
+void WidgetDisk::task_on_put_file_error(EteraAPI* api)
 {
-    QString source    = args["source"].toString();
-    QString target    = args["target"].toString();
-    quint64 parent    = args["parent"].toULongLong();
-    bool    overwrite = args["overwrite"].toBool();
+    quint64 id        = api->property("id").toULongLong();
+    QString source    = api->property("source").toString();
+    QString target    = api->property("target").toString();
+    quint64 parent    = api->property("parent").toULongLong();
+    bool    overwrite = api->property("overwrite").toBool();
 
     // если объект существует, нужно убедиться, что это файл и тогда можно продолжить работу
-    if (code == 409) {
+    if (api->lastErrorCode() == 409) {
         quint64     rootid   = m_tasks->rootID(id);
         QVariantMap rootargs = m_tasks->args(rootid);
 
@@ -1012,53 +1036,58 @@ void WidgetDisk::task_on_put_file_error(quint64 id, int code, const QString& err
 
             api->setToken(EteraSettings::instance()->token());
 
-            api->setProperty("source", source);
-            api->setProperty("target", target);
-            api->setProperty("parent", parent);
+            api->setProperty("source",    source);
+            api->setProperty("target",    target);
+            api->setProperty("parent",    parent);
             api->setProperty("overwrite", overwrite);
-            api->setProperty("ensure", "file");
+            api->setProperty("ensure",    "file");
 
             connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_ensure_error(EteraAPI*)));
             connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_put_ensure_success(EteraAPI*, const EteraItem&)));
 
             api->stat(target);
         }
-    } else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(source).arg(target).arg(error));
-
-    m_tasks->removeChildTask(id);
+    } else {
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
+        m_tasks->removeChildTask(id);
+        api->deleteLater();
+    }
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_put_file_success(quint64 id, const EteraItem& item, const QVariantMap& /*args*/)
+void WidgetDisk::task_on_put_file_success(EteraAPI* api, const QUrl& /*url*/, QIODevice* device)
 {
-    if (item.parentPath() == m_path) {
-        WidgetDiskItem* witem = findByPath(item.path());
+    device->deleteLater();
 
-        if (witem == NULL)
-            m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
-        else
-            witem->replaceItem(item, m_preview_mode);
-    }
+    QString target = api->property("target").toString();
 
-    m_tasks->removeChildTask(id);
+    disconnect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_file_error(EteraAPI*)));
+
+    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_stat_error(EteraAPI*)));
+    connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_put_stat_success(EteraAPI*, const EteraItem&)));
+
+    api->stat(target);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::putLocalFile(const QString& source, const QString& target, bool overwrite, quint64 parent)
 {
-    EteraTaskPUT* put = new EteraTaskPUT(source, target, overwrite);
+    quint64 id = EteraTask::nextID();
 
-    put->addArg("parent", parent);
+    EteraAPI* api = new EteraAPI(this);
 
-    m_tasks->addWaitTask(parent);
+    api->setToken(EteraSettings::instance()->token());
 
-    connect(put, SIGNAL(onStart(quint64, const QString&, const QVariantMap&)), this, SLOT(task_on_start(quint64, const QString&, const QVariantMap&)));
-    connect(put, SIGNAL(onProgress(quint64, qint64, qint64)), this, SLOT(task_on_put_file_progress(quint64, qint64, qint64)));
-    connect(put, SIGNAL(onSuccess(quint64, const EteraItem&, const QVariantMap&)), this, SLOT(task_on_put_file_success(quint64, const EteraItem&, const QVariantMap&)));
-    connect(put, SIGNAL(onError(quint64, int, const QString&, const QVariantMap&)), this, SLOT(task_on_put_file_error(quint64, int, const QString&, const QVariantMap&)));
+    api->setProperty("id",     id);
+    api->setProperty("parent", parent);
 
-    EteraThreadPool::instance()->start(put);
+    connect(api, SIGNAL((onError)), this, SLOT(task_on_put_file_error(EteraAPI*)));
+    connect(api, SIGNAL((onProgress)), this, SLOT(task_on_put_file_progress(EteraAPI*, qint64, qint64)));
+    connect(api, SIGNAL((onPUT)), this, SLOT(task_on_put_file_success(EteraAPI*, const QUrl&, QIODevice*)));
+
+    m_tasks->addChildTask(parent, id, source);
+
+    api->put(source, target, overwrite);
 }
 //----------------------------------------------------------------------------------------------
 

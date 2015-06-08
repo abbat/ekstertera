@@ -1311,7 +1311,7 @@ void EteraAPI::on_mv_wait_finished()
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::put(const QString& source, const QString& target, bool overwrite)
+void EteraAPI::put(const QString& source, const QString& target, bool overwrite)
 {
     EteraArgs args;
 
@@ -1320,41 +1320,88 @@ bool EteraAPI::put(const QString& source, const QString& target, bool overwrite)
     if (overwrite == true)
         args["overwrite"] = "true";
 
+    setProperty("source",    source);
+    setProperty("target",    target);
+    setProperty("overwrite", overwrite);
+
+    if (startSimpleRequest("/resources/upload", args, ermGET) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_put_file_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_put_file_finished()
+{
+    QString source = property("source").toString();
+    QString target = property("target").toString();
+
     int     code;
     QString body;
 
-    if (makeSimpleRequest(code, body, "/resources/upload", args, ermGET) == false)
-        return false;
+    if (parseReply(code, body) == false)
+        return;
 
-    if (code != 200)
-        return setLastError(code, body);
+    if (code != 200) {
+        setLastError(code, body);
+        return;
+    }
 
     QUrl               url;
     EteraRequestMethod method;
 
     if (parseLink(body, url, method) == false)
-        return false;
+        return;
 
-    if (method != ermPUT)
-        return setLastError(1, UNSUPPORTED_LINK_METHOD);
+    if (method != ermPUT) {
+        setLastError(1, UNSUPPORTED_LINK_METHOD);
+        return;
+    }
 
-    QFile file(source);
+    QFile* device = new QFile(source, this);
 
-    if (file.open(QIODevice::ReadOnly) == false)
-         return setLastError(file.error(), FILE_OPEN_ERROR);
+    setProperty("device", QVariant::fromValue<QIODevice*>(device));
 
+    if (device->open(QIODevice::ReadOnly) == false) {
+         setLastError(device->error(), FILE_OPEN_ERROR);
+         return;
+    }
+
+    put(url, device);
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::put(const QUrl& url, QIODevice* device)
+{
     QNetworkRequest request(url);
-    setDefaultHeaders(request, file.size());
+    setDefaultHeaders(request, device->size());
     request.setRawHeader("Content-Type", "application/octet-stream");
 
-    if (makeRequest(request, code, body, method, "", &file) == false)
-        return false;
+    setProperty("url",    url);
+    setProperty("device", QVariant::fromValue<QIODevice*>(device));
 
-    if (code == 201)
+    if (startRequest(request, ermPUT, "", device) == true)
+        connect(m_reply, SIGNAL(finished()), this, SLOT(on_put_url_finished()));
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::on_put_url_finished()
+{
+    QIODevice* device = qvariant_cast<QIODevice*>(property("device"));
+
+    int     code;
+    QString body;
+
+    if (parseReply(code, body) == false)
+        return;
+
+    if (code == 201) {
+        device->close();
+
         // 201 Created (ресурс успешно создан)
-        return setLastError(0);
+        setLastError(0);
 
-    return setLastError(code, body);
+        emit onPUT(this, property("url").toUrl(), device);
+    } else
+        setLastError(code, body);
 }
 //----------------------------------------------------------------------------------------------
 

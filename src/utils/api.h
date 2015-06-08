@@ -437,15 +437,24 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Загрузка локального файла на диск
+         * Сигнал onPUT
          * \param source Имя локального файла
          * \param target Путь назначения
          * \param overwrite Признак перезаписи (false - перезапись запрещена)
-         * \return Флаг успеха
          */
-        bool put(const QString& source, const QString& target, bool overwrite);
+        void put(const QString& source, const QString& target, bool overwrite);
+
+        /*!
+         * \brief Загрузка данных по url на диск
+         * Сигнал onPUT
+         * \param url Ссылка
+         * \param device Устройство чтения
+         */
+        void put(const QUrl& url, QIODevice* device);
 
         /*!
          * \brief Получение файла с диска
+         * Сигнал onGET
          * \param source Имя файла на диске
          * \param target Имя локального файла
          */
@@ -675,6 +684,8 @@ class EteraAPI : public QObject
         void on_cp_wait_finished();     /*!< \brief Завершение ожидания вызова cp()    */
         void on_mv_finished();          /*!< \brief Завершение вызова mv()             */
         void on_mv_wait_finished();     /*!< \brief Завершение ожидания вызова mv()    */
+        void on_put_file_finished();    /*!< \brief Завершение вызова put() для файла  */
+        void on_put_url_finished();     /*!< \brief Завершение вызова put() для ссылки */
         void on_get_file_finished();    /*!< \brief Завершение вызова get() для файла  */
         void on_get_url_finished();     /*!< \brief Завершение вызова get() для ссылки */
         void on_publish_finished();     /*!< \brief Завершение вызова publish()        */
@@ -769,6 +780,14 @@ class EteraAPI : public QObject
          * \param target Приемник
          */
         void onMV(EteraAPI* api, const QString& source, const QString& target);
+
+        /*!
+         * \brief Сигнал загрузки url на сервис
+         * \param api API
+         * \param url Url
+         * \param device Устройство с данными
+         */
+        void onPUT(EteraAPI* api, const QUrl& url, QIODevice* device);
 
         /*!
          * \brief Сигнал загрузки url с сервиса

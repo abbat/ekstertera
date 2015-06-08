@@ -339,9 +339,12 @@ class WidgetDisk : public QTabWidget
         void task_on_put_ensure_error(EteraAPI* api);
         void task_on_put_ensure_success(EteraAPI* api, const EteraItem& item);
 
-        void task_on_put_file_progress(quint64 id, qint64 done, qint64 total);
-        void task_on_put_file_error(quint64 id, int code, const QString& error, const QVariantMap& args);
-        void task_on_put_file_success(quint64 id, const EteraItem& item, const QVariantMap& args);
+        void task_on_put_stat_error(EteraAPI* api);
+        void task_on_put_stat_success(EteraAPI* api, const EteraItem& item);
+
+        void task_on_put_file_error(EteraAPI* api);
+        void task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 total);
+        void task_on_put_file_success(EteraAPI* api, const QUrl& url, QIODevice* device);
 
         void task_on_put_dir_stat_error(EteraAPI* api);
         void task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& item);
