@@ -505,8 +505,8 @@ void EteraIconProvider::task_on_get_preview_error(EteraAPI* api)
 {
     m_preview_queue_size--;
 
-    QUrl     url    = api->property("url").toUrl();
-    QBuffer* device = qvariant_cast<QBuffer*>(api->property("device"));
+    QUrl     url    = api->url();
+    QBuffer* device = static_cast<QBuffer*>(api->device());
 
     device->deleteLater();
 

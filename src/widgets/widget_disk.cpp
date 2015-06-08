@@ -193,9 +193,7 @@ void WidgetDisk::widget_tasks_on_change_count(int count)
 
 void WidgetDisk::task_on_ls_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     m_explorer->setCursor(Qt::ArrowCursor);
 
@@ -295,9 +293,7 @@ void WidgetDisk::menu_open_triggered()
 
 void WidgetDisk::task_on_mkdir_stat_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }
@@ -314,13 +310,11 @@ void WidgetDisk::task_on_mkdir_stat_success(EteraAPI* api, const EteraItem& item
 
 void WidgetDisk::task_on_mkdir_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
     // CONFLICT, директория уже существует
     if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Директория %1 уже существует").arg(path));
+        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Директория %1 уже существует").arg(api->path()));
     else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }
@@ -374,54 +368,42 @@ void WidgetDisk::menu_copy_triggered()
 
 void WidgetDisk::task_on_copy_paste_stat_error(EteraAPI* api)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-    QString target = api->property("target").toString();
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
+    m_tasks->removeSimpleTask(api->id());
 
     api->deleteLater();
-
-    m_tasks->removeSimpleTask(id);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_copy_paste_stat_success(EteraAPI* api, const EteraItem& item)
 {
-    quint64 id = api->property("id").toULongLong();
-
     if (item.parentPath() == m_path)
         m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
-    api->deleteLater();
+    m_tasks->removeSimpleTask(api->id());
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_copy_paste_error(EteraAPI* api)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-    QString target = api->property("target").toString();
-
     // CONFLICT, объект уже существует
     if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Ошибка копирования %1:\n%2 уже существует").arg(source).arg(target));
+        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Ошибка копирования %1:\n%2 уже существует").arg(api->source()).arg(api->target()));
     else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
-
-    api->deleteLater();
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
     // TODO: обработать асинхронную ошибку, т.к. копирование могло быть все же успешным
-    m_tasks->removeSimpleTask(id);
+    m_tasks->removeSimpleTask(api->id());
+
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_copy_paste_success(EteraAPI* api, const QString& source, const QString& target)
 {
-    quint64 id = api->property("id").toULongLong();
-
     EteraClipboard::instance()->removeByPath(source);
 
     disconnect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_copy_paste_error(EteraAPI*)));
@@ -429,7 +411,7 @@ void WidgetDisk::task_on_copy_paste_success(EteraAPI* api, const QString& source
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_copy_paste_stat_error(EteraAPI*)));
     connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_copy_paste_stat_success(EteraAPI*, const EteraItem&)));
 
-    m_tasks->addSimpleTask(id, trUtf8("Получение информации о %1").arg(target));
+    m_tasks->addSimpleTask(api->id(), trUtf8("Получение информации о %1").arg(target));
 
     int     size    = EteraIconProvider::instance()->maxIconSize();
     QString preview = QString("%1x%2").arg(size).arg(size);
@@ -440,54 +422,42 @@ void WidgetDisk::task_on_copy_paste_success(EteraAPI* api, const QString& source
 
 void WidgetDisk::task_on_cut_paste_stat_error(EteraAPI* api)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-    QString target = api->property("target").toString();
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
+    m_tasks->removeSimpleTask(api->id());
 
     api->deleteLater();
-
-    m_tasks->removeSimpleTask(id);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_cut_paste_stat_success(EteraAPI* api, const EteraItem& item)
 {
-    quint64 id = api->property("id").toULongLong();
-
     if (item.parentPath() == m_path)
         m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
-    api->deleteLater();
+    m_tasks->removeSimpleTask(api->id());
 
-    m_tasks->removeSimpleTask(id);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_cut_paste_error(EteraAPI* api)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-    QString target = api->property("target").toString();
-
     // CONFLICT, объект уже существует
     if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Ошибка перемещения %1:\n%2 уже существует").arg(source).arg(target));
+        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Ошибка перемещения %1:\n%2 уже существует").arg(api->source()).arg(api->target()));
     else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка перемещения %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
-
-    api->deleteLater();
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка перемещения %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
     // TODO: обработать асинхронную ошибку, т.к. вставка могла быть все же успешной
-    m_tasks->removeSimpleTask(id);
+    m_tasks->removeSimpleTask(api->id());
+
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_cut_paste_success(EteraAPI* api, const QString& source, const QString& target)
 {
-    quint64 id = api->property("id").toULongLong();
-
     EteraClipboard::instance()->removeByPath(source);
 
     disconnect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_copy_paste_error(EteraAPI*)));
@@ -495,7 +465,7 @@ void WidgetDisk::task_on_cut_paste_success(EteraAPI* api, const QString& source,
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_cut_paste_stat_error(EteraAPI*)));
     connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_cut_paste_stat_success(EteraAPI*, const EteraItem&)));
 
-    m_tasks->addSimpleTask(id, trUtf8("Получение информации о %1").arg(target));
+    m_tasks->addSimpleTask(api->id(), trUtf8("Получение информации о %1").arg(target));
 
     int     size    = EteraIconProvider::instance()->maxIconSize();
     QString preview = QString("%1x%2").arg(size).arg(size);
@@ -529,14 +499,14 @@ void WidgetDisk::menu_paste_triggered()
             connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_copy_paste_error(EteraAPI*)));
             connect(api, SIGNAL(onCP(EteraAPI*, const QString&, const QString&)), this, SLOT(task_on_copy_paste_success(EteraAPI*, const QString&, const QString&)));
 
-            m_tasks->addSimpleTask(id, trUtf8("Копирование %1 в %2").arg(src.path()).arg(dst));
+            m_tasks->addSimpleTask(api->id(), trUtf8("Копирование %1 в %2").arg(src.path()).arg(dst));
 
             api->cp(src.path(), dst, false);
         } else {
             connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_cut_paste_error(EteraAPI*)));
             connect(api, SIGNAL(onMV(EteraAPI*, const QString&, const QString&)), this, SLOT(task_on_cut_paste_success(EteraAPI*, const QString&, const QString&)));
 
-            m_tasks->addSimpleTask(id, trUtf8("Перемещение %1 в %2").arg(src.path()).arg(dst));
+            m_tasks->addSimpleTask(api->id(), trUtf8("Перемещение %1 в %2").arg(src.path()).arg(dst));
 
             api->mv(src.path(), dst, false);
         }
@@ -546,22 +516,20 @@ void WidgetDisk::menu_paste_triggered()
 
 void WidgetDisk::task_on_rm_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
     // Если объект не существует, то и удалять нечего
     if (api->lastErrorCode() != 404)
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка удаления %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка удаления %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     // если ошибка во время ожидания операции, то скорее всего объект будет удален
     // если объект был удален ранее, то его нужно удалить из виджета
     if (/*async == true ||*/ api->lastErrorCode() == 404) {
         // удаление из виджета
-        removeByPath(path);
+        removeByPath(api->path());
 
         // удаление из буфера обмена
         EteraClipboard* clipboard = EteraClipboard::instance();
 
-        clipboard->removeByPath(path);
+        clipboard->removeByPath(api->path());
     }
 
     api->deleteLater();
@@ -622,13 +590,9 @@ void WidgetDisk::menu_rename_triggered()
 
 void WidgetDisk::task_on_rename_stat_error(EteraAPI* api)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-    QString target = api->property("target").toString();
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
-
-    m_tasks->removeSimpleTask(id);
+    m_tasks->removeSimpleTask(api->id());
 
     api->deleteLater();
 }
@@ -636,15 +600,12 @@ void WidgetDisk::task_on_rename_stat_error(EteraAPI* api)
 
 void WidgetDisk::task_on_rename_stat_success(EteraAPI* api, const EteraItem& item)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-
     // замена описателя
-    WidgetDiskItem* witem = findByPath(source);
+    WidgetDiskItem* witem = findByPath(api->source());
     if (witem != NULL)
         witem->replaceItem(item, m_preview_mode);
 
-    m_tasks->removeSimpleTask(id);
+    m_tasks->removeSimpleTask(api->id());
 
     api->deleteLater();
 }
@@ -652,21 +613,17 @@ void WidgetDisk::task_on_rename_stat_success(EteraAPI* api, const EteraItem& ite
 
 void WidgetDisk::task_on_rename_error(EteraAPI* api)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-    QString target = api->property("target").toString();
-
     // откат переименования
-    WidgetDiskItem* witem = findByPath(source);
+    WidgetDiskItem* witem = findByPath(api->source());
     if (witem != NULL)
         witem->revertText();
 
     if (api->lastErrorCode() == 409)
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\nПриемник уже существует").arg(source).arg(target));
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\nПриемник уже существует").arg(api->source()).arg(api->target()));
     else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
-    m_tasks->removeSimpleTask(id);
+    m_tasks->removeSimpleTask(api->id());
 
     api->deleteLater();
 }
@@ -674,8 +631,6 @@ void WidgetDisk::task_on_rename_error(EteraAPI* api)
 
 void WidgetDisk::task_on_rename_success(EteraAPI* api, const QString& source, const QString& target)
 {
-    quint64 id = api->property("id").toULongLong();
-
     EteraClipboard::instance()->removeByPath(source);
 
     disconnect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_rename_error(EteraAPI*)));
@@ -683,7 +638,7 @@ void WidgetDisk::task_on_rename_success(EteraAPI* api, const QString& source, co
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_rename_stat_error(EteraAPI*)));
     connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_rename_stat_success(EteraAPI*, const EteraItem&)));
 
-    m_tasks->addSimpleTask(id, trUtf8("Получение информации о %1").arg(target));
+    m_tasks->addSimpleTask(api->id(), trUtf8("Получение информации о %1").arg(target));
 
     int     size    = EteraIconProvider::instance()->maxIconSize();
     QString preview = QString("%1x%2").arg(size).arg(size);
@@ -733,7 +688,7 @@ void WidgetDisk::item_end_edit(QWidget* editor, QAbstractItemDelegate::EndEditHi
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_rename_error(EteraAPI*)));
     connect(api, SIGNAL(onMV(EteraAPI*, const QString&, const QString&)), this, SLOT(task_on_rename_success(EteraAPI*, const QString&, const QString&)));
 
-    m_tasks->addSimpleTask(id, trUtf8("Переименование %1 в %2").arg(eitem->path()).arg(path));
+    m_tasks->addSimpleTask(api->id(), trUtf8("Переименование %1 в %2").arg(eitem->path()).arg(path));
 
     api->mv(eitem->path(), path, false);
 }
@@ -833,9 +788,7 @@ void WidgetDisk::putLocalObject(const QString& path, quint64 parent)
 
 void WidgetDisk::task_on_put_rm_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка удаления %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка удаления %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }
@@ -843,16 +796,10 @@ void WidgetDisk::task_on_put_rm_error(EteraAPI* api)
 
 void WidgetDisk::task_on_put_rm_success(EteraAPI* api, const QString& /*path*/)
 {
-    QString source    = api->property("source").toString();
-    QString target    = api->property("target").toString();
-    quint64 parent    = api->property("parent").toULongLong();
-    bool    overwrite = api->property("overwrite").toBool();
-    QString ensure    = api->property("ensure").toString();
-
-    if (ensure == "dir")
-        putLocalDir(source, target, overwrite, parent);
-    else if (ensure == "file")
-        putLocalFile(source, target, overwrite, parent);
+    if (api->ensure() == eitDir)
+        putLocalDir(api->source(), api->target(), api->overwrite(), api->parentId());
+    else if (api->ensure() == eitFile)
+        putLocalFile(api->source(), api->target(), api->overwrite(), api->parentId());
 
     api->deleteLater();
 }
@@ -860,9 +807,7 @@ void WidgetDisk::task_on_put_rm_success(EteraAPI* api, const QString& /*path*/)
 
 void WidgetDisk::task_on_put_ensure_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения информации о %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения информации о %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }
@@ -870,20 +815,14 @@ void WidgetDisk::task_on_put_ensure_error(EteraAPI* api)
 
 void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item)
 {
-    QString source    = api->property("source").toString();
-    QString target    = api->property("target").toString();
-    quint64 parent    = api->property("parent").toULongLong();
-    bool    overwrite = api->property("overwrite").toBool();
-    QString ensure    = api->property("ensure").toString();
-
     api->deleteLater();
 
-    if (ensure == "dir") {
+    if (api->ensure() == eitDir) {
         if (item.isDir() == true) {
-            syncLocalDir(source, target, overwrite, parent);
+            syncLocalDir(api->source(), api->target(), api->overwrite(), api->parentId());
             return;
         } else if (item.isFile() == true) {
-            quint64     rootid   = m_tasks->rootID(parent);
+            quint64     rootid   = m_tasks->rootID(api->parentId());
             QVariantMap rootargs = m_tasks->args(rootid);
 
             QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
@@ -892,7 +831,7 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
             if (answer != QMessageBox::NoToAll) {
                 // что делать с конфликтами?
                 if (answer != QMessageBox::YesToAll) {
-                    answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(target), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
+                    answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(api->target()), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
 
                     // обновляем ответ
                     rootargs["answer"] = answer;
@@ -901,27 +840,20 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
 
                 // удалить и перезаписать директорией при положительном ответе
                 if (answer == QMessageBox::Yes || answer == QMessageBox::YesToAll) {
-                    overwrite = (overwrite == true || answer == QMessageBox::YesToAll);
+                    bool overwrite = (api->overwrite() == true || answer == QMessageBox::YesToAll);
 
-                    EteraAPI* api = new EteraAPI(this);
+                    api->setOverwrite(overwrite);
 
-                    api->setToken(EteraSettings::instance()->token());
-
-                    api->setProperty("source",    source);
-                    api->setProperty("target",    target);
-                    api->setProperty("parent",    parent);
-                    api->setProperty("overwrite", overwrite);
-                    api->setProperty("ensure",    ensure);
-
+                    // TODO: disconnect
                     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_rm_error(EteraAPI*)));
                     connect(api, SIGNAL(onRM(EteraAPI*, const QString&)), this, SLOT(task_on_put_rm_success(EteraAPI*, const QString&)));
 
-                    api->rm(target, true);
+                    api->rm(api->target(), true);
                 }
             }
         }
-    } else if (ensure == "file") {
-        quint64     rootid   = m_tasks->rootID(parent);
+    } else if (api->ensure() == eitFile) {
+        quint64     rootid   = m_tasks->rootID(api->parentId());
         QVariantMap rootargs = m_tasks->args(rootid);
 
         QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
@@ -930,7 +862,7 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
         if (answer != QMessageBox::NoToAll) {
             // что делать с конфликтами?
             if (answer != QMessageBox::YesToAll) {
-                answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(target), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
+                answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(api->target()), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
 
                 // обновляем ответ
                 rootargs["answer"] = answer;
@@ -939,25 +871,18 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
 
             // удалить и перезаписать файлом при положительном ответе
             if (answer == QMessageBox::Yes || answer == QMessageBox::YesToAll) {
-                overwrite = (overwrite == true || answer == QMessageBox::YesToAll);
+                bool overwrite = (api->overwrite() == true || answer == QMessageBox::YesToAll);
 
                 if (item.isFile() == true) {
-                    putLocalFile(source, target, overwrite, parent);
+                    putLocalFile(api->source(), api->target(), overwrite, api->parentId());
                 } else if (item.isDir() == true) {
-                    EteraAPI* api = new EteraAPI(this);
+                    api->setOverwrite(overwrite);
 
-                    api->setToken(EteraSettings::instance()->token());
-
-                    api->setProperty("source",    source);
-                    api->setProperty("target",    target);
-                    api->setProperty("parent",    parent);
-                    api->setProperty("overwrite", overwrite);
-                    api->setProperty("ensure",    ensure);
-
+                    // TODO: disconnect
                     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_rm_error(EteraAPI*)));
                     connect(api, SIGNAL(onRM(EteraAPI*, const QString&)), this, SLOT(task_on_put_rm_success(EteraAPI*, const QString&)));
 
-                    api->rm(target, true);
+                    api->rm(api->target(), true);
                 }
             }
         }
@@ -994,15 +919,9 @@ void WidgetDisk::task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 to
 
 void WidgetDisk::task_on_put_file_error(EteraAPI* api)
 {
-    quint64 id        = api->property("id").toULongLong();
-    QString source    = api->property("source").toString();
-    QString target    = api->property("target").toString();
-    quint64 parent    = api->property("parent").toULongLong();
-    bool    overwrite = api->property("overwrite").toBool();
-
     // если объект существует, нужно убедиться, что это файл и тогда можно продолжить работу
     if (api->lastErrorCode() == 409) {
-        quint64     rootid   = m_tasks->rootID(id);
+        quint64     rootid   = m_tasks->rootID(api->id());
         QVariantMap rootargs = m_tasks->args(rootid);
 
         QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
@@ -1013,20 +932,16 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
 
             api->setToken(EteraSettings::instance()->token());
 
-            api->setProperty("source",    source);
-            api->setProperty("target",    target);
-            api->setProperty("parent",    parent);
-            api->setProperty("overwrite", overwrite);
-            api->setProperty("ensure",    "file");
+            api->setEnsure(eitFile);
 
             connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_ensure_error(EteraAPI*)));
             connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_put_ensure_success(EteraAPI*, const EteraItem&)));
 
-            api->stat(target);
+            api->stat(api->target());
         }
     } else {
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
-        m_tasks->removeChildTask(id);
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
+        m_tasks->removeChildTask(api->id());
         api->deleteLater();
     }
 }
@@ -1036,14 +951,12 @@ void WidgetDisk::task_on_put_file_success(EteraAPI* api, const QUrl& /*url*/, QI
 {
     device->deleteLater();
 
-    QString target = api->property("target").toString();
-
     disconnect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_file_error(EteraAPI*)));
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_stat_error(EteraAPI*)));
     connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_put_stat_success(EteraAPI*, const EteraItem&)));
 
-    api->stat(target);
+    api->stat(api->target());
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1053,13 +966,13 @@ void WidgetDisk::putLocalFile(const QString& source, const QString& target, bool
 
     api->setToken(EteraSettings::instance()->token());
 
-    api->setProperty("parent", parent);
+    api->setParentId(parent);
 
     connect(api, SIGNAL((onError)), this, SLOT(task_on_put_file_error(EteraAPI*)));
     connect(api, SIGNAL((onProgress)), this, SLOT(task_on_put_file_progress(EteraAPI*, qint64, qint64)));
     connect(api, SIGNAL((onPUT)), this, SLOT(task_on_put_file_success(EteraAPI*, const QUrl&, QIODevice*)));
 
-    m_tasks->addChildTask(parent, id, source);
+    m_tasks->addChildTask(parent, api->id(), source);
 
     api->put(source, target, overwrite);
 }
@@ -1067,9 +980,7 @@ void WidgetDisk::putLocalFile(const QString& source, const QString& target, bool
 
 void WidgetDisk::task_on_put_dir_stat_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }
@@ -1086,29 +997,20 @@ void WidgetDisk::task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& it
 
 void WidgetDisk::task_on_put_dir_error(EteraAPI* api)
 {
-    QString source    = api->property("source").toString();
-    QString target    = api->property("target").toString();
-    quint64 parent    = api->property("parent").toULongLong();
-    bool    overwrite = api->property("overwrite").toBool();
-
     // если объект существует, нужно убедиться, что это директория и тогда можно продолжить работу
     if (api->lastErrorCode() == 409) {
         EteraAPI* api = new EteraAPI(this);
 
         api->setToken(EteraSettings::instance()->token());
 
-        api->setProperty("source", source);
-        api->setProperty("target", target);
-        api->setProperty("parent", parent);
-        api->setProperty("overwrite", overwrite);
-        api->setProperty("ensure", "dir");
+        api->setEnsure(eitDir);
 
         connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_ensure_error(EteraAPI*)));
         connect(api, SIGNAL(onSTAT(EteraAPI*, const EteraItem&)), this, SLOT(task_on_put_ensure_success(EteraAPI*, const EteraItem&)));
 
-        api->stat(target);
+        api->stat(api->target());
     } else {
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(target).arg(api->lastErrorMessage()));
+        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(api->target()).arg(api->lastErrorMessage()));
         api->deleteLater();
     }
 }
@@ -1116,11 +1018,6 @@ void WidgetDisk::task_on_put_dir_error(EteraAPI* api)
 
 void WidgetDisk::task_on_put_dir_success(EteraAPI* api, const QString& path)
 {
-    QString source    = api->property("source").toString();
-    QString target    = api->property("target").toString();
-    quint64 parent    = api->property("parent").toULongLong();
-    bool    overwrite = api->property("overwrite").toBool();
-
     disconnect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_dir_error(EteraAPI*)));
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_dir_stat_error(EteraAPI*)));
@@ -1128,7 +1025,7 @@ void WidgetDisk::task_on_put_dir_success(EteraAPI* api, const QString& path)
 
     api->stat(path);
 
-    syncLocalDir(source, target, overwrite, parent);
+    syncLocalDir(api->source(), api->target(), api->overwrite(), api->parentId());
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1138,10 +1035,10 @@ void WidgetDisk::putLocalDir(const QString& source, const QString& target, bool 
 
     api->setToken(EteraSettings::instance()->token());
 
-    api->setProperty("source",    source);
-    api->setProperty("target",    target);
-    api->setProperty("parent",    parent);
-    api->setProperty("overwrite", overwrite);
+    api->setSource(source);
+    api->setTarget(target);
+    api->setParentId(parent);
+    api->setOverwrite(overwrite);
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_put_dir_error(EteraAPI*)));
     connect(api, SIGNAL(onMKDIR(EteraAPI*, const QString&)), this, SLOT(task_on_put_dir_success(EteraAPI*, const QString&)));
@@ -1249,33 +1146,26 @@ void WidgetDisk::getRemoteObjects(const QString& path)
 
 void WidgetDisk::task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total)
 {
-    quint64 id = api->property("id").toULongLong();
-    m_tasks->setProgress(id, done, total);
+    m_tasks->setProgress(api->id(), done, total);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_get_file_error(EteraAPI* api)
 {
-    quint64 id     = api->property("id").toULongLong();
-    QString source = api->property("source").toString();
-    QString target = api->property("target").toString();
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка загрузки %1 в %2:\n%3").arg(source).arg(target).arg(api->lastErrorMessage()));
+    m_tasks->removeChildTask(api->id());
 
     api->deleteLater();
-
-    m_tasks->removeChildTask(id);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_get_file_success(EteraAPI* api, const QUrl& /*url*/, QIODevice* device)
 {
-    quint64 id = api->property("id").toULongLong();
+    m_tasks->removeChildTask(api->id());
 
     device->deleteLater();
     api->deleteLater();
-
-    m_tasks->removeChildTask(id);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1324,7 +1214,7 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
 
     api->setToken(EteraSettings::instance()->token());
 
-    api->setProperty("parent", parent);
+    api->setParentId(parent);
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_get_file_error(EteraAPI*)));
     connect(api, SIGNAL(onProgress(EteraAPI*, qint64, qint64)), this, SLOT(task_on_get_file_progress(EteraAPI*, qint64, qint64)));
@@ -1335,7 +1225,7 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
     args["parent"] = parent;
 
     m_tasks->addWaitTask(parent);
-    m_tasks->addChildTask(parent, id, source, args);
+    m_tasks->addChildTask(parent, api->id(), source, args);
 
     api->get(source, target);
 }
@@ -1343,9 +1233,7 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
 
 void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }
@@ -1353,15 +1241,12 @@ void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 
 void WidgetDisk::task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit)
 {
-    QString target = api->property("target").toString();
-    quint64 parent = api->property("parent").toULongLong();
-
     for (int i = 0; i < list.count(); i++) {
         EteraItem item = list[i];
         if (item.isDir() == true)
-            getRemoteDir(item.path(), target + "/" + item.name(), parent);
+            getRemoteDir(item.path(), api->target() + "/" + item.name(), api->parentId());
         else if (item.isFile() == true)
-            getRemoteFile(item.path(), target + "/" + item.name(), parent);
+            getRemoteFile(item.path(), api->target() + "/" + item.name(), api->parentId());
     }
 
     if ((quint64)list.count() < limit)
@@ -1414,8 +1299,8 @@ void WidgetDisk::getRemoteDir(const QString& source, const QString& target, quin
 
     api->setToken(EteraSettings::instance()->token());
 
-    api->setProperty("target", target);
-    api->setProperty("parent", parent);
+    api->setTarget(target);
+    api->setParentId(parent);
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_get_dir_error(EteraAPI*)));
     connect(api, SIGNAL(onLS(EteraAPI*, const EteraItemList&, const QString&, const QString&, bool, quint64, quint64)), this, SLOT(task_on_get_dir_success(EteraAPI*, const EteraItemList&, const QString&, const QString&, bool, quint64, quint64)));
@@ -1456,9 +1341,7 @@ bool WidgetDisk::removeDir(QDir dir)
 
 void WidgetDisk::task_on_publish_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка открытия доступа к %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка открытия доступа к %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }
@@ -1488,9 +1371,7 @@ void WidgetDisk::task_on_publish_success(EteraAPI* api, const EteraItem& item)
 
 void WidgetDisk::task_on_unpublish_error(EteraAPI* api)
 {
-    QString path = api->property("path").toString();
-
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка закрытия доступа к %1:\n%2").arg(path).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка закрытия доступа к %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
 
     api->deleteLater();
 }

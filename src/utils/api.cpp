@@ -694,6 +694,8 @@ bool EteraAPI::parseLink(const QString& link, QUrl& url, EteraRequestMethod& met
 
 bool EteraAPI::startWait(const QString& link)
 {
+    m_link = link;
+
     QUrl               url;
     EteraRequestMethod method;
 
@@ -705,8 +707,6 @@ bool EteraAPI::startWait(const QString& link)
 
     QNetworkRequest request(url);
     setDefaultHeaders(request);
-
-    setProperty("link", link);
 
     if (startRequest(request, method) == false)
         return false;
@@ -791,9 +791,11 @@ void EteraAPI::stat(const QString& path, const QString& preview, bool crop)
     if (crop == true)
         args["preview_crop"] = "true";
 
-    setProperty("path",    path);
-    setProperty("preview", preview);
-    setProperty("crop",    crop);
+    m_path    = path;
+    m_offset  = 0;
+    m_limit   = 0;
+    m_preview = preview;
+    m_crop    = crop;
 
     if (startSimpleRequest("/resources", args) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_stat_finished);
@@ -842,11 +844,11 @@ void EteraAPI::ls(const QString& path, const QString& preview, bool crop, quint6
     if (crop == true)
         args["preview_crop"] = "true";
 
-    setProperty("path",    path);
-    setProperty("preview", preview);
-    setProperty("crop",    crop);
-    setProperty("offset",  offset);
-    setProperty("limit",   limit);
+    m_path    = path;
+    m_preview = preview;
+    m_crop    = crop;
+    m_offset  = offset;
+    m_limit   = limit;
 
     if (startSimpleRequest("/resources", args) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_ls_finished);
@@ -855,12 +857,6 @@ void EteraAPI::ls(const QString& path, const QString& preview, bool crop, quint6
 
 void EteraAPI::on_ls_finished()
 {
-    QString path    = property("path").toString();
-    QString preview = property("preview").toString();
-    bool    crop    = property("crop").toBool();
-    quint64 offset  = property("offset").toULongLong();
-    quint64 limit   = property("limit").toULongLong();
-
     int     code;
     QString body;
 
@@ -892,7 +888,7 @@ void EteraAPI::on_ls_finished()
 
         setLastError(0);
 
-        emit onLS(this, list, path, preview, crop, offset, limit);
+        emit onLS(this, list, m_path, m_preview, m_crop, m_offset, m_limit);
 
         return;
     }
@@ -910,7 +906,7 @@ void EteraAPI::on_ls_finished()
         list.append(item);
     }
 
-    limit = json["limit"].toULongLong(&ok);
+    quint64 limit = json["limit"].toULongLong(&ok);
     if (ok == false) {
         setLastError(1, JSON_PARSE_ERROR);
         return;
@@ -918,7 +914,7 @@ void EteraAPI::on_ls_finished()
 
     setLastError(0);
 
-    emit onLS(this, list, path, preview, crop, offset, limit);
+    emit onLS(this, list, m_path, m_preview, m_crop, m_offset, limit);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -928,7 +924,7 @@ void EteraAPI::mkdir(const QString& path)
 
     args["path"] = path;
 
-    setProperty("path", path);
+    m_path = path;
 
     if (startSimpleRequest("/resources", args, ermPUT) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_mkdir_finished);
@@ -937,8 +933,6 @@ void EteraAPI::mkdir(const QString& path)
 
 void EteraAPI::on_mkdir_finished()
 {
-    QString path = property("path").toString();
-
     int     code;
     QString body;
 
@@ -946,7 +940,7 @@ void EteraAPI::on_mkdir_finished()
         return;
 
     if (code == 201)
-        emit onMKDIR(this, path);
+        emit onMKDIR(this, m_path);
     else
         setLastError(code, body);
 }
@@ -961,8 +955,8 @@ void EteraAPI::rm(const QString& path, bool permanently)
     if (permanently == true)
         args["permanently"] = "true";
 
-    setProperty("path",        path);
-    setProperty("permanently", permanently);
+    m_path        = path;
+    m_permanently = permanently;
 
     if (startSimpleRequest("/resources", args, ermDELETE) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_rm_finished);
@@ -971,8 +965,6 @@ void EteraAPI::rm(const QString& path, bool permanently)
 
 void EteraAPI::on_rm_finished()
 {
-    QString path = property("path").toString();
-
     int     code;
     QString body;
 
@@ -983,7 +975,7 @@ void EteraAPI::on_rm_finished()
         // 204 No content (ресурс успешно удален)
         setLastError(0);
 
-        emit onRM(this, path);
+        emit onRM(this, m_path);
     } else if (code == 202) {
         // 202 Accepted (удаление папки начато)
         if (startWait(body) == true)
@@ -1000,14 +992,10 @@ void EteraAPI::on_rm_wait_finished()
         return;
 
     if (wait == true) {
-        QString link = property("link").toString();
-        if (startWait(link) == true)
+        if (startWait(m_link) == true)
             ETERA_API_CONNECT_ON_REPLY_FINISHED(on_rm_wait_finished);
-    } else {
-        QString path = property("path").toString();
-
-        emit onRM(this, path);
-    }
+    } else
+        emit onRM(this, m_path);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1021,9 +1009,9 @@ void EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
     if (overwrite == true)
         args["overwrite"] = "true";
 
-    setProperty("source",    source);
-    setProperty("target",    target);
-    setProperty("overwrite", overwrite);
+    m_source    = source;
+    m_target    = target;
+    m_overwrite = overwrite;
 
     if (startSimpleRequest("/resources/copy", args, ermPOST) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_cp_finished);
@@ -1032,9 +1020,6 @@ void EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
 
 void EteraAPI::on_cp_finished()
 {
-    QString source = property("source").toString();
-    QString target = property("target").toString();
-
     int     code;
     QString body;
 
@@ -1045,7 +1030,7 @@ void EteraAPI::on_cp_finished()
         // 201 Created (ресурс успешно скопирован)
         setLastError(0);
 
-        emit onCP(this, source, target);
+        emit onCP(this, m_source, m_target);
     } else if (code == 202) {
         // 202 Accepted (копирование папки начато)
         if (startWait(body) == true)
@@ -1062,15 +1047,10 @@ void EteraAPI::on_cp_wait_finished()
         return;
 
     if (wait == true) {
-        QString link = property("link").toString();
-        if (startWait(link) == true)
+        if (startWait(m_link) == true)
             ETERA_API_CONNECT_ON_REPLY_FINISHED(on_cp_wait_finished);
-    } else {
-        QString source = property("source").toString();
-        QString target = property("target").toString();
-
-        emit onCP(this, source, target);
-    }
+    } else
+        emit onCP(this, m_source, m_target);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1084,9 +1064,9 @@ void EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
     if (overwrite == true)
         args["overwrite"] = "true";
 
-    setProperty("source",    source);
-    setProperty("target",    target);
-    setProperty("overwrite", overwrite);
+    m_source    = source;
+    m_target    = target;
+    m_overwrite = overwrite;
 
     if (startSimpleRequest("/resources/move", args, ermPOST) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_mv_finished);
@@ -1095,9 +1075,6 @@ void EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
 
 void EteraAPI::on_mv_finished()
 {
-    QString source = property("source").toString();
-    QString target = property("target").toString();
-
     int     code;
     QString body;
 
@@ -1108,7 +1085,7 @@ void EteraAPI::on_mv_finished()
         // 201 Created (ресурс успешно перемещен)
         setLastError(0);
 
-        emit onMV(this, source, target);
+        emit onMV(this, m_source, m_target);
     } else if (code == 202) {
         // 202 Accepted (перемещение папки начато)
         if (startWait(body) == true)
@@ -1125,15 +1102,10 @@ void EteraAPI::on_mv_wait_finished()
         return;
 
     if (wait == true) {
-        QString link = property("link").toString();
-        if (startWait(link) == true)
+        if (startWait(m_link) == true)
             ETERA_API_CONNECT_ON_REPLY_FINISHED(on_mv_wait_finished);
-    } else {
-        QString source = property("source").toString();
-        QString target = property("target").toString();
-
-        emit onMV(this, source, target);
-    }
+    } else
+        emit onMV(this, m_source, m_target);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1146,9 +1118,9 @@ void EteraAPI::put(const QString& source, const QString& target, bool overwrite)
     if (overwrite == true)
         args["overwrite"] = "true";
 
-    setProperty("source",    source);
-    setProperty("target",    target);
-    setProperty("overwrite", overwrite);
+    m_source    = source;
+    m_target    = target;
+    m_overwrite = overwrite;
 
     if (startSimpleRequest("/resources/upload", args, ermGET) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_put_file_finished);
@@ -1157,9 +1129,6 @@ void EteraAPI::put(const QString& source, const QString& target, bool overwrite)
 
 void EteraAPI::on_put_file_finished()
 {
-    QString source = property("source").toString();
-    QString target = property("target").toString();
-
     int     code;
     QString body;
 
@@ -1182,16 +1151,14 @@ void EteraAPI::on_put_file_finished()
         return;
     }
 
-    QFile* device = new QFile(source, this);
+    m_device = new QFile(m_source, this);
 
-    setProperty("device", QVariant::fromValue<QIODevice*>(device));
-
-    if (device->open(QIODevice::ReadOnly) == false) {
-         setLastError(device->error(), FILE_OPEN_ERROR);
+    if (m_device->open(QIODevice::ReadOnly) == false) {
+         setLastError(static_cast<QFile*>(m_device)->error(), FILE_OPEN_ERROR);
          return;
     }
 
-    put(url, device);
+    put(url, m_device);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1201,8 +1168,8 @@ void EteraAPI::put(const QUrl& url, QIODevice* device)
     setDefaultHeaders(request, device->size());
     request.setRawHeader("Content-Type", "application/octet-stream");
 
-    setProperty("url",    url);
-    setProperty("device", QVariant::fromValue<QIODevice*>(device));
+    m_url    = url;
+    m_device = device;
 
     if (startRequest(request, ermPUT, "", device) == true) {
         ETERA_API_CONNECT_ON_UPLOAD_PROGRESS(on_progress);
@@ -1214,8 +1181,6 @@ void EteraAPI::put(const QUrl& url, QIODevice* device)
 
 void EteraAPI::on_put_url_finished()
 {
-    QIODevice* device = qvariant_cast<QIODevice*>(property("device"));
-
     int     code;
     QString body;
 
@@ -1223,12 +1188,12 @@ void EteraAPI::on_put_url_finished()
         return;
 
     if (code == 201) {
-        device->close();
+        m_device->close();
 
         // 201 Created (ресурс успешно создан)
         setLastError(0);
 
-        emit onPUT(this, property("url").toUrl(), device);
+        emit onPUT(this, m_url, m_device);
     } else
         setLastError(code, body);
 }
@@ -1240,9 +1205,9 @@ void EteraAPI::get(const QString& source, const QString& target)
 
     args["path"] = source;
 
-    setProperty("source", source);
-    setProperty("target", target);
-    setProperty("device", QVariant::fromValue<QIODevice*>(NULL));
+    m_source = source;
+    m_target = target;
+    m_device = NULL;
 
     if (startSimpleRequest("/resources/download", args, ermGET) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_get_file_finished);
@@ -1251,9 +1216,6 @@ void EteraAPI::get(const QString& source, const QString& target)
 
 void EteraAPI::on_get_file_finished()
 {
-    QString source = property("source").toString();
-    QString target = property("target").toString();
-
     int     code;
     QString body;
 
@@ -1276,16 +1238,14 @@ void EteraAPI::on_get_file_finished()
         return;
     }
 
-    QFile* device = new QFile(target, this);
+    m_device = new QFile(m_target, this);
 
-    setProperty("device", QVariant::fromValue<QIODevice*>(device));
-
-    if (device->open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
-        setLastError(device->error(), FILE_OPEN_ERROR);
+    if (m_device->open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
+        setLastError(static_cast<QFile*>(m_device)->error(), FILE_OPEN_ERROR);
         return;
     }
 
-    get(url, device);
+    get(url, m_device);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1299,8 +1259,8 @@ void EteraAPI::get(const QUrl& url, QIODevice* device)
         device->open(QIODevice::WriteOnly | QIODevice::Truncate);
     }
 
-    setProperty("url",    url);
-    setProperty("device", QVariant::fromValue<QIODevice*>(device));
+    m_url    = url;
+    m_device = device;
 
     if (startRequest(request, ermGET, "", device) == true) {
         ETERA_API_CONNECT_ON_UPLOAD_PROGRESS(on_progress);
@@ -1312,8 +1272,6 @@ void EteraAPI::get(const QUrl& url, QIODevice* device)
 
 void EteraAPI::on_get_url_finished()
 {
-    QIODevice* device = qvariant_cast<QIODevice*>(property("device"));
-
     int     code;
     QString body;
 
@@ -1327,13 +1285,13 @@ void EteraAPI::on_get_url_finished()
             return;
         }
 
-        get(_url, device);
+        get(_url, m_device);
     } else if (code == 200) {
-        device->close();
+        m_device->close();
 
         setLastError(0);
 
-        emit onGET(this, property("url").toUrl(), device);
+        emit onGET(this, m_url, m_device);
     } else
         setLastError(code, body);
 }
@@ -1345,7 +1303,7 @@ void EteraAPI::publish(const QString& path)
 
     args["path"] = path;
 
-    setProperty("path", path);
+    m_path = path;
 
     if (startSimpleRequest("/resources/publish", args, ermPUT) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_publish_finished);
@@ -1354,8 +1312,6 @@ void EteraAPI::publish(const QString& path)
 
 void EteraAPI::on_publish_finished()
 {
-    QString path = property("path").toString();
-
     int     code;
     QString body;
 
@@ -1369,7 +1325,7 @@ void EteraAPI::on_publish_finished()
 
     setLastError(0);
 
-    emit onPUBLISH(this, path);
+    emit onPUBLISH(this, m_path);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1379,7 +1335,7 @@ void EteraAPI::unpublish(const QString& path)
 
     args["path"] = path;
 
-    setProperty("path", path);
+    m_path = path;
 
     if (startSimpleRequest("/resources/unpublish", args, ermPUT) == true)
         ETERA_API_CONNECT_ON_REPLY_FINISHED(on_unpublish_finished);
@@ -1388,8 +1344,6 @@ void EteraAPI::unpublish(const QString& path)
 
 void EteraAPI::on_unpublish_finished()
 {
-    QString path = property("path").toString();
-
     int     code;
     QString body;
 
@@ -1403,6 +1357,6 @@ void EteraAPI::on_unpublish_finished()
 
     setLastError(0);
 
-    emit onUNPUBLISH(this, path);
+    emit onUNPUBLISH(this, m_path);
 }
 //----------------------------------------------------------------------------------------------

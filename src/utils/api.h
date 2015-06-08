@@ -281,10 +281,6 @@ class EteraItem
  */
 typedef QList<EteraItem> EteraItemList;
 
-// работа с QVariant
-Q_DECLARE_METATYPE(QBuffer*);
-Q_DECLARE_METATYPE(QIODevice*);
-
 /*!
  * \brief Работа с API Диска
  */
@@ -575,6 +571,12 @@ class EteraAPI : public QObject
 
         quint64       m_parent_id;
         EteraItemType m_ensure;
+
+        //
+        // аргументы внутренних вызовов
+        //
+
+        QString m_link;
 
         /*!
          * \brief Установка последней ошибки
