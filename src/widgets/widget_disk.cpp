@@ -191,17 +191,6 @@ void WidgetDisk::widget_tasks_on_change_count(int count)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_start(quint64 id, const QString& message, const QVariantMap& args)
-{
-    quint64 parent = args.value("parent", 0).toULongLong();
-
-    if (parent == 0)
-        m_tasks->addSimpleTask(id, message, args);
-    else
-        m_tasks->addChildTask(parent, id, message, args);
-}
-//----------------------------------------------------------------------------------------------
-
 void WidgetDisk::task_on_ls_error(EteraAPI* api)
 {
     QString path = api->property("path").toString();
@@ -257,7 +246,7 @@ void WidgetDisk::changePath(const QString& path)
     int     size    = EteraIconProvider::instance()->maxIconSize();
     QString preview = QString("%1x%2").arg(size).arg(size);
 
-    EteraAPI* api = new EteraAPI();
+    EteraAPI* api = new EteraAPI(this);
 
     api->setToken(EteraSettings::instance()->token());
 
@@ -532,13 +521,9 @@ void WidgetDisk::menu_paste_triggered()
             return;
         }
 
-        quint64 id = EteraAPI::nextID();
-
         EteraAPI* api = new EteraAPI(this);
 
         api->setToken(EteraSettings::instance()->token());
-
-        api->setProperty("id", id);
 
         if (clipboard->copyMode() == true) {
             connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_copy_paste_error(EteraAPI*)));
@@ -741,13 +726,9 @@ void WidgetDisk::item_end_edit(QWidget* editor, QAbstractItemDelegate::EndEditHi
 
     QString path = m_path + value;
 
-    quint64 id = EteraAPI::nextID();
-
     EteraAPI* api = new EteraAPI(this);
 
     api->setToken(EteraSettings::instance()->token());
-
-    api->setProperty("id", id);
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_rename_error(EteraAPI*)));
     connect(api, SIGNAL(onMV(EteraAPI*, const QString&, const QString&)), this, SLOT(task_on_rename_success(EteraAPI*, const QString&, const QString&)));
@@ -1007,9 +988,7 @@ void WidgetDisk::task_on_put_stat_success(EteraAPI* api, const EteraItem& item)
 
 void WidgetDisk::task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 total)
 {
-    quint64 id = api->property("id").toULongLong();
-
-    m_tasks->setProgress(id, done, total);
+    m_tasks->setProgress(api->id(), done, total);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1070,13 +1049,10 @@ void WidgetDisk::task_on_put_file_success(EteraAPI* api, const QUrl& /*url*/, QI
 
 void WidgetDisk::putLocalFile(const QString& source, const QString& target, bool overwrite, quint64 parent)
 {
-    quint64 id = EteraAPI::nextID();
-
     EteraAPI* api = new EteraAPI(this);
 
     api->setToken(EteraSettings::instance()->token());
 
-    api->setProperty("id",     id);
     api->setProperty("parent", parent);
 
     connect(api, SIGNAL((onError)), this, SLOT(task_on_put_file_error(EteraAPI*)));
@@ -1344,13 +1320,10 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
         }
     }
 
-    quint64 id = EteraAPI::nextID();
-
     EteraAPI* api = new EteraAPI(this);
 
     api->setToken(EteraSettings::instance()->token());
 
-    api->setProperty("id",     id);
     api->setProperty("parent", parent);
 
     connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_get_file_error(EteraAPI*)));

@@ -471,22 +471,38 @@ class EteraAPI : public QObject
          */
         void unpublish(const QString& path);
 
+        //
+        // аргументы вызовов api
+        //
+
+        quint64    id()          const { return m_id;          }
+        quint64    offset()      const { return m_offset;      }
+        quint64    limit()       const { return m_limit;       }
+        QString    path()        const { return m_path;        }
+        QString    preview()     const { return m_preview;     }
+        QString    source()      const { return m_source;      }
+        QString    target()      const { return m_target;      }
+        QUrl       url()         const { return m_url;         }
+        bool       crop()        const { return m_crop;        }
+        bool       permanently() const { return m_permanently; }
+        bool       overwrite()   const { return m_overwrite;   }
+        QIODevice* device()      const { return m_device;      }
+
+        void setSource(const QString& source) { m_source    = source;    }
+        void setTarget(const QString& target) { m_target    = target;    }
+        void setOverwrite(bool overwrite)     { m_overwrite = overwrite; }
+
+        //
+        // мета-свойства
+        //
+
+        quint64       parentId() const { return m_parent_id; }
+        EteraItemType ensure()   const { return m_ensure;    }
+
+        void setParentId(quint64 parent_id)  { m_parent_id = parent_id; }
+        void setEnsure(EteraItemType ensure) { m_ensure    = ensure;    }
+
     private:
-
-        QString m_user_agent;   /*!< \brief User-Agent в заголовках                              */
-        QString m_base_url;     /*!< \brief Базовый URL для вызовов API                          */
-        QString m_app_id;       /*!< \brief ID приложения                                        */
-        QString m_app_secret;   /*!< \brief Секрет приложения                                    */
-        QString m_token;        /*!< \brief OAuth токен                                          */
-        quint64 m_limit;        /*!< \brief Количество элементов получаемых за раз в операции ls */
-
-        int     m_error_code;      /*!< \brief Код последней ошибки    */
-        QString m_error_message;   /*!< \brief Текст последней ошибки  */
-
-        QNetworkAccessManager m_http;   /*!< \brief Транспорт HTTPS */
-
-        QNetworkReply* m_reply;    /*!< \brief Переменная для временного хранения текущего ответа */
-        QIODevice*     m_io;       /*!< \brief Переменная для временного хранения текущей цели    */
 
         /*!
          * \brief Сообщение OK
@@ -512,6 +528,53 @@ class EteraAPI : public QObject
          * \brief Ошибка открытия файла
          */
         QString FILE_OPEN_ERROR;
+
+        /*!
+         * \brief OAuth токен
+         */
+        QString m_token;
+
+        /*!
+         * \brief Код последней ошибки
+         */
+        int m_error_code;
+
+        /*!
+         * \brief Текст последней ошибки
+         */
+        QString m_error_message;
+
+        /*!
+         * \brief Транспорт HTTPS
+         */
+        QNetworkAccessManager m_http;
+
+        QNetworkReply* m_reply;    /*!< \brief Переменная для временного хранения текущего ответа */
+        QIODevice*     m_io;       /*!< \brief Переменная для временного хранения текущей цели    */
+
+        //
+        // аргументы вызовов api
+        //
+
+        quint64    m_id;
+        quint64    m_offset;
+        quint64    m_limit;
+        QString    m_path;
+        QString    m_preview;
+        QString    m_source;
+        QString    m_target;
+        QUrl       m_url;
+        bool       m_crop;
+        bool       m_permanently;
+        bool       m_overwrite;
+        QIODevice* m_device;
+
+        //
+        // мета-свойства для различных "костылей"
+        //
+
+        quint64       m_parent_id;
+        EteraItemType m_ensure;
 
         /*!
          * \brief Установка последней ошибки
@@ -616,10 +679,9 @@ class EteraAPI : public QObject
         // события HTTPS обработчика
         //
 
-        void on_download_progress(qint64 done, qint64 total);   /*!< \brief Прогресс чтения данных     */
-        void on_upload_progress(qint64 done, qint64 total);     /*!< \brief Прогресс отправки данных   */
-        void on_ssl_errors(const QList<QSslError> &errors);     /*!< \brief Ошибка SSL                 */
-        void on_ready_read();                                   /*!< \brief Готовность к приему данных */
+        void on_progress(qint64 done, qint64 total);          /*!< \brief Прогресс обработки данных  */
+        void on_ssl_errors(const QList<QSslError> &errors);   /*!< \brief Ошибка SSL                 */
+        void on_ready_read();                                 /*!< \brief Готовность к приему данных */
 
         //
         // события завершения HTTPS запроса
@@ -646,20 +708,20 @@ class EteraAPI : public QObject
     signals:
 
         /*!
-         * \brief Сигнал прогресса операции
-         * \param api API
-         * \param done Выполнено
-         * \param total Всего
-         */
-        void onProgress(EteraAPI* api, qint64 done, qint64 total);
-
-        /*!
          * \brief Сигнал ошибки
          * \param api API
          * \param code Код ошибки
          * \param error Текст ошибки
          */
         void onError(EteraAPI* api);
+
+        /*!
+         * \brief Сигнал прогресса операции
+         * \param api API
+         * \param done Выполнено
+         * \param total Всего
+         */
+        void onProgress(EteraAPI* api, qint64 done, qint64 total);
 
         /*!
          * \brief Сигнал получения информации о диске

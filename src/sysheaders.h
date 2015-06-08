@@ -12,17 +12,15 @@
 
 #include <QSet>
 #include <QDir>
-#include <QUuid>
 #include <QMenu>
 #include <QLabel>
 #include <QDebug>
-#include <QMutex>
 #include <QQueue>
-#include <QThread>
 #include <QObject>
 #include <QWidget>
 #include <QDialog>
 #include <QBuffer>
+#include <QThread>
 #include <QPainter>
 #include <QMenuBar>
 #include <QToolBar>
@@ -58,7 +56,6 @@
 #include <QApplication>
 #include <QLibraryInfo>
 #include <QNetworkReply>
-#include <QWaitCondition>
 #include <QNetworkRequest>
 #include <QListWidgetItem>
 #include <QSystemTrayIcon>
@@ -155,5 +152,11 @@
 #define ETERA_VERSION_PATCH 13
 #define ETERA_VERSION_NUM   ((ETERA_VERSION_MAJOR << 16) | (ETERA_VERSION_MINOR << 8) | (ETERA_VERSION_PATCH))
 #define ETERA_VERSION       ETERA_STR(ETERA_VERSION_MAJOR) "." ETERA_STR(ETERA_VERSION_MINOR) "." ETERA_STR(ETERA_VERSION_PATCH)
+
+// константы api
+#define ETERA_API_USER_AGENT "ekstertera/" ETERA_VERSION
+#define ETERA_API_BASE_URL   "https://cloud-api.yandex.net/v1/disk"
+#define ETERA_API_APP_ID     "51cba73d70c343fd96f0765e1eeb0435"
+#define ETERA_API_APP_SECRET "73cf4dacd4f74e7a97b77d036f90eb91"
 
 #endif   // _ekstertera_sysheaders_h_

@@ -142,12 +142,6 @@ class WidgetDisk : public QTabWidget
         WidgetTasks* m_tasks;
 
         /*!
-         * Блокиратор вызова QMessageBox::question для ситуаций, когда
-         * сигнал посылается из разных потоков, а требуется только один ответ
-         */
-        QMutex m_question_mutex;
-
-        /*!
          * Контекстное меню
          */
         QMenu*   m_menu;
@@ -292,8 +286,6 @@ class WidgetDisk : public QTabWidget
         //
         // обработчики асинхронных задач
         //
-
-        void task_on_start(quint64 id, const QString& message, const QVariantMap& args);
 
         void task_on_ls_error(EteraAPI* api);
         void task_on_ls_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
