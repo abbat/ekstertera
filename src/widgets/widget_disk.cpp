@@ -2,7 +2,6 @@
 //----------------------------------------------------------------------------------------------
 #include "widget_disk_item_delegate.h"
 //----------------------------------------------------------------------------------------------
-#include "tasks/task.h"
 #include "utils/icon.h"
 #include "utils/settings.h"
 #include "utils/clipboard.h"
@@ -533,7 +532,7 @@ void WidgetDisk::menu_paste_triggered()
             return;
         }
 
-        quint64 id = EteraTask::nextID();
+        quint64 id = EteraAPI::nextID();
 
         EteraAPI* api = new EteraAPI(this);
 
@@ -742,7 +741,7 @@ void WidgetDisk::item_end_edit(QWidget* editor, QAbstractItemDelegate::EndEditHi
 
     QString path = m_path + value;
 
-    quint64 id = EteraTask::nextID();
+    quint64 id = EteraAPI::nextID();
 
     EteraAPI* api = new EteraAPI(this);
 
@@ -817,7 +816,7 @@ void WidgetDisk::putLocalObjects(const QStringList& paths)
     if (m_path.isEmpty() == true || paths.isEmpty() == true)
         return;
 
-    quint64 fakeid = EteraTask::nextID();
+    quint64 fakeid = EteraAPI::nextID();
 
     QVariantMap map;
     map["answer"] = QMessageBox::NoButton;
@@ -1071,7 +1070,7 @@ void WidgetDisk::task_on_put_file_success(EteraAPI* api, const QUrl& /*url*/, QI
 
 void WidgetDisk::putLocalFile(const QString& source, const QString& target, bool overwrite, quint64 parent)
 {
-    quint64 id = EteraTask::nextID();
+    quint64 id = EteraAPI::nextID();
 
     EteraAPI* api = new EteraAPI(this);
 
@@ -1253,7 +1252,7 @@ void WidgetDisk::getRemoteObjects(const QString& path)
     if (count == 0)
         return;
 
-    quint64 fakeid = EteraTask::nextID();
+    quint64 fakeid = EteraAPI::nextID();
 
     QVariantMap map;
     map["answer"] = QMessageBox::NoButton;
@@ -1345,7 +1344,7 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
         }
     }
 
-    quint64 id = EteraTask::nextID();
+    quint64 id = EteraAPI::nextID();
 
     EteraAPI* api = new EteraAPI(this);
 

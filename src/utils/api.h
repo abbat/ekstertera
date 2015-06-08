@@ -317,6 +317,12 @@ class EteraAPI : public QObject
         void retranslateUi();
 
         /*!
+         * \brief Генерация следующего id вызова api
+         * \return Новый ID вызова api
+         */
+        static quint64 nextID();
+
+        /*!
          * \brief Получение кода последней ошибки
          * \return Код ошибки
          * 0 - ок
