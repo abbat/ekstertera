@@ -430,30 +430,30 @@
         <location filename="../widgets/widget_disk.cpp" line="460"/>
         <location filename="../widgets/widget_disk.cpp" line="491"/>
         <location filename="../widgets/widget_disk.cpp" line="570"/>
-        <location filename="../widgets/widget_disk.cpp" line="648"/>
+        <location filename="../widgets/widget_disk.cpp" line="646"/>
+        <location filename="../widgets/widget_disk.cpp" line="682"/>
         <location filename="../widgets/widget_disk.cpp" line="684"/>
-        <location filename="../widgets/widget_disk.cpp" line="686"/>
-        <location filename="../widgets/widget_disk.cpp" line="861"/>
-        <location filename="../widgets/widget_disk.cpp" line="888"/>
-        <location filename="../widgets/widget_disk.cpp" line="1031"/>
-        <location filename="../widgets/widget_disk.cpp" line="1073"/>
-        <location filename="../widgets/widget_disk.cpp" line="1112"/>
-        <location filename="../widgets/widget_disk.cpp" line="1264"/>
+        <location filename="../widgets/widget_disk.cpp" line="859"/>
+        <location filename="../widgets/widget_disk.cpp" line="886"/>
+        <location filename="../widgets/widget_disk.cpp" line="1027"/>
+        <location filename="../widgets/widget_disk.cpp" line="1069"/>
+        <location filename="../widgets/widget_disk.cpp" line="1108"/>
+        <location filename="../widgets/widget_disk.cpp" line="1260"/>
+        <location filename="../widgets/widget_disk.cpp" line="1311"/>
         <location filename="../widgets/widget_disk.cpp" line="1315"/>
-        <location filename="../widgets/widget_disk.cpp" line="1319"/>
-        <location filename="../widgets/widget_disk.cpp" line="1352"/>
-        <location filename="../widgets/widget_disk.cpp" line="1385"/>
-        <location filename="../widgets/widget_disk.cpp" line="1412"/>
-        <location filename="../widgets/widget_disk.cpp" line="1443"/>
-        <location filename="../widgets/widget_disk.cpp" line="1453"/>
-        <location filename="../widgets/widget_disk.cpp" line="1465"/>
-        <location filename="../widgets/widget_disk.cpp" line="1497"/>
+        <location filename="../widgets/widget_disk.cpp" line="1348"/>
+        <location filename="../widgets/widget_disk.cpp" line="1381"/>
+        <location filename="../widgets/widget_disk.cpp" line="1408"/>
+        <location filename="../widgets/widget_disk.cpp" line="1439"/>
+        <location filename="../widgets/widget_disk.cpp" line="1449"/>
+        <location filename="../widgets/widget_disk.cpp" line="1461"/>
+        <location filename="../widgets/widget_disk.cpp" line="1493"/>
         <source>Ошибка!</source>
         <translation>Error!</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="211"/>
-        <location filename="../widgets/widget_disk.cpp" line="1352"/>
+        <location filename="../widgets/widget_disk.cpp" line="1348"/>
         <source>Ошибка чтения %1:
 %2</source>
         <translation>Error read %1:
@@ -464,9 +464,9 @@
         <location filename="../widgets/widget_disk.cpp" line="423"/>
         <location filename="../widgets/widget_disk.cpp" line="489"/>
         <location filename="../widgets/widget_disk.cpp" line="533"/>
-        <location filename="../widgets/widget_disk.cpp" line="611"/>
-        <location filename="../widgets/widget_disk.cpp" line="736"/>
-        <location filename="../widgets/widget_disk.cpp" line="742"/>
+        <location filename="../widgets/widget_disk.cpp" line="609"/>
+        <location filename="../widgets/widget_disk.cpp" line="734"/>
+        <location filename="../widgets/widget_disk.cpp" line="740"/>
         <source>Внимание!</source>
         <translation>Attention!</translation>
     </message>
@@ -478,8 +478,8 @@
     <message>
         <location filename="../widgets/widget_disk.cpp" line="313"/>
         <location filename="../widgets/widget_disk.cpp" line="336"/>
-        <location filename="../widgets/widget_disk.cpp" line="1073"/>
-        <location filename="../widgets/widget_disk.cpp" line="1112"/>
+        <location filename="../widgets/widget_disk.cpp" line="1069"/>
+        <location filename="../widgets/widget_disk.cpp" line="1108"/>
         <source>Ошибка создания %1:
 %2</source>
         <translation>Error create %1:
@@ -537,27 +537,27 @@
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="570"/>
-        <location filename="../widgets/widget_disk.cpp" line="861"/>
+        <location filename="../widgets/widget_disk.cpp" line="859"/>
         <source>Ошибка удаления %1:
 %2</source>
         <translation>Error delete %1:
 %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="611"/>
+        <location filename="../widgets/widget_disk.cpp" line="609"/>
         <source>Вы уверены, что хотите удалить выбранные файлы?</source>
         <translation>Are you sure to delete selected files?</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="684"/>
+        <location filename="../widgets/widget_disk.cpp" line="682"/>
         <source>Ошибка переименования %1 в %2:
 Приемник уже существует</source>
         <translation>Error rename %1 to %2:
 Target already exists</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="648"/>
-        <location filename="../widgets/widget_disk.cpp" line="686"/>
+        <location filename="../widgets/widget_disk.cpp" line="646"/>
+        <location filename="../widgets/widget_disk.cpp" line="684"/>
         <source>Ошибка переименования %1 в %2:
 %3</source>
         <translation>Error rename %1 to %2:
@@ -566,7 +566,7 @@ Target already exists</translation>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="445"/>
         <location filename="../widgets/widget_disk.cpp" line="511"/>
-        <location filename="../widgets/widget_disk.cpp" line="705"/>
+        <location filename="../widgets/widget_disk.cpp" line="703"/>
         <source>Получение информации о %1</source>
         <translation>Get information about %1</translation>
     </message>
@@ -581,88 +581,88 @@ Target already exists</translation>
         <translation>Move %1 to %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="736"/>
+        <location filename="../widgets/widget_disk.cpp" line="734"/>
         <source>Недопустимый символ &quot;%1&quot; в имени</source>
         <translation>Invalid char &quot;%1&quot;</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="742"/>
+        <location filename="../widgets/widget_disk.cpp" line="740"/>
         <source>Недопустимое имя</source>
         <translation>Invalid name</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="759"/>
+        <location filename="../widgets/widget_disk.cpp" line="757"/>
         <source>Переименование %1 в %2</source>
         <translation>Rename %1 to %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="828"/>
+        <location filename="../widgets/widget_disk.cpp" line="826"/>
         <source>Загрузка на Диск</source>
         <translation>Upload to Disk</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="888"/>
+        <location filename="../widgets/widget_disk.cpp" line="886"/>
         <source>Ошибка чтения информации о %1:
 %2</source>
         <translation>Error read information about %1:
 %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="918"/>
-        <location filename="../widgets/widget_disk.cpp" line="957"/>
-        <location filename="../widgets/widget_disk.cpp" line="1299"/>
-        <location filename="../widgets/widget_disk.cpp" line="1399"/>
+        <location filename="../widgets/widget_disk.cpp" line="916"/>
+        <location filename="../widgets/widget_disk.cpp" line="954"/>
+        <location filename="../widgets/widget_disk.cpp" line="1295"/>
+        <location filename="../widgets/widget_disk.cpp" line="1395"/>
         <source>Файл уже существует!</source>
         <translation>File already exists!</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="918"/>
-        <location filename="../widgets/widget_disk.cpp" line="957"/>
-        <location filename="../widgets/widget_disk.cpp" line="1299"/>
-        <location filename="../widgets/widget_disk.cpp" line="1399"/>
+        <location filename="../widgets/widget_disk.cpp" line="916"/>
+        <location filename="../widgets/widget_disk.cpp" line="954"/>
+        <location filename="../widgets/widget_disk.cpp" line="1295"/>
+        <location filename="../widgets/widget_disk.cpp" line="1395"/>
         <source>Файл %1 уже существует, перезаписать?</source>
         <translation>File %1 already exists, overwrite?</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1031"/>
-        <location filename="../widgets/widget_disk.cpp" line="1264"/>
+        <location filename="../widgets/widget_disk.cpp" line="1027"/>
+        <location filename="../widgets/widget_disk.cpp" line="1260"/>
         <source>Ошибка загрузки %1 в %2:
 %3</source>
         <translation>Error upload %1 to %2:
 %3</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1237"/>
+        <location filename="../widgets/widget_disk.cpp" line="1233"/>
         <source>Сохранение с Диска</source>
         <translation>Download from Disk</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1315"/>
-        <location filename="../widgets/widget_disk.cpp" line="1412"/>
-        <location filename="../widgets/widget_disk.cpp" line="1443"/>
-        <location filename="../widgets/widget_disk.cpp" line="1453"/>
+        <location filename="../widgets/widget_disk.cpp" line="1311"/>
+        <location filename="../widgets/widget_disk.cpp" line="1408"/>
+        <location filename="../widgets/widget_disk.cpp" line="1439"/>
+        <location filename="../widgets/widget_disk.cpp" line="1449"/>
         <source>Ошибка удаления %1</source>
         <translation>Error delete %1</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1319"/>
+        <location filename="../widgets/widget_disk.cpp" line="1315"/>
         <source>Неизвестный объект %1</source>
         <translation>Unknown object %1</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1385"/>
+        <location filename="../widgets/widget_disk.cpp" line="1381"/>
         <source>Ошибка создания %1</source>
         <translation>Error create %1</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1465"/>
+        <location filename="../widgets/widget_disk.cpp" line="1461"/>
         <source>Ошибка открытия доступа к %1:
 %2</source>
         <translation>Error publish %1:
 %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="1497"/>
+        <location filename="../widgets/widget_disk.cpp" line="1493"/>
         <source>Ошибка закрытия доступа к %1:
 %2</source>
         <translation>Error unpublish %1:
