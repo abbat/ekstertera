@@ -6,6 +6,7 @@
 #ifndef _ekstertera_forms_form_settings_h_
 #define _ekstertera_forms_form_settings_h_
 
+#include "utils/api.h"
 #include "form_settings_ui.h"
 
 /*!
@@ -56,6 +57,19 @@ class FormSettings : public FormSettingsUI
          * \brief Получение OAuth токена
          */
         void button_token_clicked();
+
+        /*!
+         * \brief Ошибка получения OAuth токена
+         * \param api API
+         */
+        void task_on_token_error(EteraAPI* api);
+
+        /*!
+         * \brief Получение OAuth токена
+         * \param api API
+         * \param token OAuth токен
+         */
+        void task_on_token_success(EteraAPI* api, const QString& token);
 };
 
 #endif   // _ekstertera_forms_form_settings_h_

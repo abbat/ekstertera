@@ -1,6 +1,5 @@
 #include "form_settings.h"
 //----------------------------------------------------------------------------------------------
-#include "utils/api.h"
 #include "utils/settings.h"
 #include "utils/translator.h"
 //----------------------------------------------------------------------------------------------
@@ -75,22 +74,35 @@ void FormSettings::button_ok_clicked ()
 
 void FormSettings::button_token_clicked()
 {
-    EteraAPI api;
-    api.getToken();
+    EteraAPI* api = new EteraAPI(this);
+
+    api->getToken();
 
     bool ok;
     QString auth_code = QInputDialog::getText(this, trUtf8("Получение OAuth токена"), trUtf8("Введите код подтверждения"), QLineEdit::Normal, "", &ok).trimmed();
     if (ok == false || auth_code.isEmpty() == true) {
+        delete api;
         QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Необходимо ввести код подтверждения!"));
         return;
     }
 
-    QString token = api.getToken(auth_code);
-    if (token.isEmpty() == true) {
-        QMessageBox::critical(this, trUtf8("Ошибка!"), api.lastErrorMessage());
-        return;
-    }
+    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_token_error(EteraAPI*)));
+    connect(api, SIGNAL(onTOKEN(EteraAPI*, const QString&)), this, SLOT(task_on_token_success(EteraAPI*, const QString&)));
 
+    api->getToken(auth_code);
+}
+//----------------------------------------------------------------------------------------------
+
+void FormSettings::task_on_token_error(EteraAPI* api)
+{
+    QMessageBox::critical(this, trUtf8("Ошибка!"), api->lastErrorMessage());
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void FormSettings::task_on_token_success(EteraAPI* api, const QString& token)
+{
     m_text_token->setText(token);
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------

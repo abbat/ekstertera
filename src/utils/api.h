@@ -298,7 +298,7 @@ class EteraAPI : public QObject
          * \brief Конструктор
          * \param noprogress Не посылать сигналы прогресса операции
          */
-        EteraAPI(QObject* parent = NULL, bool noprogress = false);
+        EteraAPI(QObject* parent = NULL);
         ~EteraAPI();
 
         /*!
@@ -338,13 +338,6 @@ class EteraAPI : public QObject
         QString lastErrorMessage() const { return m_error_message; }
 
         /*!
-         * \brief Флаг возникновения ошибки во время ожидания результата асинхронной операции
-         * Позволяет сделать предположение относительно результата самой операции
-         * \return true если ошибка произошла во время ожидания
-         */
-        bool isAsyncError() const { return m_async_error; }
-
-        /*!
          * \brief Человекочитаемый размер
          * \param val Размер в байтах
          * \return Человекочитаемый размер
@@ -360,10 +353,10 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Получение OAuth токена
+         * Сигнал onTOKEN
          * \param auth_code Код для получения токена или пустое значения для открытия браузера и запроса кода
-         * \return OAuth токен
          */
-        QString getToken(const QString& auth_code = "");
+        void getToken(const QString& auth_code = "");
 
         /*!
          * \brief Установка OAuth токена
@@ -376,17 +369,6 @@ class EteraAPI : public QObject
          * Сигнал onINFO
          */
         void info();
-
-        /*!
-         * \brief Получение информации об объекте на диске
-         * DEPRECATED
-         * \param path Путь к объекту
-         * \param result Описатель объекта
-         * \param preview Размер превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
-         * \param crop Параметр для обрезания превью (см. https://tech.yandex.ru/disk/api/reference/meta-docpage/)
-         * \return Флаг успеха
-         */
-        bool stat(const QString& path, EteraItem& result, const QString& preview = "", bool crop = false);
 
         /*!
          * \brief Получение информации об объекте на диске
@@ -500,9 +482,6 @@ class EteraAPI : public QObject
 
         int     m_error_code;      /*!< \brief Код последней ошибки    */
         QString m_error_message;   /*!< \brief Текст последней ошибки  */
-        bool    m_async_error;     /*!< \brief Флаг асинхронной ошибки */
-
-        bool m_noprogress;   /*!< \brief Флаг запрета посылать сигналы прогресса операции */
 
         QNetworkAccessManager m_http;   /*!< \brief Транспорт HTTPS */
 
@@ -576,19 +555,6 @@ class EteraAPI : public QObject
         } EteraRequestMethod;
 
         /*!
-         * \brief Выполнение запроса
-         * DEPRECATED
-         * \param request Запрос
-         * \param code HTTP-код ответа
-         * \param body Тело ответа
-         * \param method Метод
-         * \param data Тело для POST/PUT запроса (исключает io)
-         * \param io Тело для POST/PUT запроса (исключает data)
-         * \return false при возникновении сетевой ошибки, иначе true
-         */
-        bool makeRequest(const QNetworkRequest& request, int& code, QString& body, EteraRequestMethod method = ermGET, const QString& data = "", QIODevice* io = NULL);
-
-        /*!
          * \brief Старт выполнения запроса
          * \param request Запрос
          * \param method Метод
@@ -605,17 +571,6 @@ class EteraAPI : public QObject
          * \return false при возникновении сетевой ошибки, иначе true
          */
         bool parseReply(int& code, QString& body);
-
-        /*!
-         * \brief Выполнение простого запроса
-         * DEPRECATED
-         * \param code Код ответа
-         * \param body Тело ответа
-         * \param url Относительный URL
-         * \param args Аргументы запроса
-         * \return Флаг успеха
-         */
-        bool makeSimpleRequest(int& code, QString& body, const QString& url, const EteraArgs& args = EteraArgs(), EteraRequestMethod method = ermGET);
 
         /*!
          * \brief Старт выполнения простого запроса
@@ -642,14 +597,6 @@ class EteraAPI : public QObject
         bool parseLink(const QString& link, QUrl& url, EteraRequestMethod& method);
 
         /*!
-         * \brief Ожидание асинхронной операции
-         * DEPRECATED
-         * \param link Тело объекта Link
-         * \return Флаг успеха
-         */
-        bool wait(const QString& link);
-
-        /*!
          * \brief Старт запроса на ожидание асинхронной операции
          * \param link Тело объекта Link
          * \return Флаг успеха
@@ -674,12 +621,11 @@ class EteraAPI : public QObject
         void on_ssl_errors(const QList<QSslError> &errors);     /*!< \brief Ошибка SSL                 */
         void on_ready_read();                                   /*!< \brief Готовность к приему данных */
 
-        /*!
-         * \brief Обработка сигнала выхода из приложения
-         * DEPRECATED
-         */
-        void on_about_to_quit();
+        //
+        // события завершения HTTPS запроса
+        //
 
+        void on_token_finished();       /*!< \brief Завершение вызова getToken()       */
         void on_info_finished();        /*!< \brief Завершение вызова info()           */
         void on_stat_finished();        /*!< \brief Завершение вызова stat()           */
         void on_ls_finished();          /*!< \brief Завершение вызова ls()             */
@@ -701,26 +647,11 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Сигнал прогресса операции
-         * DEPRECATED
-         * \param done Выполнено
-         * \param total Всего
-         */
-        void onProgress(qint64 done, qint64 total);
-
-        /*!
-         * \brief Сигнал прогресса операции
          * \param api API
          * \param done Выполнено
          * \param total Всего
          */
         void onProgress(EteraAPI* api, qint64 done, qint64 total);
-
-        /*!
-         * \brief Сигнал ошибки ssl
-         * DEPRECATED
-         * \param error Ошибки
-         */
-        void onError(const QString& error);
 
         /*!
          * \brief Сигнал ошибки
@@ -729,6 +660,13 @@ class EteraAPI : public QObject
          * \param error Текст ошибки
          */
         void onError(EteraAPI* api);
+
+        /*!
+         * \brief Сигнал получения информации о диске
+         * \param api API
+         * \param info Результат
+         */
+        void onTOKEN(EteraAPI* api, const QString& token);
 
         /*!
          * \brief Сигнал получения информации о диске

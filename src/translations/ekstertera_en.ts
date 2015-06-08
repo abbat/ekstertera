@@ -5,70 +5,67 @@
 <context>
     <name>EteraAPI</name>
     <message>
-        <location filename="../utils/api.cpp" line="353"/>
+        <location filename="../utils/api.cpp" line="351"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="354"/>
+        <location filename="../utils/api.cpp" line="352"/>
         <source>Ошибка разбора JSON</source>
         <translation>JSON parse error</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="355"/>
+        <location filename="../utils/api.cpp" line="353"/>
         <source>Неподдерживаемый URL объекта Link</source>
         <translation>Malformed URL of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="356"/>
+        <location filename="../utils/api.cpp" line="354"/>
         <source>Неподдерживаемый метод объекта Link</source>
         <translation>Unsupported method of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="357"/>
+        <location filename="../utils/api.cpp" line="355"/>
         <source>Ошибка открытия файла</source>
         <translation>An error occurred when opening the file</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="454"/>
+        <location filename="../utils/api.cpp" line="437"/>
         <source>КБ</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="457"/>
+        <location filename="../utils/api.cpp" line="440"/>
         <source>МБ</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="460"/>
+        <location filename="../utils/api.cpp" line="443"/>
         <source>ГБ</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="463"/>
+        <location filename="../utils/api.cpp" line="446"/>
         <source>ТБ</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="515"/>
-        <location filename="../utils/api.cpp" line="597"/>
+        <location filename="../utils/api.cpp" line="501"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="711"/>
+        <location filename="../utils/api.cpp" line="598"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="843"/>
-        <location filename="../utils/api.cpp" line="900"/>
+        <location filename="../utils/api.cpp" line="743"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="847"/>
-        <location filename="../utils/api.cpp" line="904"/>
+        <location filename="../utils/api.cpp" line="747"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>
@@ -274,17 +271,17 @@
         <translation>Enter authentication code</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings.cpp" line="84"/>
+        <location filename="../forms/form_settings.cpp" line="85"/>
         <source>Внимание!</source>
         <translation>Attention!</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings.cpp" line="84"/>
+        <location filename="../forms/form_settings.cpp" line="85"/>
         <source>Необходимо ввести код подтверждения!</source>
         <translation>Authentication code required!</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings.cpp" line="90"/>
+        <location filename="../forms/form_settings.cpp" line="98"/>
         <source>Ошибка!</source>
         <translation>Error!</translation>
     </message>
