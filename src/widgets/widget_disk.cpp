@@ -123,6 +123,47 @@ void WidgetDisk::retranslateUi()
 
     setTabText(0, trUtf8("Проводник"));
     setTabText(1, trUtf8("Задачи"));
+
+    //
+    // информационные сообщения
+    //
+
+    ERROR_MESSAGE                       = trUtf8("Ошибка!");
+    ATTENTION_MESSAGE                   = trUtf8("Внимание!");
+    ERROR_MESSAGE_LS                    = trUtf8("Ошибка чтения %1:\n%2");
+    START_MESSAGE_LS                    = trUtf8("Чтение %1");
+    ERROR_MESSAGE_MKDIR                 = trUtf8("Ошибка создания %1:\n%2");
+    START_MESSAGE_MKDIR_CAPTION         = trUtf8("Создать директорию");
+    START_MESSAGE_MKDIR_TEXT            = trUtf8("Введите имя новой директории");
+    START_MESSAGE_MKDIR_VALUE           = trUtf8("Новая папка");
+    ERROR_MESSAGE_MKDIR_ALREADY_EXISTS  = trUtf8("Директория %1 уже существует");
+    START_MESSAGE_MKDIR                 = trUtf8("Создание %1");
+    ERROR_MESSAGE_STAT                  = trUtf8("Ошибка чтения информации о %1:\n%2");
+    START_MESSAGE_STAT                  = trUtf8("Чтение информации о %1");
+    ROOT_MESSAGE_CP                     = trUtf8("Копирование");
+    ERROR_MESSAGE_CP                    = trUtf8("Ошибка копирования %1 в %2:\n%3");
+    ERROR_MESSAGE_CP_ALREADY_EXISTS     = trUtf8("Ошибка копирования %1:\n%2 уже существует");
+    START_MESSAGE_CP                    = trUtf8("Копирование %1 в %2");
+    ROOT_MESSAGE_MV                     = trUtf8("Перемещение");
+    ERROR_MESSAGE_MV                    = trUtf8("Ошибка перемещения %1 в %2:\n%3");
+    ERROR_MESSAGE_MV_ALREADY_EXISTS     = trUtf8("Ошибка перемещения %1:\n%2 уже существует");
+    START_MESSAGE_MV                    = trUtf8("Перемещение %1 в %2");
+    ERROR_MESSAGE_CPMV_SAME             = trUtf8("Источник и приемник совпадают");
+    ROOT_MESSAGE_RM                     = trUtf8("Удаление");
+    ASK_DELETE_MESSAGE                  = trUtf8("Вы уверены, что хотите удалить выбранные элементы?");
+    ERROR_MESSAGE_RM                    = trUtf8("Ошибка удаления %1:\n%2");
+    START_MESSAGE_RM                    = trUtf8("Удаление %1");
+    ERROR_MESSAGE_RENAME_INVALID_CHAR   = trUtf8("Недопустимый символ \"%1\" в имени");
+    ERROR_MESSAGE_RENAME_IVALID_NAME    = trUtf8("Недопустимое имя");
+    ERROR_MESSAGE_RENAME                = trUtf8("Ошибка переименования %1 в %2:\n%3");
+    ERROR_MESSAGE_RENAME_ALREADY_EXISTS = trUtf8("Ошибка переименования %1:\n%2 же существует");
+    START_MESSAGE_RENAME                = trUtf8("Переименование %1 в %2");
+    ROOT_MESSAGE_PUBLISH                = trUtf8("Открытие доступа");
+    ERROR_MESSAGE_PUBLISH               = trUtf8("Ошибка открытия доступа к %1:\n%2");
+    START_MESSAGE_PUBLISH               = trUtf8("Открытие доступа к %1");
+    ROOT_MESSAGE_UNPUBLISH              = trUtf8("Закрытие доступа");
+    ERROR_MESSAGE_UNPUBLISH             = trUtf8("Ошибка закрытия доступа к %1:\n%2");
+    START_MESSAGE_UNPUBLISH             = trUtf8("Закрытие доступа к %1");
 }
 //----------------------------------------------------------------------------------------------
 
@@ -202,41 +243,6 @@ void WidgetDisk::widget_tasks_on_change_count(int count)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_ls_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка чтения %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
-
-    m_explorer->setCursor(Qt::ArrowCursor);
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_ls_success(EteraAPI* api, const EteraItemList& list, quint64 limit)
-{
-    if (api->path() != m_required_path) {
-        api->deleteLater();
-        return;
-    }
-
-    for (int i = 0; i < list.count(); i++)
-        new WidgetDiskItem(m_explorer, list[i], m_preview_mode);
-
-    if ((quint64)list.count() < limit) {
-        api->deleteLater();
-
-        m_path = api->path();
-
-        m_explorer->setCursor(Qt::ArrowCursor);
-
-        emit onPathChanged(api->path());
-    } else {
-        quint64 offset = api->offset() + limit;
-        api->ls(api->path(), api->preview(), api->crop(), offset, limit);
-    }
-}
-//----------------------------------------------------------------------------------------------
-
 void WidgetDisk::changePath(const QString& path)
 {
     m_explorer->setCursor(Qt::BusyCursor);
@@ -253,8 +259,55 @@ void WidgetDisk::changePath(const QString& path)
     }
 
     EteraAPI* api = createAPI();
+
     ETERA_API_TASK_LS(api, task_on_ls_success, task_on_ls_error);
+
+    m_tasks->addSimpleTask(api->id(), START_MESSAGE_LS.arg(_path));
+
     api->ls(_path, m_preview_arg, true);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_ls_error(EteraAPI* api)
+{
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_LS.arg(api->path()).arg(api->lastErrorMessage()));
+
+    m_explorer->setCursor(Qt::ArrowCursor);
+
+    m_tasks->removeSimpleTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_ls_success(EteraAPI* api, const EteraItemList& list, quint64 limit)
+{
+    // если загружался большой список, но в это время сменили текущий путь - останавливаем предыдущую работу
+    if (api->path() != m_required_path) {
+        m_tasks->removeSimpleTask(api->id());
+        api->deleteLater();
+        return;
+    }
+
+    // добавление элементов
+    for (int i = 0; i < list.count(); i++)
+        new WidgetDiskItem(m_explorer, list[i], m_preview_mode);
+
+    // проверка необходимости остановки
+    if ((quint64)list.count() < limit) {
+        m_tasks->removeSimpleTask(api->id());
+
+        m_path = api->path();
+
+        m_explorer->setCursor(Qt::ArrowCursor);
+
+        emit onPathChanged(api->path());
+
+        api->deleteLater();
+    } else {
+        quint64 offset = api->offset() + limit;
+        api->ls(api->path(), api->preview(), api->crop(), offset, limit);
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -294,9 +347,57 @@ void WidgetDisk::menu_open_triggered()
 }
 //----------------------------------------------------------------------------------------------
 
+void WidgetDisk::menu_new_triggered()
+{
+    if (m_path.isEmpty() == true)
+        return;
+
+    bool ok;
+    QString value = QInputDialog::getText(this, START_MESSAGE_MKDIR_CAPTION, START_MESSAGE_MKDIR_TEXT, QLineEdit::Normal, START_MESSAGE_MKDIR_VALUE, &ok);
+    if (ok == false || value.isEmpty() == true)
+        return;
+
+    QString path = m_path + value;
+
+    EteraAPI* api = createAPI();
+
+    ETERA_API_TASK_MKDIR(api, task_on_mkdir_success, task_on_mkdir_error);
+
+    m_tasks->addSimpleTask(api->id(), START_MESSAGE_MKDIR.arg(path));
+
+    api->mkdir(path);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_mkdir_error(EteraAPI* api)
+{
+    // CONFLICT, директория уже существует
+    if (api->lastErrorCode() == 409)
+        QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_MKDIR_ALREADY_EXISTS.arg(api->path()));
+    else
+        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MKDIR.arg(api->path()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeSimpleTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_mkdir_success(EteraAPI* api)
+{
+    ETERA_API_CONTINUE_TASK_STAT(api, task_on_mkdir_stat_success, task_on_mkdir_stat_error, task_on_mkdir_error);
+
+    m_tasks->addSimpleTask(api->id(), START_MESSAGE_STAT.arg(api->path()));
+
+    api->stat(api->path());
+}
+//----------------------------------------------------------------------------------------------
+
 void WidgetDisk::task_on_mkdir_stat_error(EteraAPI* api)
 {
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeSimpleTask(api->id());
 
     api->deleteLater();
 }
@@ -307,45 +408,9 @@ void WidgetDisk::task_on_mkdir_stat_success(EteraAPI* api, const EteraItem& item
     if (item.parentPath() == m_path)
         m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_mkdir_error(EteraAPI* api)
-{
-    // CONFLICT, директория уже существует
-    if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Директория %1 уже существует").arg(api->path()));
-    else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
+    m_tasks->removeSimpleTask(api->id());
 
     api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_mkdir_success(EteraAPI* api)
-{
-    ETERA_API_CONTINUE_TASK_STAT(api, task_on_mkdir_stat_success, task_on_mkdir_stat_error, task_on_mkdir_error);
-
-    api->stat(api->path());
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::menu_new_triggered()
-{
-    if (m_path.isEmpty() == true)
-        return;
-
-    bool ok;
-    QString value = QInputDialog::getText(this, trUtf8("Создать директорию"), trUtf8("Введите имя новой директории"), QLineEdit::Normal, trUtf8("Новая папка"), &ok);
-    if (ok == false || value.isEmpty() == true)
-        return;
-
-    QString path = m_path + value;
-
-    EteraAPI* api = createAPI();
-    ETERA_API_TASK_MKDIR(api, task_on_mkdir_success, task_on_mkdir_error);
-    api->mkdir(path);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -361,24 +426,48 @@ void WidgetDisk::menu_copy_triggered()
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_copy_paste_stat_error(EteraAPI* api)
+void WidgetDisk::menu_paste_triggered()
 {
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
+    EteraClipboard* clipboard = EteraClipboard::instance();
 
-    m_tasks->removeSimpleTask(api->id());
+    if (clipboard->isEmpty() == true || m_path.isEmpty() == true)
+        return;
 
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
+    quint64 parent = 0;
+    if (clipboard->count() > 1) {
+        parent = EteraAPI::nextID();
+        if (clipboard->copyMode() == true)
+            m_tasks->addSimpleTask(parent, ROOT_MESSAGE_CP);
+        else
+            m_tasks->addSimpleTask(parent, ROOT_MESSAGE_MV);
+    }
 
-void WidgetDisk::task_on_copy_paste_stat_success(EteraAPI* api, const EteraItem& item)
-{
-    if (item.parentPath() == m_path)
-        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
+    for (int i = 0; i < clipboard->count(); i++) {
+        EteraItem src = clipboard->at(i);
+        QString   dst = m_path + src.name();
 
-    m_tasks->removeSimpleTask(api->id());
+        // нет смысла перемещать само в себя
+        if (src.path() == dst) {
+            QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_CPMV_SAME);
+            return;
+        }
 
-    api->deleteLater();
+        EteraAPI* api = createAPI();
+
+        if (clipboard->copyMode() == true) {
+            ETERA_API_TASK_CP(api, task_on_copy_paste_success, task_on_copy_paste_error);
+
+            m_tasks->addChildTask(parent, api->id(), START_MESSAGE_CP.arg(src.path()).arg(dst));
+
+            api->cp(src.path(), dst, false);
+        } else {
+            ETERA_API_TASK_MV(api, task_on_cut_paste_success, task_on_cut_paste_error);
+
+            m_tasks->addChildTask(parent, api->id(), START_MESSAGE_MV.arg(src.path()).arg(dst));
+
+            api->mv(src.path(), dst, false);
+        }
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -386,12 +475,12 @@ void WidgetDisk::task_on_copy_paste_error(EteraAPI* api)
 {
     // CONFLICT, объект уже существует
     if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Ошибка копирования %1:\n%2 уже существует").arg(api->source()).arg(api->target()));
+        QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_CP_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
     else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
+        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_CP.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
     // TODO: обработать асинхронную ошибку, т.к. копирование могло быть все же успешным
-    m_tasks->removeSimpleTask(api->id());
+    m_tasks->removeChildTask(api->id());
 
     api->deleteLater();
 }
@@ -401,32 +490,11 @@ void WidgetDisk::task_on_copy_paste_success(EteraAPI* api)
 {
     EteraClipboard::instance()->removeByPath(api->source());
 
-    ETERA_API_CONTINUE_TASK_STAT(api, task_on_copy_paste_stat_success, task_on_copy_paste_stat_error, task_on_copy_paste_error);
+    ETERA_API_CONTINUE_TASK_STAT(api, task_on_copy_cut_paste_stat_success, task_on_copy_cut_paste_stat_error, task_on_copy_paste_error);
 
-    m_tasks->addSimpleTask(api->id(), trUtf8("Получение информации о %1").arg(api->target()));
+    m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_STAT.arg(api->target()));
 
     api->stat(api->target(), m_preview_arg, true);
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_cut_paste_stat_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка копирования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
-
-    m_tasks->removeSimpleTask(api->id());
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_cut_paste_stat_success(EteraAPI* api, const EteraItem& item)
-{
-    if (item.parentPath() == m_path)
-        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
-
-    m_tasks->removeSimpleTask(api->id());
-
-    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -434,12 +502,12 @@ void WidgetDisk::task_on_cut_paste_error(EteraAPI* api)
 {
     // CONFLICT, объект уже существует
     if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Ошибка перемещения %1:\n%2 уже существует").arg(api->source()).arg(api->target()));
+        QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_MV_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
     else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка перемещения %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
+        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MV.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
     // TODO: обработать асинхронную ошибку, т.к. вставка могла быть все же успешной
-    m_tasks->removeSimpleTask(api->id());
+    m_tasks->removeChildTask(api->id());
 
     api->deleteLater();
 }
@@ -449,81 +517,30 @@ void WidgetDisk::task_on_cut_paste_success(EteraAPI* api)
 {
     EteraClipboard::instance()->removeByPath(api->source());
 
-    ETERA_API_CONTINUE_TASK_STAT(api, task_on_cut_paste_stat_success, task_on_cut_paste_stat_error, task_on_copy_paste_error);
+    ETERA_API_CONTINUE_TASK_STAT(api, task_on_copy_cut_paste_stat_success, task_on_copy_cut_paste_stat_error, task_on_copy_paste_error);
 
-    m_tasks->addSimpleTask(api->id(), trUtf8("Получение информации о %1").arg(api->target()));
+    m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_STAT.arg(api->target()));
 
     api->stat(api->target(), m_preview_arg, true);
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::menu_paste_triggered()
+void WidgetDisk::task_on_copy_cut_paste_stat_error(EteraAPI* api)
 {
-    EteraClipboard* clipboard = EteraClipboard::instance();
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->target()).arg(api->lastErrorMessage()));
 
-    if (clipboard->isEmpty() == true || m_path.isEmpty() == true)
-        return;
-
-    for (int i = 0; i < clipboard->count(); i++) {
-        EteraItem src = clipboard->at(i);
-        QString   dst = m_path + src.name();
-
-        // нет смысла перемещать само в себя
-        if (src.path() == dst) {
-            QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Источник и приемник совпадают"));
-            return;
-        }
-
-        EteraAPI* api = createAPI();
-
-        if (clipboard->copyMode() == true) {
-            m_tasks->addSimpleTask(api->id(), trUtf8("Копирование %1 в %2").arg(src.path()).arg(dst));
-
-            ETERA_API_TASK_CP(api, task_on_copy_paste_success, task_on_copy_paste_error);
-
-            api->cp(src.path(), dst, false);
-        } else {
-            m_tasks->addSimpleTask(api->id(), trUtf8("Перемещение %1 в %2").arg(src.path()).arg(dst));
-
-            ETERA_API_TASK_MV(api, task_on_cut_paste_success, task_on_cut_paste_error);
-
-            api->mv(src.path(), dst, false);
-        }
-    }
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_rm_error(EteraAPI* api)
-{
-    // Если объект не существует, то и удалять нечего
-    if (api->lastErrorCode() != 404)
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка удаления %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
-
-    // если ошибка во время ожидания операции, то скорее всего объект будет удален
-    // если объект был удален ранее, то его нужно удалить из виджета
-    if (/*async == true ||*/ api->lastErrorCode() == 404) {
-        // удаление из виджета
-        removeByPath(api->path());
-
-        // удаление из буфера обмена
-        EteraClipboard* clipboard = EteraClipboard::instance();
-
-        clipboard->removeByPath(api->path());
-    }
+    m_tasks->removeChildTask(api->id());
 
     api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_rm_success(EteraAPI* api)
+void WidgetDisk::task_on_copy_cut_paste_stat_success(EteraAPI* api, const EteraItem& item)
 {
-    // удаление из виджета
-    removeByPath(api->path());
+    if (item.parentPath() == m_path)
+        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
-    // удаление из буфера обмена
-    EteraClipboard* clipboard = EteraClipboard::instance();
-
-    clipboard->removeByPath(api->path());
+    m_tasks->removeChildTask(api->id());
 
     api->deleteLater();
 }
@@ -536,17 +553,58 @@ void WidgetDisk::menu_delete_triggered()
     if (selected.count() == 0)
         return;
 
-    if (QMessageBox::question(this, trUtf8("Внимание!"), trUtf8("Вы уверены, что хотите удалить выбранные файлы?"), QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
+    if (QMessageBox::question(this, ATTENTION_MESSAGE, ASK_DELETE_MESSAGE, QMessageBox::Yes | QMessageBox::No, QMessageBox::No) != QMessageBox::Yes)
         return;
+
+    quint64 parent = 0;
+    if (selected.count() > 1) {
+        parent = EteraAPI::nextID();
+        m_tasks->addSimpleTask(parent, ROOT_MESSAGE_RM);
+    }
 
     for (int i = 0; i < selected.count(); i++) {
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
         const EteraItem* eitem = witem->item();
 
         EteraAPI* api = createAPI();
+
         ETERA_API_TASK_RM(api, task_on_rm_success, task_on_rm_error);
+
+        m_tasks->addChildTask(parent, api->id(), START_MESSAGE_RM.arg(eitem->path()));
+
         api->rm(eitem->path(), true);
     }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_rm_error(EteraAPI* api)
+{
+    // если объект не существует, то и удалять нечего
+    if (api->lastErrorCode() != 404)
+        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RM.arg(api->path()).arg(api->lastErrorMessage()));
+
+    // если ошибка во время ожидания операции, то скорее всего объект будет удален
+    // если объект был удален ранее, то его нужно удалить из виджета
+    if (/* TODO: async == true ||*/ api->lastErrorCode() == 404) {
+        removeByPath(api->path());
+        EteraClipboard::instance()->removeByPath(api->path());
+    }
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_rm_success(EteraAPI* api)
+{
+    removeByPath(api->path());
+
+    EteraClipboard::instance()->removeByPath(api->path());
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -559,59 +617,6 @@ void WidgetDisk::menu_rename_triggered()
         witem->setFlags(witem->flags() | Qt::ItemIsEditable);
         m_explorer->editItem(witem);
     }
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_rename_stat_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
-
-    m_tasks->removeSimpleTask(api->id());
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_rename_stat_success(EteraAPI* api, const EteraItem& item)
-{
-    // замена описателя
-    WidgetDiskItem* witem = findByPath(api->source());
-    if (witem != NULL)
-        witem->replaceItem(item, m_preview_mode);
-
-    m_tasks->removeSimpleTask(api->id());
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_rename_error(EteraAPI* api)
-{
-    // откат переименования
-    WidgetDiskItem* witem = findByPath(api->source());
-    if (witem != NULL)
-        witem->revertText();
-
-    if (api->lastErrorCode() == 409)
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\nПриемник уже существует").arg(api->source()).arg(api->target()));
-    else
-        QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка переименования %1 в %2:\n%3").arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
-
-    m_tasks->removeSimpleTask(api->id());
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_rename_success(EteraAPI* api)
-{
-    EteraClipboard::instance()->removeByPath(api->source());
-
-    ETERA_API_CONTINUE_TASK_STAT(api, task_on_rename_stat_success, task_on_rename_stat_error, task_on_rename_error);
-
-    m_tasks->addSimpleTask(api->id(), trUtf8("Получение информации о %1").arg(api->target()));
-
-    api->stat(api->target(), m_preview_arg, true);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -637,13 +642,13 @@ void WidgetDisk::item_end_edit(QWidget* editor, QAbstractItemDelegate::EndEditHi
     for (int i = 0; i < chars.count(); i++)
         if (value.contains(chars[i]) == true) {
             witem->revertText();
-            QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Недопустимый символ \"%1\" в имени").arg(chars[i]));
+            QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_RENAME_INVALID_CHAR.arg(chars[i]));
             return;
         }
 
     if (value == "." || value == "..") {
         witem->revertText();
-        QMessageBox::warning(this, trUtf8("Внимание!"), trUtf8("Недопустимое имя"));
+        QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_RENAME_IVALID_NAME);
         return;
     }
 
@@ -651,11 +656,63 @@ void WidgetDisk::item_end_edit(QWidget* editor, QAbstractItemDelegate::EndEditHi
 
     EteraAPI* api = createAPI();
 
-    m_tasks->addSimpleTask(api->id(), trUtf8("Переименование %1 в %2").arg(eitem->path()).arg(path));
-
     ETERA_API_TASK_MV(api, task_on_rename_success, task_on_rename_error);
 
+    m_tasks->addSimpleTask(api->id(), START_MESSAGE_RENAME.arg(eitem->path()).arg(path));
+
     api->mv(eitem->path(), path, false);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_rename_error(EteraAPI* api)
+{
+    // откат переименования
+    WidgetDiskItem* witem = findByPath(api->source());
+    if (witem != NULL)
+        witem->revertText();
+
+    if (api->lastErrorCode() == 409)
+        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RENAME_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
+    else
+        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RENAME.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeSimpleTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_rename_success(EteraAPI* api)
+{
+    EteraClipboard::instance()->removeByPath(api->source());
+
+    ETERA_API_CONTINUE_TASK_STAT(api, task_on_rename_stat_success, task_on_rename_stat_error, task_on_rename_error);
+
+    m_tasks->addSimpleTask(api->id(), START_MESSAGE_STAT.arg(api->target()));
+
+    api->stat(api->target(), m_preview_arg, true);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_rename_stat_error(EteraAPI* api)
+{
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->target()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeSimpleTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_rename_stat_success(EteraAPI* api, const EteraItem& item)
+{
+    WidgetDiskItem* witem = findByPath(api->source());
+    if (witem != NULL)
+        witem->replaceItem(item, m_preview_mode);
+
+    m_tasks->removeSimpleTask(api->id());
+
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -668,6 +725,147 @@ void WidgetDisk::menu_share_triggered()
 void WidgetDisk::menu_revoke_triggered()
 {
     shareObjects(false);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::shareObjects(bool share)
+{
+    QList<QListWidgetItem*> selected = m_explorer->selectedItems();
+
+    int count = selected.count();
+
+    if (count == 0)
+        return;
+
+    quint64 parent = 0;
+    if (count > 1) {
+        parent = EteraAPI::nextID();
+        if (share == true)
+            m_tasks->addSimpleTask(parent, ROOT_MESSAGE_PUBLISH);
+        else
+            m_tasks->addSimpleTask(parent, ROOT_MESSAGE_UNPUBLISH);
+    }
+
+    for (int i = 0; i < count; i++) {
+        WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
+        const EteraItem* eitem = witem->item();
+
+        EteraAPI* api = createAPI();
+
+        if (share == true) {
+            ETERA_API_TASK_PUBLISH(api, task_on_publish_success, task_on_publish_error);
+
+            m_tasks->addChildTask(parent, api->id(), START_MESSAGE_PUBLISH.arg(eitem->path()));
+
+            api->publish(eitem->path());
+        } else {
+            ETERA_API_TASK_UNPUBLISH(api, task_on_unpublish_success, task_on_unpublish_error);
+
+            m_tasks->addChildTask(parent, api->id(), START_MESSAGE_UNPUBLISH.arg(eitem->path()));
+
+            api->unpublish(eitem->path());
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_publish_error(EteraAPI* api)
+{
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_PUBLISH.arg(api->path()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_publish_success(EteraAPI* api)
+{
+    WidgetDiskItem* witem = findByPath(api->path());
+
+    if (witem == NULL) {
+        m_tasks->removeChildTask(api->id());
+        api->deleteLater();
+    } else {
+        ETERA_API_CONTINUE_TASK_STAT(api, task_on_publish_stat_success, task_on_publish_stat_error, task_on_publish_error);
+
+        m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_STAT.arg(api->path()));
+
+        api->stat(api->path());
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_unpublish_error(EteraAPI* api)
+{
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_UNPUBLISH.arg(api->path()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_unpublish_success(EteraAPI* api)
+{
+    WidgetDiskItem* witem = findByPath(api->path());
+
+    if (witem == NULL) {
+        m_tasks->removeChildTask(api->id());
+        api->deleteLater();
+    } else {
+        ETERA_API_CONTINUE_TASK_STAT(api, task_on_unpublish_stat_success, task_on_unpublish_stat_error, task_on_unpublish_error);
+
+        m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_STAT.arg(api->path()));
+
+        api->stat(api->path());
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_publish_stat_error(EteraAPI* api)
+{
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_publish_stat_success(EteraAPI* api, const EteraItem& item)
+{
+    WidgetDiskItem* witem = findByPath(item.path());
+
+    if (witem != NULL)
+        witem->replaceItem(item, m_preview_mode);
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_unpublish_stat_error(EteraAPI* api)
+{
+    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::task_on_unpublish_stat_success(EteraAPI* api, const EteraItem& item)
+{
+    WidgetDiskItem* witem = findByPath(item.path());
+
+    if (witem != NULL)
+        witem->replaceItem(item, m_preview_mode);
+
+    m_tasks->removeChildTask(api->id());
+
+    api->deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -719,15 +917,14 @@ void WidgetDisk::putLocalObjects(const QStringList& paths)
 
     quint64 fakeid = EteraAPI::nextID();
 
-    QVariantMap map;
-    map["answer"] = QMessageBox::NoButton;
+    // FIX ME
+    /*QVariantMap map;
+    map["answer"] = QMessageBox::NoButton;*/
 
-    m_tasks->addSimpleTask(fakeid, trUtf8("Загрузка на Диск"), map);
+    m_tasks->addSimpleTask(fakeid, trUtf8("Загрузка на Диск")/*, map*/);
 
     for (int i = 0; i < paths.count(); i++)
         putLocalObject(paths[i], fakeid);
-
-    m_tasks->checkWaitTask(fakeid);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -787,10 +984,11 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
             syncLocalDir(api->source(), api->target(), api->overwrite(), api->parentId());
             return;
         } else if (item.isFile() == true) {
-            quint64     rootid   = m_tasks->rootID(api->parentId());
-            QVariantMap rootargs = m_tasks->args(rootid);
+            //quint64     rootid   = m_tasks->rootID(api->parentId());
+            //QVariantMap rootargs = m_tasks->args(rootid); FIXME
 
-            QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
+            QMessageBox::StandardButton answer;
+            // (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
 
             // пропускаем если ранее было указано не перезаписывать файлы
             if (answer != QMessageBox::NoToAll) {
@@ -798,9 +996,9 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
                 if (answer != QMessageBox::YesToAll) {
                     answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(api->target()), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
 
-                    // обновляем ответ
-                    rootargs["answer"] = answer;
-                    m_tasks->setArgs(rootid, rootargs);
+                    // обновляем ответ FIXME
+                    /*rootargs["answer"] = answer;
+                    m_tasks->setArgs(rootid, rootargs);*/
                 }
 
                 // удалить и перезаписать директорией при положительном ответе
@@ -816,10 +1014,11 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
             }
         }
     } else if (api->ensure() == eitFile) {
-        quint64     rootid   = m_tasks->rootID(api->parentId());
-        QVariantMap rootargs = m_tasks->args(rootid);
+        //quint64     rootid   = m_tasks->rootID(api->parentId());
+        //QVariantMap rootargs = m_tasks->args(rootid); FIXME
 
-        QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
+        QMessageBox::StandardButton answer;
+        // (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
 
         // пропускаем если ранее было указано не перезаписывать файлы
         if (answer != QMessageBox::NoToAll) {
@@ -828,8 +1027,8 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
                 answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(api->target()), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
 
                 // обновляем ответ
-                rootargs["answer"] = answer;
-                m_tasks->setArgs(rootid, rootargs);
+                /*rootargs["answer"] = answer; FIXME
+                m_tasks->setArgs(rootid, rootargs);*/
             }
 
             // удалить и перезаписать файлом при положительном ответе
@@ -882,10 +1081,11 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
 {
     // если объект существует, нужно убедиться, что это файл и тогда можно продолжить работу
     if (api->lastErrorCode() == 409) {
-        quint64     rootid   = m_tasks->rootID(api->id());
-        QVariantMap rootargs = m_tasks->args(rootid);
+        //quint64     rootid   = m_tasks->rootID(api->id());
+        //QVariantMap rootargs = m_tasks->args(rootid); FIXME
 
-        QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
+        QMessageBox::StandardButton answer;
+        // (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
 
         // пропускаем если ранее было указано не перезаписывать файлы
         if (answer != QMessageBox::NoToAll) {
@@ -1069,10 +1269,10 @@ void WidgetDisk::getRemoteObjects(const QString& path)
 
     quint64 fakeid = EteraAPI::nextID();
 
-    QVariantMap map;
-    map["answer"] = QMessageBox::NoButton;
+    /*QVariantMap map; FIXME
+    map["answer"] = QMessageBox::NoButton;*/
 
-    m_tasks->addSimpleTask(fakeid, trUtf8("Сохранение с Диска"), map);
+    m_tasks->addSimpleTask(fakeid, trUtf8("Сохранение с Диска")/*, map*/);
 
     for (int i = 0; i < count; i++) {
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
@@ -1115,10 +1315,11 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
     QFileInfo info(target);
 
     if (info.exists() == true) {
-        quint64     rootid   = m_tasks->rootID(parent);
-        QVariantMap rootargs = m_tasks->args(rootid);
+        //quint64     rootid   = m_tasks->rootID(parent);
+        //QVariantMap rootargs = m_tasks->args(rootid); FIXME
 
-        QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
+        QMessageBox::StandardButton answer;
+        // (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
 
         // ранее было указано не перезаписывать файлы
         if (answer == QMessageBox::NoToAll)
@@ -1128,9 +1329,9 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
         if (answer != QMessageBox::YesToAll) {
             answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(target), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
 
-            // обновляем ответ
-            rootargs["answer"] = answer;
-            m_tasks->setArgs(rootid, rootargs);
+            // обновляем ответ FIXME
+            /*rootargs["answer"] = answer;
+            m_tasks->setArgs(rootid, rootargs);*/
 
             // оставить локальную копию
             if (answer == QMessageBox::No || answer == QMessageBox::NoToAll)
@@ -1157,12 +1358,7 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
 
     ETERA_API_TASK_GET(api, task_on_get_file_success, task_on_get_file_error, task_on_get_file_progress);
 
-    // TODO: Fix me
-    QVariantMap args;
-    args["parent"] = parent;
-
-    m_tasks->addWaitTask(parent);
-    m_tasks->addChildTask(parent, api->id(), source, args);
+    m_tasks->addChildTask(parent, api->id(), source);
 
     api->get(source, target);
 }
@@ -1203,10 +1399,11 @@ void WidgetDisk::getRemoteDir(const QString& source, const QString& target, quin
         QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка создания %1").arg(info.absoluteFilePath()));
         return;
     } else if (info.exists() == true && info.isDir() == false) {
-        quint64     rootid   = m_tasks->rootID(parent);
-        QVariantMap rootargs = m_tasks->args(rootid);
+        //quint64     rootid   = m_tasks->rootID(parent);
+        //QVariantMap rootargs = m_tasks->args(rootid); FIXME
 
-        QMessageBox::StandardButton answer = (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
+        QMessageBox::StandardButton answer;
+        // (QMessageBox::StandardButton)rootargs.value("answer", QMessageBox::NoButton).toInt();
 
         // ранее было указано не перезаписывать файлы
         if (answer == QMessageBox::NoToAll)
@@ -1216,9 +1413,9 @@ void WidgetDisk::getRemoteDir(const QString& source, const QString& target, quin
         if (answer != QMessageBox::YesToAll) {
             answer = QMessageBox::question(this, trUtf8("Файл уже существует!"), trUtf8("Файл %1 уже существует, перезаписать?").arg(target), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
 
-            // обновляем ответ
-            rootargs["answer"] = answer;
-            m_tasks->setArgs(rootid, rootargs);
+            // обновляем ответ FIXME
+            /*rootargs["answer"] = answer;
+            m_tasks->setArgs(rootid, rootargs);*/
 
             // оставить локальную копию
             if (answer == QMessageBox::No || answer == QMessageBox::NoToAll)
@@ -1270,112 +1467,6 @@ bool WidgetDisk::removeDir(QDir dir)
     }
 
     return true;
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_publish_stat_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка открытия доступа к %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_publish_stat_success(EteraAPI* api, const EteraItem& item)
-{
-    WidgetDiskItem* witem = findByPath(item.path());
-
-    if (witem != NULL)
-        witem->replaceItem(item, m_preview_mode);
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_publish_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка открытия доступа к %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_publish_success(EteraAPI* api)
-{
-    WidgetDiskItem* witem = findByPath(api->path());
-
-    if (witem == NULL)
-        api->deleteLater();
-    else {
-        ETERA_API_CONTINUE_TASK_STAT(api, task_on_publish_stat_success, task_on_publish_stat_error, task_on_publish_error);
-        api->stat(api->path());
-    }
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_unpublish_stat_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка закрытия доступа к %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_unpublish_stat_success(EteraAPI* api, const EteraItem& item)
-{
-    WidgetDiskItem* witem = findByPath(item.path());
-
-    if (witem != NULL)
-        witem->replaceItem(item, m_preview_mode);
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_unpublish_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, trUtf8("Ошибка!"), trUtf8("Ошибка закрытия доступа к %1:\n%2").arg(api->path()).arg(api->lastErrorMessage()));
-
-    api->deleteLater();
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_unpublish_success(EteraAPI* api)
-{
-    WidgetDiskItem* witem = findByPath(api->path());
-
-    if (witem == NULL)
-        api->deleteLater();
-    else {
-        ETERA_API_CONTINUE_TASK_STAT(api, task_on_unpublish_stat_success, task_on_unpublish_stat_error, task_on_unpublish_error);
-        api->stat(api->path());
-    }
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::shareObjects(bool share)
-{
-    QList<QListWidgetItem*> selected = m_explorer->selectedItems();
-
-    int count = selected.count();
-
-    if (count == 0)
-        return;
-
-    for (int i = 0; i < count; i++) {
-        WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
-        const EteraItem* eitem = witem->item();
-
-        EteraAPI* api = createAPI();
-
-        if (share == true) {
-            ETERA_API_TASK_PUBLISH(api, task_on_publish_success, task_on_publish_error);
-            api->publish(eitem->path());
-        } else {
-            ETERA_API_TASK_UNPUBLISH(api, task_on_unpublish_success, task_on_unpublish_error);
-            api->unpublish(eitem->path());
-        }
-    }
 }
 //----------------------------------------------------------------------------------------------
 

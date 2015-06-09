@@ -445,7 +445,8 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
 {
     m_preview_queue_size--;
 
-    QUrl url = api->url();
+    QUrl    url  = api->url();
+    QString surl = url.toString();   // https://bugreports.qt.io/browse/QTBUG-9985
 
     const QByteArray& data = static_cast<QBuffer*>(api->device())->buffer();
 
@@ -456,6 +457,7 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
 
     if (pixmap.isNull() == true) {
         m_preview_wait.remove(api->url());
+        loadNextPreview(api);
         return;
     }
 
@@ -474,7 +476,7 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
     m_preview_cache_size += citem->Size;
 
     EteraPreviewWaitCache::const_iterator i = m_preview_wait.constFind(url);
-    while (i != m_preview_wait.end() && i.key() == url) {
+    while (i != m_preview_wait.end() && i.key().toString() == surl /* https://bugreports.qt.io/browse/QTBUG-9985 */) {
         WidgetDiskItem* item = *i;
 
         if (item->item()->isPublic() == false)

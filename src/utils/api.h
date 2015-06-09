@@ -319,6 +319,20 @@ class EteraAPI : public QObject
         static quint64 nextID();
 
         /*!
+         * \brief Человекочитаемый размер
+         * \param val Размер в байтах
+         * \return Человекочитаемый размер
+         */
+        static QString humanBytes(quint64 val);
+
+        /*!
+         * \brief Удаление концевых нулей
+         * \param val Строковое представление дробного числа
+         * \return Человекочитаемый размер без концевых нулей
+         */
+        static QString humanZeros(const QString& val);
+
+        /*!
          * \brief Получение кода последней ошибки
          * \return Код ошибки
          * 0 - ок
@@ -334,18 +348,9 @@ class EteraAPI : public QObject
         QString lastErrorMessage() const { return m_error_message; }
 
         /*!
-         * \brief Человекочитаемый размер
-         * \param val Размер в байтах
-         * \return Человекочитаемый размер
+         * \brief Остановка активного запроса
          */
-        static QString humanBytes(quint64 val);
-
-        /*!
-         * \brief Удаление концевых нулей
-         * \param val Строковое представление дробного числа
-         * \return Человекочитаемый размер без концевых нулей
-         */
-        static QString humanZeros(const QString& val);
+        void abort() { if (m_reply != NULL) m_reply->abort(); }
 
         /*!
          * \brief Получение OAuth токена
@@ -524,6 +529,8 @@ class EteraAPI : public QObject
          * \brief Ошибка открытия файла
          */
         QString FILE_OPEN_ERROR;
+
+    private:
 
         /*!
          * \brief OAuth токен

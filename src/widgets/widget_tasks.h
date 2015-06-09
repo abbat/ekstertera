@@ -30,7 +30,7 @@ class WidgetTasks : public QTreeWidget
          * \param text Текст задачи
          * \param args Аргументы задачи
          */
-        void addSimpleTask(quint64 id, const QString& text, const QVariantMap& args = QVariantMap());
+        void addSimpleTask(quint64 id, const QString& text);
 
         /*!
          * \brief Удаление простой задачи
@@ -39,27 +39,13 @@ class WidgetTasks : public QTreeWidget
         void removeSimpleTask(quint64 id);
 
         /*!
-         * \brief Добавление задачи на ожидание addChildTask
-         * Фактически, блокирование удаления родительской задачи у которых нет дочерних
-         * \param parent ID родительской задачи
-         */
-        void addWaitTask(quint64 parent);
-
-        /*!
-         * \brief Проверка задачи на возможность удаления
-         * Проверяется количество ожидающих / дочерних задач
-         * \param id ID задачи
-         */
-        void checkWaitTask(quint64 id);
-
-        /*!
          * \brief Добавление подчиненной задачи
          * \param parent ID родительской задачи
          * \param id ID задачи
          * \param text Текст задачи
          * \param args Аргументы задачи
          */
-        void addChildTask(quint64 parent, quint64 id, const QString& text, const QVariantMap& args = QVariantMap());
+        void addChildTask(quint64 parent, quint64 id, const QString& text);
 
         /*!
          * \brief Удаление дочерней задачи
@@ -73,19 +59,6 @@ class WidgetTasks : public QTreeWidget
          * \return ID корневой задачи или 0
          */
         quint64 rootID(quint64 id);
-
-        /*!
-         * \brief Получение аргументов задачи
-         * \param id ID задачи
-         */
-        QVariantMap args(quint64 id);
-
-        /*!
-         * \brief Установка аргументов задачи
-         * \param id ID задачи
-         * \param args Аргументы задачи
-         */
-        void setArgs(quint64 id, const QVariantMap& args);
 
         /*!
          * \brief Обновление прогресса задачи
@@ -109,10 +82,9 @@ class WidgetTasks : public QTreeWidget
          * \brief Элемент карты задач
          */
         typedef struct {
-            WidgetTasksItem* Item;    /*!< \brief Графический элемент         */
-            QProgressBar*    Bar;     /*!< \brief Виджет прогресса            */
-            QVariantMap      Args;    /*!< \brief Аргументы задачи            */
-            quint64          Wait;    /*!< \brief Количество задач в ожидании */
+            quint64          Parent;   /*!< \brief ID родителя         */
+            WidgetTasksItem* Item;     /*!< \brief Графический элемент */
+            QProgressBar*    Bar;      /*!< \brief Виджет прогресса    */
         } TasksItem;
 
         /*!
