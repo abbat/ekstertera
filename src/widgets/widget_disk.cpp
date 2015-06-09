@@ -883,13 +883,13 @@ void WidgetDisk::shareObjects(bool share)
 
         EteraAPI* api = createAPI();
 
-        if (share == true) {
+        if (share == true && eitem->isPublic() == false) {
             ETERA_API_TASK_PUBLISH(api, task_on_publish_success, task_on_publish_error);
 
             m_tasks->addChildTask(parent, api->id(), START_MESSAGE_PUBLISH.arg(eitem->path()));
 
             api->publish(eitem->path());
-        } else {
+        } else if (share == false && eitem->isPublic() == true) {
             ETERA_API_TASK_UNPUBLISH(api, task_on_unpublish_success, task_on_unpublish_error);
 
             m_tasks->addChildTask(parent, api->id(), START_MESSAGE_UNPUBLISH.arg(eitem->path()));
@@ -922,7 +922,7 @@ void WidgetDisk::task_on_publish_success(EteraAPI* api)
 
         m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_STAT.arg(api->path()));
 
-        api->stat(api->path());
+        api->stat(api->path(), m_preview_arg, true);
     }
 }
 //----------------------------------------------------------------------------------------------
@@ -949,7 +949,7 @@ void WidgetDisk::task_on_unpublish_success(EteraAPI* api)
 
         m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_STAT.arg(api->path()));
 
-        api->stat(api->path());
+        api->stat(api->path(), m_preview_arg, true);
     }
 }
 //----------------------------------------------------------------------------------------------
@@ -1216,7 +1216,7 @@ void WidgetDisk::task_on_put_file_success(EteraAPI* api)
 
         m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_STAT.arg(api->target()));
 
-        api->stat(api->target());
+        api->stat(api->target(), m_preview_arg, true);
     }
 }
 //----------------------------------------------------------------------------------------------

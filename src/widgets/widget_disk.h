@@ -398,8 +398,14 @@ class WidgetDisk : public QTabWidget
         void task_on_put_file_success(EteraAPI* api);
         void task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 total);
 
+        void task_on_put_stat_error(EteraAPI* api);
+        void task_on_put_stat_success(EteraAPI* api, const EteraItem& item);
+
         void task_on_put_ensure_error(EteraAPI* api);
         void task_on_put_ensure_success(EteraAPI* api, const EteraItem& item);
+
+        void task_on_put_rm_error(EteraAPI* api);
+        void task_on_put_rm_success(EteraAPI* api);
 
         void task_on_get_dir_error(EteraAPI* api);
         void task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, quint64 limit);
@@ -407,14 +413,6 @@ class WidgetDisk : public QTabWidget
         void task_on_get_file_error(EteraAPI* api);
         void task_on_get_file_success(EteraAPI* api);
         void task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total);
-
-
-
-        void task_on_put_rm_error(EteraAPI* api);
-        void task_on_put_rm_success(EteraAPI* api);
-
-        void task_on_put_stat_error(EteraAPI* api);
-        void task_on_put_stat_success(EteraAPI* api, const EteraItem& item);
 
     signals:
 
