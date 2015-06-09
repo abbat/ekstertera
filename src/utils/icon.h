@@ -231,7 +231,7 @@ class EteraIconProvider : public QObject
     private slots:
 
         void task_on_get_preview_error(EteraAPI* api);
-        void task_on_get_preview_success(EteraAPI* api, const QUrl& url, QIODevice* device);
+        void task_on_get_preview_success(EteraAPI* api);
 };
 
 #endif   // _ekstertera_icon_h_

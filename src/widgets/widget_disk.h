@@ -288,45 +288,45 @@ class WidgetDisk : public QTabWidget
         //
 
         void task_on_ls_error(EteraAPI* api);
-        void task_on_ls_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
+        void task_on_ls_success(EteraAPI* api, const EteraItemList& list, quint64 limit);
 
         void task_on_mkdir_stat_error(EteraAPI* api);
         void task_on_mkdir_stat_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_mkdir_error(EteraAPI* api);
-        void task_on_mkdir_success(EteraAPI* api, const QString& path);
+        void task_on_mkdir_success(EteraAPI* api);
 
         void task_on_rm_error(EteraAPI* api);
-        void task_on_rm_success(EteraAPI* api, const QString& path);
+        void task_on_rm_success(EteraAPI* api);
 
         void task_on_rename_stat_error(EteraAPI* api);
         void task_on_rename_stat_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_rename_error(EteraAPI* api);
-        void task_on_rename_success(EteraAPI* api, const QString& source, const QString& target);
+        void task_on_rename_success(EteraAPI* api);
 
         void task_on_copy_paste_stat_error(EteraAPI* api);
         void task_on_copy_paste_stat_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_copy_paste_error(EteraAPI* api);
-        void task_on_copy_paste_success(EteraAPI* api, const QString& source, const QString& target);
+        void task_on_copy_paste_success(EteraAPI* api);
 
         void task_on_cut_paste_stat_error(EteraAPI* api);
         void task_on_cut_paste_stat_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_cut_paste_error(EteraAPI* api);
-        void task_on_cut_paste_success(EteraAPI* api, const QString& source, const QString& target);
+        void task_on_cut_paste_success(EteraAPI* api);
 
         void task_on_publish_error(EteraAPI* api);
-        void task_on_publish_success(EteraAPI* api, const QString& path);
+        void task_on_publish_success(EteraAPI* api);
         void task_on_publish_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_unpublish_error(EteraAPI* api);
-        void task_on_unpublish_success(EteraAPI* api, const QString& path);
+        void task_on_unpublish_success(EteraAPI* api);
         void task_on_unpublish_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_put_rm_error(EteraAPI* api);
-        void task_on_put_rm_success(EteraAPI* api, const QString& path);
+        void task_on_put_rm_success(EteraAPI* api);
 
         void task_on_put_ensure_error(EteraAPI* api);
         void task_on_put_ensure_success(EteraAPI* api, const EteraItem& item);
@@ -336,20 +336,20 @@ class WidgetDisk : public QTabWidget
 
         void task_on_put_file_error(EteraAPI* api);
         void task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 total);
-        void task_on_put_file_success(EteraAPI* api, const QUrl& url, QIODevice* device);
+        void task_on_put_file_success(EteraAPI* api);
 
         void task_on_put_dir_stat_error(EteraAPI* api);
         void task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_put_dir_error(EteraAPI* api);
-        void task_on_put_dir_success(EteraAPI* api, const QString& path);
+        void task_on_put_dir_success(EteraAPI* api);
 
         void task_on_get_file_error(EteraAPI* api);
         void task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total);
-        void task_on_get_file_success(EteraAPI* api, const QUrl& url, QIODevice* device);
+        void task_on_get_file_success(EteraAPI* api);
 
         void task_on_get_dir_error(EteraAPI* api);
-        void task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
+        void task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, quint64 limit);
 
     signals:
 

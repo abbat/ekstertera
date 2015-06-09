@@ -712,8 +712,6 @@ class EteraAPI : public QObject
         /*!
          * \brief Сигнал ошибки
          * \param api API
-         * \param code Код ошибки
-         * \param error Текст ошибки
          */
         void onError(EteraAPI* api);
 
@@ -750,74 +748,112 @@ class EteraAPI : public QObject
          * \brief Сигнал получения списка файлов и директорий
          * \param api API
          * \param list Список описателей объектов
-         * \param path Путь
-         * \param preview Размер превью
-         * \param crop Параметр для обрезания превью
-         * \param offset Смещение
          * \param limit Количество
          * При limit < list.count() дальнейшие запросы можно прекращать
          */
-        void onLS(EteraAPI* api, const EteraItemList& list, const QString& path, const QString& preview, bool crop, quint64 offset, quint64 limit);
+        void onLS(EteraAPI* api, const EteraItemList& list, quint64 limit);
 
         /*!
          * \brief Сигнал создания директории
          * \param api API
-         * \param path Путь
          */
-        void onMKDIR(EteraAPI* api, const QString& path);
+        void onMKDIR(EteraAPI* api);
 
         /*!
          * \brief Сигнал удаления объекта
          * \param api API
-         * \param path Путь
          */
-        void onRM(EteraAPI* api, const QString& path);
+        void onRM(EteraAPI* api);
 
         /*!
          * \brief Сигнал копирования объекта
          * \param api API
-         * \param source Источник
-         * \param target Приемник
          */
-        void onCP(EteraAPI* api, const QString& source, const QString& target);
+        void onCP(EteraAPI* api);
 
         /*!
          * \brief Сигнал перемещения объекта
          * \param api API
-         * \param source Источник
-         * \param target Приемник
          */
-        void onMV(EteraAPI* api, const QString& source, const QString& target);
+        void onMV(EteraAPI* api);
 
         /*!
          * \brief Сигнал загрузки url на сервис
          * \param api API
-         * \param url Url
-         * \param device Устройство с данными
          */
-        void onPUT(EteraAPI* api, const QUrl& url, QIODevice* device);
+        void onPUT(EteraAPI* api);
 
         /*!
          * \brief Сигнал загрузки url с сервиса
          * \param api API
-         * \param url Url
-         * \param device Устройство с данными
          */
-        void onGET(EteraAPI* api, const QUrl& url, QIODevice* device);
+        void onGET(EteraAPI* api);
 
         /*!
          * \brief Сигнал открытия доступа к объекту
          * \param api API
-         * \param path Путь
          */
-        void onPUBLISH(EteraAPI* api, const QString& path);
+        void onPUBLISH(EteraAPI* api);
 
         /*!
          * \brief Сигнал закрытия доступа к объекту
          * \param api API
-         * \param path Путь
          */
-        void onUNPUBLISH(EteraAPI* api, const QString& path);
+        void onUNPUBLISH(EteraAPI* api);
 };
+
+//
+// вспомогательные хэлперы работы с сигналами и слотами
+//
+
+#define ETERA_API_SLOT_SIG_SIMPLE    EteraAPI*
+
+#define ETERA_API_SLOT_SIG_ERROR     ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_MKDIR     ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_RM        ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_CP        ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_MV        ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_PUT       ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_GET       ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_PUBLISH   ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_UNPUBLISH ETERA_API_SLOT_SIG_SIMPLE
+#define ETERA_API_SLOT_SIG_PROGRESS  EteraAPI*, qint64, qint64
+#define ETERA_API_SLOT_SIG_TOKEN     EteraAPI*, const QString&
+#define ETERA_API_SLOT_SIG_INFO      EteraAPI*, const EteraInfo&
+#define ETERA_API_SLOT_SIG_STAT      EteraAPI*, const EteraItem&
+#define ETERA_API_SLOT_SIG_LS        EteraAPI*, const EteraItemList&, quint64
+
+#define ETERA_API_CONNECT_SIMPLE(api, signal, slot, sig) connect(api, SIGNAL(signal(sig)), SLOT(slot(sig)))
+#define ETERA_API_DISCONNECT_SIMPLE(api, signal, slot, sig) disconnect(api, SIGNAL(signal(sig)), SLOT(slot(sig)))
+
+#define ETERA_API_CONNECT_ERROR(api, slot)        ETERA_API_CONNECT_SIMPLE(api, onError,     slot, ETERA_API_SLOT_SIG_ERROR)
+#define ETERA_API_CONNECT_MKDIR(api, slot)        ETERA_API_CONNECT_SIMPLE(api, onMKDIR,     slot, ETERA_API_SLOT_SIG_MKDIR)
+#define ETERA_API_CONNECT_RM(api, slot)           ETERA_API_CONNECT_SIMPLE(api, onRM,        slot, ETERA_API_SLOT_SIG_RM)
+#define ETERA_API_CONNECT_CP(api, slot)           ETERA_API_CONNECT_SIMPLE(api, onCP,        slot, ETERA_API_SLOT_SIG_CP)
+#define ETERA_API_CONNECT_MV(api, slot)           ETERA_API_CONNECT_SIMPLE(api, onMV,        slot, ETERA_API_SLOT_SIG_MV)
+#define ETERA_API_CONNECT_PUT(api, slot)          ETERA_API_CONNECT_SIMPLE(api, onPUT,       slot, ETERA_API_SLOT_SIG_PUT)
+#define ETERA_API_CONNECT_GET(api, slot)          ETERA_API_CONNECT_SIMPLE(api, onGET,       slot, ETERA_API_SLOT_SIG_GET)
+#define ETERA_API_CONNECT_PUBLISH(api, slot)      ETERA_API_CONNECT_SIMPLE(api, onPUBLISH,   slot, ETERA_API_SLOT_SIG_PUBLISH)
+#define ETERA_API_CONNECT_UNPUBLISH(api, slot)    ETERA_API_CONNECT_SIMPLE(api, onUNPUBLISH, slot, ETERA_API_SLOT_SIG_UNPUBLISH)
+#define ETERA_API_CONNECT_PROGRESS(api, slot)     connect(api, SIGNAL(onProgress(ETERA_API_SLOT_SIG_PROGRESS)), SLOT(slot(ETERA_API_SLOT_SIG_PROGRESS)))
+#define ETERA_API_CONNECT_TOKEN(api, slot)        connect(api, SIGNAL(onTOKEN(ETERA_API_SLOT_SIG_TOKEN)), SLOT(slot(ETERA_API_SLOT_SIG_TOKEN)))
+#define ETERA_API_CONNECT_INFO(api, slot)         connect(api, SIGNAL(onINFO(ETERA_API_SLOT_SIG_INFO)), SLOT(slot(ETERA_API_SLOT_SIG_INFO)))
+#define ETERA_API_CONNECT_STAT(api, slot)         connect(api, SIGNAL(onSTAT(ETERA_API_SLOT_SIG_STAT)), SLOT(slot(ETERA_API_SLOT_SIG_STAT)))
+#define ETERA_API_CONNECT_LS(api, slot)           connect(api, SIGNAL(onLS(ETERA_API_SLOT_SIG_LS)), SLOT(slot(ETERA_API_SLOT_SIG_LS)))
+
+#define ETERA_API_DISCONNECT_ERROR(api, slot)     ETERA_API_DISCONNECT_SIMPLE(api, onError,     slot, ETERA_API_SLOT_SIG_ERROR)
+#define ETERA_API_DISCONNECT_MKDIR(api, slot)     ETERA_API_DISCONNECT_SIMPLE(api, onMKDIR,     slot, ETERA_API_SLOT_SIG_MKDIR)
+#define ETERA_API_DISCONNECT_RM(api, slot)        ETERA_API_DISCONNECT_SIMPLE(api, onRM,        slot, ETERA_API_SLOT_SIG_RM)
+#define ETERA_API_DISCONNECT_CP(api, slot)        ETERA_API_DISCONNECT_SIMPLE(api, onCP,        slot, ETERA_API_SLOT_SIG_CP)
+#define ETERA_API_DISCONNECT_MV(api, slot)        ETERA_API_DISCONNECT_SIMPLE(api, onMV,        slot, ETERA_API_SLOT_SIG_MV)
+#define ETERA_API_DISCONNECT_PUT(api, slot)       ETERA_API_DISCONNECT_SIMPLE(api, onPUT,       slot, ETERA_API_SLOT_SIG_PUT)
+#define ETERA_API_DISCONNECT_GET(api, slot)       ETERA_API_DISCONNECT_SIMPLE(api, onGET,       slot, ETERA_API_SLOT_SIG_GET)
+#define ETERA_API_DISCONNECT_PUBLISH(api, slot)   ETERA_API_DISCONNECT_SIMPLE(api, onPUBLISH,   slot, ETERA_API_SLOT_SIG_PUBLISH)
+#define ETERA_API_DISCONNECT_UNPUBLISH(api, slot) ETERA_API_DISCONNECT_SIMPLE(api, onUNPUBLISH, slot, ETERA_API_SLOT_SIG_UNPUBLISH)
+#define ETERA_API_DISCONNECT_PROGRESS(api, slot)  disconnect(api, SIGNAL(onProgress(ETERA_API_SLOT_SIG_PROGRESS)), SLOT(slot(ETERA_API_SLOT_SIG_PROGRESS)))
+#define ETERA_API_DISCONNECT_TOKEN(api, slot)     disconnect(api, SIGNAL(onTOKEN(ETERA_API_SLOT_SIG_TOKEN)), SLOT(slot(ETERA_API_SLOT_SIG_TOKEN)))
+#define ETERA_API_DISCONNECT_INFO(api, slot)      disconnect(api, SIGNAL(onINFO(ETERA_API_SLOT_SIG_INFO)), SLOT(slot(ETERA_API_SLOT_SIG_INFO)))
+#define ETERA_API_DISCONNECT_STAT(api, slot)      disconnect(api, SIGNAL(onSTAT(ETERA_API_SLOT_SIG_STAT)), SLOT(slot(ETERA_API_SLOT_SIG_STAT)))
+#define ETERA_API_DISCONNECT_LS(api, slot)        disconnect(api, SIGNAL(onLS(ETERA_API_SLOT_SIG_LS)), SLOT(slot(ETERA_API_SLOT_SIG_LS)))
 
 #endif   // _ekstertera_api_h_

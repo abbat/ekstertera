@@ -415,8 +415,8 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
 
     api->setToken(EteraSettings::instance()->token());
 
-    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_get_preview_error(EteraAPI*)));
-    connect(api, SIGNAL(onGET(EteraAPI*, const QUrl&, QIODevice*)), this, SLOT(task_on_get_preview_success(EteraAPI*, const QUrl&, QIODevice*)));
+    ETERA_API_CONNECT_GET(api, task_on_get_preview_success);
+    ETERA_API_CONNECT_ERROR(api, task_on_get_preview_error);
 
     api->get(preview);
 
@@ -441,19 +441,21 @@ void EteraIconProvider::cancelPreview(const WidgetDiskItem* item)
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraIconProvider::task_on_get_preview_success(EteraAPI* api, const QUrl& url, QIODevice* device)
+void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
 {
     m_preview_queue_size--;
 
-    const QByteArray& data = static_cast<QBuffer*>(device)->buffer();
+    QUrl url = api->url();
+
+    const QByteArray& data = static_cast<QBuffer*>(api->device())->buffer();
 
     QPixmap pixmap;
     pixmap.loadFromData(data);
 
-    device->deleteLater();
+    api->device()->deleteLater();
 
     if (pixmap.isNull() == true) {
-        m_preview_wait.remove(url);
+        m_preview_wait.remove(api->url());
         return;
     }
 

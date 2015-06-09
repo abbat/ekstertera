@@ -2,9 +2,9 @@
 //----------------------------------------------------------------------------------------------
 #include <unistd.h>
 //----------------------------------------------------------------------------------------------
-#define ETERA_API_CONNECT_ON_REPLY_FINISHED(x)    connect(m_reply, SIGNAL(finished()), SLOT(x()))
-#define ETERA_API_CONNECT_ON_UPLOAD_PROGRESS(x)   connect(m_reply, SIGNAL(uploadProgress(qint64, qint64)), SLOT(x(qint64, qint64)))
-#define ETERA_API_CONNECT_ON_DOWNLOAD_PROGRESS(x) connect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), SLOT(x(qint64, qint64)))
+#define ETERA_API_CONNECT_REPLY_FINISHED(x)    connect(m_reply, SIGNAL(finished()), SLOT(x()))
+#define ETERA_API_CONNECT_UPLOAD_PROGRESS(x)   connect(m_reply, SIGNAL(uploadProgress(qint64, qint64)), SLOT(x(qint64, qint64)))
+#define ETERA_API_CONNECT_DOWNLOAD_PROGRESS(x) connect(m_reply, SIGNAL(downloadProgress(qint64, qint64)), SLOT(x(qint64, qint64)))
 //----------------------------------------------------------------------------------------------
 /*!
  * \brief Флаг разрешения работы api
@@ -609,7 +609,7 @@ void EteraAPI::getToken(const QString& auth_code)
     request.setRawHeader("Content-Type", "application/x-www-form-urlencoded");
 
     if (startRequest(request, ermPOST, oauth_data) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_token_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_token_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -749,7 +749,7 @@ bool EteraAPI::parseWait(bool& wait)
 void EteraAPI::info()
 {
     if (startSimpleRequest("") == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_info_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_info_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -798,7 +798,7 @@ void EteraAPI::stat(const QString& path, const QString& preview, bool crop)
     m_crop    = crop;
 
     if (startSimpleRequest("/resources", args) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_stat_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_stat_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -851,7 +851,7 @@ void EteraAPI::ls(const QString& path, const QString& preview, bool crop, quint6
     m_limit   = limit;
 
     if (startSimpleRequest("/resources", args) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_ls_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_ls_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -888,7 +888,7 @@ void EteraAPI::on_ls_finished()
 
         setLastError(0);
 
-        emit onLS(this, list, m_path, m_preview, m_crop, m_offset, m_limit);
+        emit onLS(this, list, m_limit);
 
         return;
     }
@@ -914,7 +914,7 @@ void EteraAPI::on_ls_finished()
 
     setLastError(0);
 
-    emit onLS(this, list, m_path, m_preview, m_crop, m_offset, limit);
+    emit onLS(this, list, limit);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -927,7 +927,7 @@ void EteraAPI::mkdir(const QString& path)
     m_path = path;
 
     if (startSimpleRequest("/resources", args, ermPUT) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_mkdir_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_mkdir_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -940,7 +940,7 @@ void EteraAPI::on_mkdir_finished()
         return;
 
     if (code == 201)
-        emit onMKDIR(this, m_path);
+        emit onMKDIR(this);
     else
         setLastError(code, body);
 }
@@ -959,7 +959,7 @@ void EteraAPI::rm(const QString& path, bool permanently)
     m_permanently = permanently;
 
     if (startSimpleRequest("/resources", args, ermDELETE) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_rm_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_rm_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -975,11 +975,11 @@ void EteraAPI::on_rm_finished()
         // 204 No content (ресурс успешно удален)
         setLastError(0);
 
-        emit onRM(this, m_path);
+        emit onRM(this);
     } else if (code == 202) {
         // 202 Accepted (удаление папки начато)
         if (startWait(body) == true)
-            ETERA_API_CONNECT_ON_REPLY_FINISHED(on_rm_wait_finished);
+            ETERA_API_CONNECT_REPLY_FINISHED(on_rm_wait_finished);
     } else
         setLastError(code, body);
 }
@@ -993,9 +993,9 @@ void EteraAPI::on_rm_wait_finished()
 
     if (wait == true) {
         if (startWait(m_link) == true)
-            ETERA_API_CONNECT_ON_REPLY_FINISHED(on_rm_wait_finished);
+            ETERA_API_CONNECT_REPLY_FINISHED(on_rm_wait_finished);
     } else
-        emit onRM(this, m_path);
+        emit onRM(this);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1014,7 +1014,7 @@ void EteraAPI::cp(const QString& source, const QString& target, bool overwrite)
     m_overwrite = overwrite;
 
     if (startSimpleRequest("/resources/copy", args, ermPOST) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_cp_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_cp_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1030,11 +1030,11 @@ void EteraAPI::on_cp_finished()
         // 201 Created (ресурс успешно скопирован)
         setLastError(0);
 
-        emit onCP(this, m_source, m_target);
+        emit onCP(this);
     } else if (code == 202) {
         // 202 Accepted (копирование папки начато)
         if (startWait(body) == true)
-            ETERA_API_CONNECT_ON_REPLY_FINISHED(on_cp_wait_finished);
+            ETERA_API_CONNECT_REPLY_FINISHED(on_cp_wait_finished);
     } else
         setLastError(code, body);
 }
@@ -1048,9 +1048,9 @@ void EteraAPI::on_cp_wait_finished()
 
     if (wait == true) {
         if (startWait(m_link) == true)
-            ETERA_API_CONNECT_ON_REPLY_FINISHED(on_cp_wait_finished);
+            ETERA_API_CONNECT_REPLY_FINISHED(on_cp_wait_finished);
     } else
-        emit onCP(this, m_source, m_target);
+        emit onCP(this);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1069,7 +1069,7 @@ void EteraAPI::mv(const QString& source, const QString& target, bool overwrite)
     m_overwrite = overwrite;
 
     if (startSimpleRequest("/resources/move", args, ermPOST) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_mv_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_mv_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1085,11 +1085,11 @@ void EteraAPI::on_mv_finished()
         // 201 Created (ресурс успешно перемещен)
         setLastError(0);
 
-        emit onMV(this, m_source, m_target);
+        emit onMV(this);
     } else if (code == 202) {
         // 202 Accepted (перемещение папки начато)
         if (startWait(body) == true)
-            ETERA_API_CONNECT_ON_REPLY_FINISHED(on_mv_wait_finished);
+            ETERA_API_CONNECT_REPLY_FINISHED(on_mv_wait_finished);
     } else
         setLastError(code, body);
 }
@@ -1103,9 +1103,9 @@ void EteraAPI::on_mv_wait_finished()
 
     if (wait == true) {
         if (startWait(m_link) == true)
-            ETERA_API_CONNECT_ON_REPLY_FINISHED(on_mv_wait_finished);
+            ETERA_API_CONNECT_REPLY_FINISHED(on_mv_wait_finished);
     } else
-        emit onMV(this, m_source, m_target);
+        emit onMV(this);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1123,7 +1123,7 @@ void EteraAPI::put(const QString& source, const QString& target, bool overwrite)
     m_overwrite = overwrite;
 
     if (startSimpleRequest("/resources/upload", args, ermGET) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_put_file_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_put_file_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1172,9 +1172,9 @@ void EteraAPI::put(const QUrl& url, QIODevice* device)
     m_device = device;
 
     if (startRequest(request, ermPUT, "", device) == true) {
-        ETERA_API_CONNECT_ON_UPLOAD_PROGRESS(on_progress);
-        ETERA_API_CONNECT_ON_DOWNLOAD_PROGRESS(on_progress);
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_put_url_finished);
+        ETERA_API_CONNECT_UPLOAD_PROGRESS(on_progress);
+        ETERA_API_CONNECT_DOWNLOAD_PROGRESS(on_progress);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_put_url_finished);
     }
 }
 //----------------------------------------------------------------------------------------------
@@ -1193,7 +1193,7 @@ void EteraAPI::on_put_url_finished()
         // 201 Created (ресурс успешно создан)
         setLastError(0);
 
-        emit onPUT(this, m_url, m_device);
+        emit onPUT(this);
     } else
         setLastError(code, body);
 }
@@ -1210,7 +1210,7 @@ void EteraAPI::get(const QString& source, const QString& target)
     m_device = NULL;
 
     if (startSimpleRequest("/resources/download", args, ermGET) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_get_file_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_get_file_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1263,9 +1263,9 @@ void EteraAPI::get(const QUrl& url, QIODevice* device)
     m_device = device;
 
     if (startRequest(request, ermGET, "", device) == true) {
-        ETERA_API_CONNECT_ON_UPLOAD_PROGRESS(on_progress);
-        ETERA_API_CONNECT_ON_DOWNLOAD_PROGRESS(on_progress);
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_get_url_finished);
+        ETERA_API_CONNECT_UPLOAD_PROGRESS(on_progress);
+        ETERA_API_CONNECT_DOWNLOAD_PROGRESS(on_progress);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_get_url_finished);
     }
 }
 //----------------------------------------------------------------------------------------------
@@ -1291,7 +1291,7 @@ void EteraAPI::on_get_url_finished()
 
         setLastError(0);
 
-        emit onGET(this, m_url, m_device);
+        emit onGET(this);
     } else
         setLastError(code, body);
 }
@@ -1306,7 +1306,7 @@ void EteraAPI::publish(const QString& path)
     m_path = path;
 
     if (startSimpleRequest("/resources/publish", args, ermPUT) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_publish_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_publish_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1325,7 +1325,7 @@ void EteraAPI::on_publish_finished()
 
     setLastError(0);
 
-    emit onPUBLISH(this, m_path);
+    emit onPUBLISH(this);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1338,7 +1338,7 @@ void EteraAPI::unpublish(const QString& path)
     m_path = path;
 
     if (startSimpleRequest("/resources/unpublish", args, ermPUT) == true)
-        ETERA_API_CONNECT_ON_REPLY_FINISHED(on_unpublish_finished);
+        ETERA_API_CONNECT_REPLY_FINISHED(on_unpublish_finished);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1357,6 +1357,6 @@ void EteraAPI::on_unpublish_finished()
 
     setLastError(0);
 
-    emit onUNPUBLISH(this, m_path);
+    emit onUNPUBLISH(this);
 }
 //----------------------------------------------------------------------------------------------
