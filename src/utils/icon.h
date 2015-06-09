@@ -184,14 +184,14 @@ class EteraIconProvider : public QObject
         /*!
          * \brief Кэш превью
          */
-        typedef QMap<QUrl, EteraPreviewCacheItem*> EteraPreviewCache;
+        typedef QMap<QString, EteraPreviewCacheItem*> EteraPreviewCache;
 
         /*!
          * \brief Кэш ожидающих превью
          */
-        typedef QMultiMap<QUrl, WidgetDiskItem*> EteraPreviewWaitCache;
+        typedef QMultiMap<QString, WidgetDiskItem*> EteraPreviewWaitCache;
 
-        QSet<QUrl>            m_preview_queue;        /*!< \brief Очередь ожидающих начала загрузки превью */
+        QSet<QString>         m_preview_queue;        /*!< \brief Очередь ожидающих начала загрузки превью */
         EteraPreviewWaitCache m_preview_wait;         /*!< \brief Карта ожидающих превью элементов         */
         EteraPreviewCache     m_preview_cache;        /*!< \brief Карта иконок по превью                   */
         EteraPreviewCache     m_preview_cache_link;   /*!< \brief Карта публичных иконок по превью         */

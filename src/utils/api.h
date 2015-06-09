@@ -231,7 +231,7 @@ class EteraItem
          * \brief Ссылка на превьюшку объекта
          * \return Ссылка на превьюшку объекта
          */
-        QUrl preview() const { return m_preview; }
+        QString preview() const { return m_preview; }
 
         /*!
          * \brief Публичный ключ
@@ -266,7 +266,7 @@ class EteraItem
         QString            m_media_string;   /*!< \brief Тип медиа           */
         EteraItemMediaType m_media_type;     /*!< \brief Тип медиа           */
         QString            m_mime_type;      /*!< \brief MIME                */
-        QUrl               m_preview;        /*!< \brief Ссылка на превьюшку */
+        QString            m_preview;        /*!< \brief Ссылка на превьюшку */
 
         //
         // поля общих ресурсов
@@ -439,7 +439,7 @@ class EteraAPI : public QObject
          * \param url Ссылка
          * \param device Устройство чтения
          */
-        void put(const QUrl& url, QIODevice* device);
+        void put(const QString& url, QIODevice* device);
 
         /*!
          * \brief Получение файла с диска
@@ -456,7 +456,7 @@ class EteraAPI : public QObject
          * \param device Устройство записи
          * При device == NULL будет создан QBuffer
          */
-        void get(const QUrl& url, QIODevice* device = NULL);
+        void get(const QString& url, QIODevice* device = NULL);
 
         /*!
          * \brief Открыть доступ к объекту
@@ -483,7 +483,7 @@ class EteraAPI : public QObject
         QString    preview()     const { return m_preview;     }
         QString    source()      const { return m_source;      }
         QString    target()      const { return m_target;      }
-        QUrl       url()         const { return m_url;         }
+        QString    url()         const { return m_url;         }
         bool       crop()        const { return m_crop;        }
         bool       permanently() const { return m_permanently; }
         bool       overwrite()   const { return m_overwrite;   }
@@ -566,7 +566,7 @@ class EteraAPI : public QObject
         QString    m_preview;
         QString    m_source;
         QString    m_target;
-        QUrl       m_url;
+        QString    m_url;
         bool       m_crop;
         bool       m_permanently;
         bool       m_overwrite;
@@ -657,7 +657,7 @@ class EteraAPI : public QObject
          * \param url Проверяемый URL
          * \return Результат проверки
          */
-        bool checkYandexDomain(const QUrl& url);
+        bool checkYandexDomain(const QString& url);
 
         /*!
          * \brief Парсинг объекта Link
@@ -666,7 +666,7 @@ class EteraAPI : public QObject
          * \param method Полученный метод
          * \return Флаг успеха
          */
-        bool parseLink(const QString& link, QUrl& url, EteraRequestMethod& method);
+        bool parseLink(const QString& link, QString& url, EteraRequestMethod& method);
 
         /*!
          * \brief Старт запроса на ожидание асинхронной операции

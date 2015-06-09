@@ -361,7 +361,7 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
 
     const EteraItem* eitem = item->item();
 
-    QUrl preview = eitem->preview();
+    QString preview = eitem->preview();
 
     if (eitem->isPublic() == true) {
         EteraPreviewCacheItem* citem = m_preview_cache_link.value(preview, NULL);
@@ -433,7 +433,7 @@ void EteraIconProvider::cancelPreview()
 
 void EteraIconProvider::cancelPreview(const WidgetDiskItem* item)
 {
-    QUrl preview = item->item()->preview();
+    QString preview = item->item()->preview();
     m_preview_wait.remove(preview, const_cast<WidgetDiskItem*>(item));
 
     if (m_preview_wait.count(preview) == 0)
@@ -445,8 +445,7 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
 {
     m_preview_queue_size--;
 
-    QUrl    url  = api->url();
-    QString surl = url.toString();   // https://bugreports.qt.io/browse/QTBUG-9985
+    QString url = api->url();
 
     const QByteArray& data = static_cast<QBuffer*>(api->device())->buffer();
 
@@ -476,7 +475,7 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
     m_preview_cache_size += citem->Size;
 
     EteraPreviewWaitCache::const_iterator i = m_preview_wait.constFind(url);
-    while (i != m_preview_wait.end() && i.key().toString() == surl /* https://bugreports.qt.io/browse/QTBUG-9985 */) {
+    while (i != m_preview_wait.end() && i.key() == url) {
         WidgetDiskItem* item = *i;
 
         if (item->item()->isPublic() == false)
@@ -509,7 +508,7 @@ void EteraIconProvider::task_on_get_preview_error(EteraAPI* api)
 {
     m_preview_queue_size--;
 
-    QUrl     url    = api->url();
+    QString  url    = api->url();
     QBuffer* device = static_cast<QBuffer*>(api->device());
 
     device->deleteLater();
@@ -530,8 +529,8 @@ void EteraIconProvider::loadNextPreview(EteraAPI* api)
     else {
         m_preview_queue_size++;
 
-        QSet<QUrl>::const_iterator i = m_preview_queue.constBegin();
-        QUrl preview = *i;
+        QSet<QString>::const_iterator i = m_preview_queue.constBegin();
+        QString preview = *i;
         m_preview_queue.remove(preview);
 
         api->get(preview);
@@ -560,7 +559,7 @@ void EteraIconProvider::clearPreviewCache(EteraPreviewCache* cache)
 void EteraIconProvider::gcPreviewCache()
 {
     // пока что простой LRU
-    QMap<QDateTime, QUrl> map;
+    QMap<QDateTime, QString> map;
 
     EteraPreviewCache::const_iterator i = m_preview_cache.constBegin();
     while (i != m_preview_cache.constEnd()) {
@@ -576,9 +575,9 @@ void EteraIconProvider::gcPreviewCache()
 
     quint64 threshold = m_preview_cache_size_limit / 4 * 3;
 
-    QMap<QDateTime, QUrl>::const_iterator j = map.constBegin();
+    QMap<QDateTime, QString>::const_iterator j = map.constBegin();
     while (m_preview_cache_size + m_preview_cache_link_size > threshold) {
-        QUrl url = j.value();
+        QString url = j.value();
 
         EteraPreviewCacheItem* item = m_preview_cache.value(url, NULL);
         if (item != NULL) {

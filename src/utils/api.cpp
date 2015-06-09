@@ -115,7 +115,7 @@ bool EteraItem::parse(const QtJson::JsonObject& json)
 
     m_md5       = json["md5"].toString();
     m_mime_type = json["mime_type"].toString();
-    m_preview   = QUrl::fromEncoded(json["preview"].toString().toUtf8());
+    m_preview   = json["preview"].toString();
 
     m_size = json["size"].toULongLong(&ok);
     if (ok == false)
@@ -467,7 +467,7 @@ void EteraAPI::setDefaultHeaders(QNetworkRequest& request, quint64 length, bool 
 
 void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, const EteraArgs& args, quint64 length)
 {
-    QUrl url(QString(ETERA_API_BASE_URL) + relurl);
+    QUrl url = QUrl::fromEncoded((QString(ETERA_API_BASE_URL) + relurl).toUtf8());
 
 #if QT_VERSION >= 0x050000
     QUrlQuery query;
@@ -646,8 +646,10 @@ void EteraAPI::on_token_finished()
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::checkYandexDomain(const QUrl& url)
+bool EteraAPI::checkYandexDomain(const QString& _url)
 {
+    QUrl url = QUrl::fromEncoded(_url.toUtf8());
+
     if (url.isValid() == false)
         return false;
 
@@ -662,16 +664,14 @@ bool EteraAPI::checkYandexDomain(const QUrl& url)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::parseLink(const QString& link, QUrl& url, EteraRequestMethod& method)
+bool EteraAPI::parseLink(const QString& link, QString& url, EteraRequestMethod& method)
 {
     bool ok;
     QtJson::JsonObject json = QtJson::parse(link, ok).toMap();
     if (ok == false)
         return setLastError(1, JSON_PARSE_ERROR);
 
-    QString _url = json["href"].toString();
-
-    url = QUrl::fromEncoded(_url.toUtf8());
+    url = json["href"].toString();
 
     if (checkYandexDomain(url) == false)
         return setLastError(1, MALFORMED_LINK_URL);
@@ -696,7 +696,7 @@ bool EteraAPI::startWait(const QString& link)
 {
     m_link = link;
 
-    QUrl               url;
+    QString            url;
     EteraRequestMethod method;
 
     if (parseLink(link, url, method) == false)
@@ -705,7 +705,7 @@ bool EteraAPI::startWait(const QString& link)
     if (method != ermGET)
         return setLastError(1, UNSUPPORTED_LINK_METHOD);
 
-    QNetworkRequest request(url);
+    QNetworkRequest request(QUrl::fromEncoded(url.toUtf8()));
     setDefaultHeaders(request);
 
     if (startRequest(request, method) == false)
@@ -1140,7 +1140,7 @@ void EteraAPI::on_put_file_finished()
         return;
     }
 
-    QUrl               url;
+    QString            url;
     EteraRequestMethod method;
 
     if (parseLink(body, url, method) == false)
@@ -1162,9 +1162,9 @@ void EteraAPI::on_put_file_finished()
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::put(const QUrl& url, QIODevice* device)
+void EteraAPI::put(const QString& url, QIODevice* device)
 {
-    QNetworkRequest request(url);
+    QNetworkRequest request(QUrl::fromEncoded(url.toUtf8()));
     setDefaultHeaders(request, device->size());
     request.setRawHeader("Content-Type", "application/octet-stream");
 
@@ -1227,7 +1227,7 @@ void EteraAPI::on_get_file_finished()
         return;
     }
 
-    QUrl               url;
+    QString            url;
     EteraRequestMethod method;
 
     if (parseLink(body, url, method) == false)
@@ -1249,9 +1249,9 @@ void EteraAPI::on_get_file_finished()
 }
 //----------------------------------------------------------------------------------------------
 
-void EteraAPI::get(const QUrl& url, QIODevice* device)
+void EteraAPI::get(const QString& url, QIODevice* device)
 {
-    QNetworkRequest request(url);
+    QNetworkRequest request(QUrl::fromEncoded(url.toUtf8()));
     setDefaultHeaders(request, 0, true, true);
 
     if (device == NULL) {
@@ -1282,13 +1282,12 @@ void EteraAPI::on_get_url_finished()
         return;
 
     if (code == 301 || code == 302) {
-        QUrl _url = QUrl::fromEncoded(body.toUtf8());
-        if (checkYandexDomain(_url) == false) {
+        if (checkYandexDomain(body) == false) {
             setLastError(1, MALFORMED_LINK_URL);
             return;
         }
 
-        get(_url, m_device);
+        get(body, m_device);
     } else if (code == 200) {
         m_device->close();
 
