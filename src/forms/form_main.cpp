@@ -174,8 +174,7 @@ void FormMain::updateInfoStatus()
 
     api->setToken(token);
 
-    connect(api, SIGNAL(onError(EteraAPI*)), this, SLOT(task_on_info_error(EteraAPI*)));
-    connect(api, SIGNAL(onINFO(EteraAPI*, const EteraInfo&)), this, SLOT(task_on_info_success(EteraAPI*, const EteraInfo&)));
+    ETERA_API_TASK_INFO(api, task_on_info_success, task_on_info_error);
 
     api->info();
 }

@@ -132,6 +132,11 @@ class WidgetDisk : public QTabWidget
         bool m_preview_mode;
 
         /*!
+         * Формат запроса на превьюшки
+         */
+        QString m_preview_arg;
+
+        /*!
          * Виджет списка файлов и директорий
          */
         QListWidget* m_explorer;
@@ -155,6 +160,12 @@ class WidgetDisk : public QTabWidget
         QAction* m_menu_share;    /*!< \brief Открыть доступ */
         QAction* m_menu_revoke;   /*!< \brief Закрыть доступ */
         QAction* m_menu_info;     /*!< \brief Свойства       */
+
+        /*!
+         * Создание экземпляра API и установка токена
+         * \return Экземпляр api
+         */
+        EteraAPI* createAPI();
 
         /*!
          * Обновление списка в буфере обмена для cut/copy
@@ -317,13 +328,17 @@ class WidgetDisk : public QTabWidget
         void task_on_cut_paste_error(EteraAPI* api);
         void task_on_cut_paste_success(EteraAPI* api);
 
+        void task_on_publish_stat_error(EteraAPI* api);
+        void task_on_publish_stat_success(EteraAPI* api, const EteraItem& item);
+
         void task_on_publish_error(EteraAPI* api);
         void task_on_publish_success(EteraAPI* api);
-        void task_on_publish_success(EteraAPI* api, const EteraItem& item);
+
+        void task_on_unpublish_stat_error(EteraAPI* api);
+        void task_on_unpublish_stat_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_unpublish_error(EteraAPI* api);
         void task_on_unpublish_success(EteraAPI* api);
-        void task_on_unpublish_success(EteraAPI* api, const EteraItem& item);
 
         void task_on_put_rm_error(EteraAPI* api);
         void task_on_put_rm_success(EteraAPI* api);

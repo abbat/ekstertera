@@ -1256,7 +1256,10 @@ void EteraAPI::get(const QUrl& url, QIODevice* device)
 
     if (device == NULL) {
         device = new QBuffer(this);
-        device->open(QIODevice::WriteOnly | QIODevice::Truncate);
+        if (device->open(QIODevice::WriteOnly | QIODevice::Truncate) == false) {
+            setLastError(static_cast<QFile*>(m_device)->error(), FILE_OPEN_ERROR);
+            return;
+        }
     }
 
     m_url    = url;
