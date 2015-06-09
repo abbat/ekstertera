@@ -61,6 +61,18 @@ class WidgetTasks : public QTreeWidget
         quint64 rootID(quint64 id);
 
         /*!
+         * \brief Получение стандартного ответа
+         * \param id ID задачи
+         */
+        QMessageBox::StandardButton answer(quint64 id);
+
+        /*!
+         * \brief Установка стандартного ответа
+         * \param id ID задачи
+         */
+        void setAnswer(quint64 id, QMessageBox::StandardButton answer);
+
+        /*!
          * \brief Обновление прогресса задачи
          * \param id ID задачи
          * \param done Завершено
@@ -82,9 +94,10 @@ class WidgetTasks : public QTreeWidget
          * \brief Элемент карты задач
          */
         typedef struct {
-            quint64          Parent;   /*!< \brief ID родителя         */
-            WidgetTasksItem* Item;     /*!< \brief Графический элемент */
-            QProgressBar*    Bar;      /*!< \brief Виджет прогресса    */
+            quint64                     Parent;   /*!< \brief ID родителя         */
+            WidgetTasksItem*            Item;     /*!< \brief Графический элемент */
+            QProgressBar*               Bar;      /*!< \brief Виджет прогресса    */
+            QMessageBox::StandardButton Answer;   /*!< \brief Стандартный ответ   */
         } TasksItem;
 
         /*!

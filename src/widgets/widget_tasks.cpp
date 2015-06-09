@@ -40,6 +40,7 @@ void WidgetTasks::addSimpleTask(quint64 id, const QString& text)
 
         titem->Bar    = NULL;
         titem->Parent = 0;
+        titem->Answer = QMessageBox::NoButton;
 
         m_tasks[id] = titem;
 
@@ -85,6 +86,7 @@ void WidgetTasks::addChildTask(quint64 parent, quint64 id, const QString& text)
 
         titem->Bar    = NULL;
         titem->Parent = parent;
+        titem->Answer = QMessageBox::NoButton;
 
         m_tasks[id] = titem;
 
@@ -132,6 +134,26 @@ quint64 WidgetTasks::rootID(quint64 id)
     }
 
     return id;
+}
+//----------------------------------------------------------------------------------------------
+
+QMessageBox::StandardButton WidgetTasks::answer(quint64 id)
+{
+    TasksItem* titem = m_tasks.value(id, NULL);
+    if (titem == NULL)
+        return QMessageBox::NoButton;
+
+    return titem->Answer;
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::setAnswer(quint64 id, QMessageBox::StandardButton answer)
+{
+    TasksItem* titem = m_tasks.value(id, NULL);
+    if (titem == NULL)
+        return;
+
+    titem->Answer = answer;
 }
 //----------------------------------------------------------------------------------------------
 

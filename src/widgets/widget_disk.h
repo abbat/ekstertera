@@ -110,42 +110,54 @@ class WidgetDisk : public QTabWidget
 
     private:
 
-        QString ERROR_MESSAGE;                         /*!< \brief "Ошибка!"                                                */
-        QString ATTENTION_MESSAGE;                     /*!< \brief "Внимание!"                                              */
-        QString ERROR_MESSAGE_LS;                      /*!< \brief "Ошибка чтения %1:\n%2" для ls                           */
-        QString START_MESSAGE_LS;                      /*!< \brief "Чтение %1" для ls                                       */
-        QString ERROR_MESSAGE_MKDIR;                   /*!< \brief "Ошибка создания %1:\n%2" для mkdir                      */
-        QString START_MESSAGE_MKDIR;                   /*!< \brief "Создание %1" для mkdir                                  */
-        QString START_MESSAGE_MKDIR_CAPTION;           /*!< \brief "Создать директорию" для mkdir                           */
-        QString START_MESSAGE_MKDIR_TEXT;              /*!< \brief "Введите имя новой директории" для mkdir                 */
-        QString START_MESSAGE_MKDIR_VALUE;             /*!< \brief "Новая папка" для mkdir                                  */
-        QString ERROR_MESSAGE_MKDIR_ALREADY_EXISTS;    /*!< \brief "Директория %1 уже существует" для mkdir                 */
-        QString ERROR_MESSAGE_STAT;                    /*!< \brief "Ошибка чтения информации о %1:\n%2" для stat            */
-        QString START_MESSAGE_STAT;                    /*!< \brief "Чтение информации о %1" для stat                        */
-        QString ROOT_MESSAGE_CP;                       /*!< \brief "Копирование" для cp                                     */
-        QString ERROR_MESSAGE_CP;                      /*!< \brief "Ошибка копирования %1 в %2:\n%3" для cp                 */
-        QString ERROR_MESSAGE_CP_ALREADY_EXISTS;       /*!< \brief "Ошибка копирования %1:\n%2 уже существует" для cp       */
-        QString START_MESSAGE_CP;                      /*!< \brief "Копирование %1 в %2" для cp                             */
-        QString ROOT_MESSAGE_MV;                       /*!< \brief "Перемещение" для mv                                     */
-        QString ERROR_MESSAGE_MV;                      /*!< \brief "Ошибка перемещения %1 в %2:\n%3" для mv                 */
-        QString ERROR_MESSAGE_MV_ALREADY_EXISTS;       /*!< \brief "Ошибка перемещения %1:\n%2 уже существует" для mv       */
-        QString START_MESSAGE_MV;                      /*!< \brief "Перемещение %1 в %2" для mv                             */
-        QString ERROR_MESSAGE_CPMV_SAME;               /*!< \brief "Источник и приемник совпадают"                          */
-        QString ROOT_MESSAGE_RM;                       /*!< \brief "Удаление"                                               */
-        QString ASK_DELETE_MESSAGE;                    /*!< \brief "Вы уверены, что хотите удалить выбранные элементы?"     */
-        QString ERROR_MESSAGE_RM;                      /*!< \brief "Ошибка удаления %1:\n%2" для rm                         */
-        QString START_MESSAGE_RM;                      /*!< \brief "Удаление %1" для rm                                     */
-        QString ERROR_MESSAGE_RENAME_INVALID_CHAR;     /*!< \brief "Недопустимый символ \"%1\" в имени" для rename          */
-        QString ERROR_MESSAGE_RENAME_IVALID_NAME;      /*!< \brief "Недопустимое имя" для rename                            */
-        QString ERROR_MESSAGE_RENAME;                  /*!< \brief "Ошибка переименования %1 в %2:\n%3" для rename          */
-        QString ERROR_MESSAGE_RENAME_ALREADY_EXISTS;   /*!< \brief "Ошибка переименования %1:\n%2 же существует" для rename */
-        QString START_MESSAGE_RENAME;                  /*!< \brief "Переименование %1 в %2" для rename                      */
-        QString ROOT_MESSAGE_PUBLISH;                  /*!< \brief "Открытие доступа"                                       */
-        QString ERROR_MESSAGE_PUBLISH;                 /*!< \brief "Ошибка открытия доступа к %1:\n%2"                      */
-        QString START_MESSAGE_PUBLISH;                 /*!< \brief "Открытие доступа к %1"                                  */
-        QString ROOT_MESSAGE_UNPUBLISH;                /*!< \brief "Закрытие доступа"                                       */
-        QString ERROR_MESSAGE_UNPUBLISH;               /*!< \brief "Ошибка закрытия доступа к %1:\n%2"                      */
-        QString START_MESSAGE_UNPUBLISH;               /*!< \brief "Закрытие доступа к %1"                                  */
+        QString ERROR_MESSAGE;                         /*!< \brief "Ошибка!"                                                   */
+        QString ATTENTION_MESSAGE;                     /*!< \brief "Внимание!"                                                 */
+        QString ERROR_MESSAGE_QT;                      /*!< \brief "QTBUG-1158"                                                */
+        QString ERROR_MESSAGE_LS;                      /*!< \brief "Ошибка чтения %1:\n%2" для ls                              */
+        QString START_MESSAGE_LS;                      /*!< \brief "Чтение %1" для ls                                          */
+        QString ERROR_MESSAGE_MKDIR;                   /*!< \brief "Ошибка создания %1:\n%2" для mkdir                         */
+        QString START_MESSAGE_MKDIR;                   /*!< \brief "Создание %1" для mkdir                                     */
+        QString START_MESSAGE_MKDIR_CAPTION;           /*!< \brief "Создать директорию" для mkdir                              */
+        QString START_MESSAGE_MKDIR_TEXT;              /*!< \brief "Введите имя новой директории" для mkdir                    */
+        QString START_MESSAGE_MKDIR_VALUE;             /*!< \brief "Новая папка" для mkdir                                     */
+        QString ERROR_MESSAGE_MKDIR_ALREADY_EXISTS;    /*!< \brief "Директория %1 уже существует" для mkdir                    */
+        QString ERROR_MESSAGE_STAT;                    /*!< \brief "Ошибка чтения информации о %1:\n%2" для stat               */
+        QString START_MESSAGE_STAT;                    /*!< \brief "Чтение информации о %1" для stat                           */
+        QString ROOT_MESSAGE_CP;                       /*!< \brief "Копирование" для cp                                        */
+        QString ERROR_MESSAGE_CP;                      /*!< \brief "Ошибка копирования %1 в %2:\n%3" для cp                    */
+        QString ERROR_MESSAGE_CP_ALREADY_EXISTS;       /*!< \brief "Ошибка копирования %1:\n%2 уже существует" для cp          */
+        QString START_MESSAGE_CP;                      /*!< \brief "Копирование %1 в %2" для cp                                */
+        QString ROOT_MESSAGE_MV;                       /*!< \brief "Перемещение" для mv                                        */
+        QString ERROR_MESSAGE_MV;                      /*!< \brief "Ошибка перемещения %1 в %2:\n%3" для mv                    */
+        QString ERROR_MESSAGE_MV_ALREADY_EXISTS;       /*!< \brief "Ошибка перемещения %1:\n%2 уже существует" для mv          */
+        QString START_MESSAGE_MV;                      /*!< \brief "Перемещение %1 в %2" для mv                                */
+        QString ERROR_MESSAGE_CPMV_SAME;               /*!< \brief "Источник и приемник совпадают" для mv                      */
+        QString ROOT_MESSAGE_RM;                       /*!< \brief "Удаление" для rm                                           */
+        QString ASK_DELETE_MESSAGE;                    /*!< \brief "Вы уверены, что хотите удалить выбранные элементы?" для rm */
+        QString ERROR_MESSAGE_RM;                      /*!< \brief "Ошибка удаления %1:\n%2" для rm                            */
+        QString START_MESSAGE_RM;                      /*!< \brief "Удаление %1" для rm                                        */
+        QString ERROR_MESSAGE_RENAME_INVALID_CHAR;     /*!< \brief "Недопустимый символ \"%1\" в имени" для rename             */
+        QString ERROR_MESSAGE_RENAME_IVALID_NAME;      /*!< \brief "Недопустимое имя" для rename                               */
+        QString ERROR_MESSAGE_RENAME;                  /*!< \brief "Ошибка переименования %1 в %2:\n%3" для rename             */
+        QString ERROR_MESSAGE_RENAME_ALREADY_EXISTS;   /*!< \brief "Ошибка переименования %1:\n%2 же существует" для rename    */
+        QString START_MESSAGE_RENAME;                  /*!< \brief "Переименование %1 в %2" для rename                         */
+        QString ROOT_MESSAGE_PUBLISH;                  /*!< \brief "Открытие доступа" для publish                              */
+        QString ERROR_MESSAGE_PUBLISH;                 /*!< \brief "Ошибка открытия доступа к %1:\n%2" для publish             */
+        QString START_MESSAGE_PUBLISH;                 /*!< \brief "Открытие доступа к %1" для publish                         */
+        QString ROOT_MESSAGE_UNPUBLISH;                /*!< \brief "Закрытие доступа" для unpublish                            */
+        QString ERROR_MESSAGE_UNPUBLISH;               /*!< \brief "Ошибка закрытия доступа к %1:\n%2" для unpublish           */
+        QString START_MESSAGE_UNPUBLISH;               /*!< \brief "Закрытие доступа к %1" для unpublish                       */
+        QString ROOT_MESSAGE_UPLOAD;                   /*!< \brief "Отправка на Диск" для put                                  */
+        QString ERROR_MESSAGE_UPLOAD;                  /*!< \brief "Ошибка отправки %1 в %2:\n%3" для put                      */
+        QString START_MESSAGE_UPLOAD;                  /*!< \brief "Отправка %1 в %2" для put                                  */
+        QString START_MESSAGE_UPLOAD_CAPTION;          /*!< \brief "Файл уже существует!" для put                              */
+        QString START_MESSAGE_UPLOAD_TEXT;             /*!< \brief "Файл %1 уже существует, перезаписать?" для put             */
+        QString ROOT_MESSAGE_DOWNLOAD;                 /*!< \brief "Загрузка с Диска" для get                                  */
+        QString ERROR_MESSAGE_DOWNLOAD;                /*!< \brief "Ошибка загрузки %1 в %2:\n%3" для get                      */
+        QString START_MESSAGE_DOWNLOAD;                /*!< \brief "Загрузка %1 в %2" для get                                  */
+        QString START_MESSAGE_DOWNLOAD_CAPTION;        /*!< \brief "Файл уже существует!" для get                              */
+        QString START_MESSAGE_DOWNLOAD_TEXT;           /*!< \brief "Файл %1 уже существует, перезаписать?" для get             */
+        QString ERROR_MESSAGE_UNKNOWN_OBJECT;          /*!< \brief "Неизвестный объект %1" для get                             */
 
     private:
 
@@ -376,35 +388,33 @@ class WidgetDisk : public QTabWidget
         void task_on_unpublish_stat_error(EteraAPI* api);
         void task_on_unpublish_stat_success(EteraAPI* api, const EteraItem& item);
 
+        void task_on_put_dir_error(EteraAPI* api);
+        void task_on_put_dir_success(EteraAPI* api);
 
+        void task_on_put_dir_stat_error(EteraAPI* api);
+        void task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& item);
+
+        void task_on_put_file_error(EteraAPI* api);
+        void task_on_put_file_success(EteraAPI* api);
+        void task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 total);
+
+        void task_on_put_ensure_error(EteraAPI* api);
+        void task_on_put_ensure_success(EteraAPI* api, const EteraItem& item);
+
+        void task_on_get_dir_error(EteraAPI* api);
+        void task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, quint64 limit);
+
+        void task_on_get_file_error(EteraAPI* api);
+        void task_on_get_file_success(EteraAPI* api);
+        void task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total);
 
 
 
         void task_on_put_rm_error(EteraAPI* api);
         void task_on_put_rm_success(EteraAPI* api);
 
-        void task_on_put_ensure_error(EteraAPI* api);
-        void task_on_put_ensure_success(EteraAPI* api, const EteraItem& item);
-
         void task_on_put_stat_error(EteraAPI* api);
         void task_on_put_stat_success(EteraAPI* api, const EteraItem& item);
-
-        void task_on_put_file_error(EteraAPI* api);
-        void task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 total);
-        void task_on_put_file_success(EteraAPI* api);
-
-        void task_on_put_dir_stat_error(EteraAPI* api);
-        void task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& item);
-
-        void task_on_put_dir_error(EteraAPI* api);
-        void task_on_put_dir_success(EteraAPI* api);
-
-        void task_on_get_file_error(EteraAPI* api);
-        void task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total);
-        void task_on_get_file_success(EteraAPI* api);
-
-        void task_on_get_dir_error(EteraAPI* api);
-        void task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, quint64 limit);
 
     signals:
 
