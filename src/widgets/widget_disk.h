@@ -394,6 +394,23 @@ class WidgetDisk : public QTabWidget
         void task_on_unpublish_stat_error(EteraAPI* api);
         void task_on_unpublish_stat_success(EteraAPI* api, const EteraItem& item);
 
+        /*
+         * putLocalObject +-> putLocalFile -> EteraAPI::put +-> EteraAPI::stat (?)
+         *                |       ^   ^                     |
+         *                |       |   |                     +-> EteraAPI::stat (HTTP-409) --+
+         *                |       |   |                               |                     |
+         *                |       |   +-------------------------------+                     |
+         *                |       |                                                         v
+         *                |       +-----------------------------------+-------------- EteraAPI::rm
+         *                |       |                                   |                     ^
+         *                |       v                                   |                     |
+         *                +-> putLocalDir -> EteraAPI::mkdir +-> syncLocalDir               |
+         *                                                   |                              |
+         *                                                   +-> EteraAPI::stat (HTTP-409) -+
+         *                                                   |
+         *                                                   +-> EteraAPI::stat (?)
+         */
+
         void task_on_put_dir_error(EteraAPI* api);
         void task_on_put_dir_success(EteraAPI* api);
 
@@ -412,6 +429,16 @@ class WidgetDisk : public QTabWidget
 
         void task_on_put_rm_error(EteraAPI* api);
         void task_on_put_rm_success(EteraAPI* api);
+
+        /*
+         * getRemoteObjects +-> getRemoteFile (@removeDir) -> EteraAPI::get
+         *                  |         ^
+         *                  |         |
+         *                  |         +-----------------------+
+         *                  |         |                       |
+         *                  |         v                       |
+         *                  +-> getRemoteDir -> EteraAPI::ls -+
+         */
 
         void task_on_get_dir_error(EteraAPI* api);
         void task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, quint64 limit);
