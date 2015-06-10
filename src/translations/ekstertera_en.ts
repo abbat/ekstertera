@@ -5,67 +5,67 @@
 <context>
     <name>EteraAPI</name>
     <message>
-        <location filename="../utils/api.cpp" line="358"/>
+        <location filename="../utils/api.cpp" line="362"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="359"/>
+        <location filename="../utils/api.cpp" line="363"/>
         <source>Ошибка разбора JSON</source>
         <translation>JSON parse error</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="360"/>
+        <location filename="../utils/api.cpp" line="364"/>
         <source>Неподдерживаемый URL объекта Link</source>
         <translation>Malformed URL of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="361"/>
+        <location filename="../utils/api.cpp" line="365"/>
         <source>Неподдерживаемый метод объекта Link</source>
         <translation>Unsupported method of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="362"/>
+        <location filename="../utils/api.cpp" line="366"/>
         <source>Ошибка открытия файла</source>
         <translation>An error occurred when opening the file</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="435"/>
+        <location filename="../utils/api.cpp" line="439"/>
         <source>КБ</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="438"/>
+        <location filename="../utils/api.cpp" line="442"/>
         <source>МБ</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="441"/>
+        <location filename="../utils/api.cpp" line="445"/>
         <source>ГБ</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="444"/>
+        <location filename="../utils/api.cpp" line="448"/>
         <source>ТБ</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="499"/>
+        <location filename="../utils/api.cpp" line="503"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="596"/>
+        <location filename="../utils/api.cpp" line="600"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="741"/>
+        <location filename="../utils/api.cpp" line="745"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="745"/>
+        <location filename="../utils/api.cpp" line="749"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>

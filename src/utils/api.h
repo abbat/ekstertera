@@ -292,9 +292,10 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Конструктор
-         * \param noprogress Не посылать сигналы прогресса операции
+         * \param parent Родитель
+         * \param id ID задачи (для 0 будет назначено новое значение)
          */
-        EteraAPI(QObject* parent = NULL);
+        EteraAPI(QObject* parent = NULL, quint64 id = 0);
         ~EteraAPI();
 
         /*!

@@ -326,12 +326,16 @@ void EteraAPI::cleanup()
 }
 //----------------------------------------------------------------------------------------------
 
-EteraAPI::EteraAPI(QObject* parent) : QObject(parent)
+EteraAPI::EteraAPI(QObject* parent, quint64 id) : QObject(parent)
 {
     m_io    = NULL;
     m_reply = NULL;
 
-    m_id          = nextID();
+    if (id == 0)
+        m_id = nextID();
+    else
+        m_id = id;
+
     m_offset      = 0;
     m_limit       = 0;
     m_crop        = false;
