@@ -28,42 +28,9 @@ void WidgetTasks::resizeEvent(QResizeEvent* event)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetTasks::addSimpleTask(quint64 id, const QString& text)
+void WidgetTasks::addTask(quint64 id, const QString& text)
 {
-    TasksItem* titem = m_tasks.value(id, NULL);
-
-    if (titem == NULL) {
-        titem = new TasksItem();
-
-        titem->Item = new WidgetTasksItem(this);
-        titem->Item->setText(0, text);
-
-        titem->Bar    = NULL;
-        titem->Parent = 0;
-        titem->Answer = QMessageBox::NoButton;
-
-        m_tasks[id] = titem;
-
-        emit onChangeCount(m_tasks.count());
-    } else
-        titem->Item->setText(0, text);
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetTasks::removeSimpleTask(quint64 id)
-{
-    TasksItem* titem = m_tasks.value(id, NULL);
-
-    if (titem == NULL)
-        return;
-
-    delete titem->Bar;
-    delete titem->Item;
-    delete titem;
-
-    m_tasks.remove(id);
-
-    emit onChangeCount(m_tasks.count());
+    addChildTask(0, id, text);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -96,7 +63,7 @@ void WidgetTasks::addChildTask(quint64 parent, quint64 id, const QString& text)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetTasks::removeChildTask(quint64 id)
+void WidgetTasks::removeTask(quint64 id)
 {
     TasksItem* titem = m_tasks.value(id, NULL);
 
@@ -113,7 +80,7 @@ void WidgetTasks::removeChildTask(quint64 id)
     if (parent != 0) {
         TasksItem* pitem = m_tasks.value(parent, NULL);
         if (pitem != NULL && pitem->Item->childCount() == 0)
-            removeChildTask(parent);
+            removeTask(parent);
     }
 
     emit onChangeCount(m_tasks.count());

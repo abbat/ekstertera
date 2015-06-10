@@ -396,7 +396,7 @@
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="125"/>
-        <location filename="../widgets/widget_disk.cpp" line="252"/>
+        <location filename="../widgets/widget_disk.cpp" line="259"/>
         <source>Задачи</source>
         <translation>Tasks</translation>
     </message>
@@ -484,7 +484,7 @@
         <translation>Download %1 to %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="249"/>
+        <location filename="../widgets/widget_disk.cpp" line="256"/>
         <source>Задачи (%1)</source>
         <translation>Tasks (%1)</translation>
     </message>

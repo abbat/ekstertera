@@ -25,33 +25,25 @@ class WidgetTasks : public QTreeWidget
         ~WidgetTasks();
 
         /*!
-         * \brief Добавление простой задачи
+         * \brief Добавление задачи
          * \param id ID задачи
          * \param text Текст задачи
-         * \param args Аргументы задачи
          */
-        void addSimpleTask(quint64 id, const QString& text);
-
-        /*!
-         * \brief Удаление простой задачи
-         * \param id ID задачи
-         */
-        void removeSimpleTask(quint64 id);
+        void addTask(quint64 id, const QString& text);
 
         /*!
          * \brief Добавление подчиненной задачи
          * \param parent ID родительской задачи
          * \param id ID задачи
          * \param text Текст задачи
-         * \param args Аргументы задачи
          */
         void addChildTask(quint64 parent, quint64 id, const QString& text);
 
         /*!
-         * \brief Удаление дочерней задачи
+         * \brief Удаление задачи
          * \param id ID задачи
          */
-        void removeChildTask(quint64 id);
+        void removeTask(quint64 id);
 
         /*!
          * \brief Получение ID корневой задачи

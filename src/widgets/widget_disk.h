@@ -26,6 +26,11 @@ class WidgetDisk : public QTabWidget
         ~WidgetDisk();
 
         /*!
+         * \brief Функция перевода надписей на элементах управления
+         */
+        void retranslateUi();
+
+        /*!
          * \brief Сменить отображаемый путь
          * \param path Путь
          */
@@ -85,11 +90,6 @@ class WidgetDisk : public QTabWidget
          * \return Список пунктов
          */
         QList<QAction*> contextMenuActions() { return m_menu->actions(); }
-
-        /*!
-         * \brief Функция перевода надписей на элементах управления
-         */
-        void retranslateUi();
 
     protected:
 
@@ -217,6 +217,12 @@ class WidgetDisk : public QTabWidget
          * \return Экземпляр api
          */
         EteraAPI* createAPI();
+
+        /*!
+         * Освобождение экземпляра API
+         * и удаление id задачи из списка задач
+         */
+        void releaseAPI(EteraAPI* api);
 
         /*!
          * Обновление списка в буфере обмена для cut/copy
