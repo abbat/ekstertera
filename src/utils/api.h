@@ -490,6 +490,7 @@ class EteraAPI : public QObject
         bool       overwrite()   const { return m_overwrite;   }
         QIODevice* device()      const { return m_device;      }
 
+        void setID(quint64 id)                { m_id        = id;        }
         void setSource(const QString& source) { m_source    = source;    }
         void setTarget(const QString& target) { m_target    = target;    }
         void setOverwrite(bool overwrite)     { m_overwrite = overwrite; }
@@ -734,7 +735,7 @@ class EteraAPI : public QObject
         /*!
          * \brief Сигнал получения информации о диске
          * \param api API
-         * \param info Результат
+         * \param token Результат
          */
         void onTOKEN(EteraAPI* api, const QString& token);
 

@@ -61,6 +61,7 @@ class WidgetTasks : public QTreeWidget
         /*!
          * \brief Установка стандартного ответа
          * \param id ID задачи
+         * \param answer Ответ
          */
         void setAnswer(quint64 id, QMessageBox::StandardButton answer);
 

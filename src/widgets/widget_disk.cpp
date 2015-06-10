@@ -13,6 +13,9 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 {
     m_preview_mode = false;
 
+    m_get_activity_size  = 0;
+    m_get_activity_limit = (quint64)QThread::idealThreadCount();
+
     m_explorer = new QListWidget(this);
 
     m_explorer->setWrapping(true);
@@ -184,18 +187,34 @@ void WidgetDisk::wheelEvent(QWheelEvent* event)
 }
 //----------------------------------------------------------------------------------------------
 
-EteraAPI* WidgetDisk::createAPI()
+EteraAPI* WidgetDisk::createAPI(quint64 id)
 {
-    EteraAPI* api = new EteraAPI(this);
+    EteraAPI* api = new EteraAPI(this, id);
     api->setToken(EteraSettings::instance()->token());
+    return api;
+}
+//----------------------------------------------------------------------------------------------
+
+EteraAPI* WidgetDisk::resetAPI(EteraAPI* api, quint64 id)
+{
+    if (api == NULL)
+        api = createAPI(id);
+    else {
+        m_tasks->removeTask(api->id());
+        api->disconnect(this);
+        api->setID(id);
+    }
+
     return api;
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::releaseAPI(EteraAPI* api)
 {
-    m_tasks->removeTask(api->id());
-    api->deleteLater();
+    if (api != NULL) {
+        m_tasks->removeTask(api->id());
+        api->deleteLater();
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1352,17 +1371,7 @@ void WidgetDisk::getRemoteDir(const QString& source, const QString& target, quin
         }
     }
 
-    EteraAPI* api = createAPI();
-
-    api->setSource(source);
-    api->setTarget(target);
-    api->setParentId(parent);
-
-    ETERA_API_TASK_LS(api, task_on_get_dir_success, task_on_get_dir_error);
-
-    m_tasks->addChildTask(api->parentId(), api->id(), START_MESSAGE_LS.arg(source));
-
-    api->ls(source);
+    addGetActivity(egatLS, parent, source, target);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1391,7 +1400,10 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
 
         // QMessageBox::YesToAll
         if (info.isDir() == true) {
-            removeDir(target);
+            if (removeDir(target) == false) {
+                QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RM.arg(target).arg(ERROR_MESSAGE_QT));
+                return;
+            }
         } else if (info.isFile() == true || info.isSymLink() == true) {
             if (info.dir().remove(info.absoluteFilePath()) == false) {
                 QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RM.arg(info.absoluteFilePath()).arg(ERROR_MESSAGE_QT));
@@ -1403,28 +1415,20 @@ void WidgetDisk::getRemoteFile(const QString& source, const QString& target, qui
         }
     }
 
-    EteraAPI* api = createAPI();
-
-    api->setParentId(parent);
-
-    ETERA_API_TASK_GET(api, task_on_get_file_success, task_on_get_file_error, task_on_get_file_progress);
-
-    m_tasks->addChildTask(parent, api->id(), START_MESSAGE_DOWNLOAD.arg(source).arg(target));
-
-    api->get(source, target);
+    addGetActivity(agatGet, parent, source, target);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_get_file_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_DOWNLOAD.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
-    releaseAPI(api);
+    nextGetActivity(api);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_get_file_success(EteraAPI* api)
 {
-    releaseAPI(api);
+    nextGetActivity(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1467,7 +1471,7 @@ bool WidgetDisk::removeDir(QDir dir)
 void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_LS.arg(api->path()).arg(api->lastErrorMessage()));
-    releaseAPI(api);
+    nextGetActivity(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1476,16 +1480,74 @@ void WidgetDisk::task_on_get_dir_success(EteraAPI* api, const EteraItemList& lis
     for (int i = 0; i < list.count(); i++) {
         EteraItem item = list[i];
         if (item.isDir() == true)
-            getRemoteDir(item.path(), api->target() + "/" + item.name(), api->parentId());
+            getRemoteDir(item.path(), api->target() + "/" + item.name(), api->id());
         else if (item.isFile() == true)
-            getRemoteFile(item.path(), api->target() + "/" + item.name(), api->parentId());
+            getRemoteFile(item.path(), api->target() + "/" + item.name(), api->id());
     }
 
     if ((quint64)list.count() < limit)
-        releaseAPI(api);
+        nextGetActivity(api);
     else {
         quint64 offset = api->offset() + limit;
         api->ls(api->path(), api->preview(), api->crop(), offset, limit);
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::addGetActivity(EteraGetActivityType type, quint64 parent, const QString& source, const QString& target)
+{
+    EteraGetActivityItem item;
+
+    item.ID     = EteraAPI::nextID();
+    item.Parent = parent;
+    item.Source = source;
+    item.Target = target;
+
+    if (type == egatLS) {
+        m_get_queue_ls.enqueue(item);
+        m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_LS.arg(item.Source));
+    } else if (type == agatGet) {
+        m_get_queue_get.enqueue(item);
+        m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_DOWNLOAD.arg(item.Source).arg(item.Target));
+    } else
+        return;
+
+    if (m_get_activity_size <= m_get_activity_limit)
+        nextGetActivity();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::nextGetActivity(EteraAPI* api)
+{
+    if (m_get_queue_get.empty() == false) {
+        m_get_activity_size++;
+
+        EteraGetActivityItem item = m_get_queue_get.dequeue();
+
+        api = resetAPI(api, item.ID);
+
+        api->setParentId(item.Parent);
+
+        ETERA_API_TASK_GET(api, task_on_get_file_success, task_on_get_file_error, task_on_get_file_progress);
+
+        api->get(item.Source, item.Target);
+    } else if (m_get_queue_ls.empty() == false) {
+        m_get_activity_size++;
+
+        EteraGetActivityItem item = m_get_queue_ls.dequeue();
+
+        api = resetAPI(api, item.ID);
+
+        api->setSource(item.Source);
+        api->setTarget(item.Target);
+        api->setParentId(item.Parent);
+
+        ETERA_API_TASK_LS(api, task_on_get_dir_success, task_on_get_dir_error);
+
+        api->ls(item.Source);
+    } else {
+        releaseAPI(api);
+        m_get_activity_size--;
     }
 }
 //----------------------------------------------------------------------------------------------

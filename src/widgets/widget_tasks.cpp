@@ -70,6 +70,9 @@ void WidgetTasks::removeTask(quint64 id)
     if (titem == NULL)
         return;
 
+    if (titem->Item->childCount() > 0)
+        return;
+
     quint64 parent = titem->Parent;
 
     delete titem->Item;
