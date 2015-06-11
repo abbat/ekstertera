@@ -499,10 +499,10 @@ class EteraAPI : public QObject
         // мета-свойства
         //
 
-        quint64       parentId() const { return m_parent_id; }
+        quint64       parentID() const { return m_parent_id; }
         EteraItemType ensure()   const { return m_ensure;    }
 
-        void setParentId(quint64 parent_id)  { m_parent_id = parent_id; }
+        void setParentID(quint64 parent_id)  { m_parent_id = parent_id; }
         void setEnsure(EteraItemType ensure) { m_ensure    = ensure;    }
 
     private:

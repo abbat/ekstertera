@@ -214,27 +214,6 @@ class WidgetDisk : public QTabWidget
         QAction* m_menu_info;     /*!< \brief Свойства       */
 
         /*!
-         * \brief Создание экземпляра API и установка токена
-         * \param id ID задачи
-         * \return Экземпляр api
-         */
-        EteraAPI* createAPI(quint64 id = 0);
-
-        /*!
-         * \brief Получение экземпляра API из имеющегося
-         * \param api API или NULL для создания нового экземпляра
-         * \param id ID задачи
-         * \return Экземпляр api
-         */
-        EteraAPI* resetAPI(EteraAPI* api, quint64 id);
-
-        /*!
-         * \brief Освобождение экземпляра API и удаление id задачи из списка задач
-         * \param api API (может быть NULL)
-         */
-        void releaseAPI(EteraAPI* api);
-
-        /*!
          * \brief Обновление списка в буфере обмена для cut/copy
          * \param copy_mode Флаг режима копирования
          */
@@ -292,23 +271,28 @@ class WidgetDisk : public QTabWidget
          * \param source Имя файла на диске
          * \param target Имя локального файла
          * \param parent ID родительской задачи
+         * \return QMessageBox::NoButton в случае успешного выполнения
+         * другие в случае ошибки (QMessageBox::Abort)
          */
-        void getRemoteFile(const QString& source, const QString& target, quint64 parent);
+        QMessageBox::StandardButton getRemoteFile(const QString& source, const QString& target, quint64 parent);
 
         /*!
          * \brief Получение директории с диска
          * \param source Имя директории на диске
          * \param target Имя локальной директории
          * \param parent ID родительской задачи
+         * \return QMessageBox::NoButton в случае успешного выполнения
+         * другие в случае ошибки (QMessageBox::Abort)
          */
-        void getRemoteDir(const QString& source, const QString& target, quint64 parent);
+        QMessageBox::StandardButton getRemoteDir(const QString& source, const QString& target, quint64 parent);
 
         /*!
          * \brief Рекурсивное удаление локальной директории
          * \param path Имя директории
-         * \return Флаг успеха
+         * \return QMessageBox::NoButton в случае успешного выполнения
+         * другие в случае ошибки (QMessageBox::Abort)
          */
-        bool removeDir(QDir dir);
+        QMessageBox::StandardButton removeDir(QDir dir);
 
         /*!
          * \brief Публикация выделенных ресурсов
@@ -346,9 +330,28 @@ class WidgetDisk : public QTabWidget
         EteraGetActivityQueue m_get_queue_ls;         /*!< \brief Очередь ls для получения файлов              */
         EteraGetActivityQueue m_get_queue_get;        /*!< \brief Очередь get для получения файлов             */
 
+        /*!
+         * \brief Добавление get активности в очередь ожидания
+         * \param type Тип активности
+         * \param parent ID родительской задачи
+         * \param source Источник
+         * \param target Приемник
+         */
         void addGetActivity(EteraGetActivityType type, quint64 parent, const QString& source, const QString& target);
 
-        void nextGetActivity(EteraGetActivityType type, EteraAPI* api = NULL);
+        /*!
+         * \brief Запуск get активностей
+         * \param type Тип активности, которая была завершена параметром api
+         * \param api API для удаления или NULL для активности agatUnknown
+         */
+        void spawnGetActivity(EteraGetActivityType type, EteraAPI* api = NULL);
+
+        /*!
+         * \brief Остановка get активностей
+         * \param id ID активности
+         * \param full Флаг полного удаления дерева активностей
+         */
+        void abortGetActivity(quint64 id, bool full = false);
 
     private slots:
 

@@ -25,25 +25,56 @@ class WidgetTasks : public QTreeWidget
         ~WidgetTasks();
 
         /*!
+         * \brief Создание экземпляра API и установка токена
+         * \param id ID задачи
+         * \return Экземпляр api
+         */
+        EteraAPI* createAPI(quint64 id = 0);
+
+        /*!
+         * \brief Получение экземпляра API из имеющегося
+         * \param api API или NULL для создания нового экземпляра
+         * \param id ID задачи
+         * \return Экземпляр api
+         */
+        EteraAPI* resetAPI(EteraAPI* api, quint64 id);
+
+        /*!
+         * \brief Освобождение экземпляра API и удаление id задачи из списка задач
+         * \param api API (может быть NULL)
+         */
+        void releaseAPI(EteraAPI* api);
+
+        /*!
          * \brief Добавление задачи
          * \param id ID задачи
          * \param text Текст задачи
+         * \param tooltip Всплывающая подсказка
+         * \param api API
          */
-        void addTask(quint64 id, const QString& text);
+        void addTask(quint64 id, const QString& text, const QString& tooltip = "", EteraAPI* api = NULL);
 
         /*!
          * \brief Добавление подчиненной задачи
          * \param parent ID родительской задачи
          * \param id ID задачи
          * \param text Текст задачи
+         * \param tooltip Всплывающая подсказка
+         * \param api API
          */
-        void addChildTask(quint64 parent, quint64 id, const QString& text);
+        void addChildTask(quint64 parent, quint64 id, const QString& text, const QString& tooltip = "", EteraAPI* api = NULL);
 
         /*!
          * \brief Удаление задачи
          * \param id ID задачи
          */
         void removeTask(quint64 id);
+
+        /*!
+         * \brief Остановка и удаление задачи
+         * \param id ID задачи
+         */
+        void abortTask(quint64 id);
 
         /*!
          * \brief Получение ID корневой задачи
@@ -56,14 +87,21 @@ class WidgetTasks : public QTreeWidget
          * \brief Получение стандартного ответа
          * \param id ID задачи
          */
-        QMessageBox::StandardButton answer(quint64 id);
+        QMessageBox::StandardButton reply(quint64 id);
 
         /*!
          * \brief Установка стандартного ответа
          * \param id ID задачи
          * \param answer Ответ
          */
-        void setAnswer(quint64 id, QMessageBox::StandardButton answer);
+        void setReply(quint64 id, QMessageBox::StandardButton answer);
+
+        /*!
+         * \brief Установка API
+         * \param id ID задачи
+         * \param api API
+         */
+        void setAPI(quint64 id, EteraAPI* api);
 
         /*!
          * \brief Обновление прогресса задачи
@@ -84,19 +122,9 @@ class WidgetTasks : public QTreeWidget
     private:
 
         /*!
-         * \brief Элемент карты задач
-         */
-        typedef struct {
-            quint64                     Parent;   /*!< \brief ID родителя         */
-            WidgetTasksItem*            Item;     /*!< \brief Графический элемент */
-            QProgressBar*               Bar;      /*!< \brief Виджет прогресса    */
-            QMessageBox::StandardButton Answer;   /*!< \brief Стандартный ответ   */
-        } TasksItem;
-
-        /*!
          * \brief Карта задач по id задачи
          */
-        QMap<quint64, TasksItem*> m_tasks;
+        QMap<quint64, WidgetTasksItem*> m_tasks;
 
     signals:
 

@@ -1,5 +1,7 @@
 #include "widget_tasks.h"
 //----------------------------------------------------------------------------------------------
+#include "utils/settings.h"
+//----------------------------------------------------------------------------------------------
 
 WidgetTasks::WidgetTasks(QWidget* parent) : QTreeWidget(parent)
 {
@@ -12,8 +14,6 @@ WidgetTasks::WidgetTasks(QWidget* parent) : QTreeWidget(parent)
 
 WidgetTasks::~WidgetTasks()
 {
-    foreach(TasksItem* titem, m_tasks)
-        delete titem;
 }
 //----------------------------------------------------------------------------------------------
 
@@ -28,65 +28,106 @@ void WidgetTasks::resizeEvent(QResizeEvent* event)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetTasks::addTask(quint64 id, const QString& text)
+EteraAPI* WidgetTasks::createAPI(quint64 id)
 {
-    addChildTask(0, id, text);
+    EteraAPI* api = new EteraAPI(this, id);
+    api->setToken(EteraSettings::instance()->token());
+    setAPI(id, api);
+    return api;
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetTasks::addChildTask(quint64 parent, quint64 id, const QString& text)
+EteraAPI* WidgetTasks::resetAPI(EteraAPI* api, quint64 id)
 {
-    TasksItem* pitem = m_tasks.value(parent, NULL);
-    TasksItem* titem = m_tasks.value(id, NULL);
+    if (api == NULL)
+        api = createAPI(id);
+    else {
+        removeTask(api->id());
+        api->disconnect(this);
+        api->setID(id);
+    }
+
+    return api;
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::releaseAPI(EteraAPI* api)
+{
+    if (api != NULL) {
+        removeTask(api->id());
+        api->deleteLater();
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::addTask(quint64 id, const QString& text, const QString& tooltip, EteraAPI* api)
+{
+    addChildTask(0, id, text, tooltip, api);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::addChildTask(quint64 parent, quint64 id, const QString& text, const QString& tooltip, EteraAPI* api)
+{
+    WidgetTasksItem* pitem = m_tasks.value(parent, NULL);
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
 
     if (titem == NULL) {
-        titem = new TasksItem();
-
         if (pitem != NULL) {
-            titem->Item = new WidgetTasksItem(pitem->Item);
-            if (pitem->Item->isExpanded() == false)
-                pitem->Item->setExpanded(true);
+            titem = new WidgetTasksItem(pitem);
+            if (pitem->isExpanded() == false)
+                pitem->setExpanded(true);
         } else
-            titem->Item = new WidgetTasksItem(this);
+            titem = new WidgetTasksItem(this);
 
-        titem->Item->setText(0, text);
+        titem->setText(0, text);
+        titem->setToolTip(0, tooltip);
 
-        titem->Bar    = NULL;
-        titem->Parent = parent;
-        titem->Answer = QMessageBox::NoButton;
+        titem->setAPI(api);
+        titem->setParentID(parent);
 
         m_tasks[id] = titem;
 
         emit onChangeCount(m_tasks.count());
-    } else
-        titem->Item->setText(0, text);
+    } else {
+        titem->setText(0, text);
+        titem->setToolTip(0, tooltip);
+    }
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetTasks::removeTask(quint64 id)
 {
-    TasksItem* titem = m_tasks.value(id, NULL);
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
 
     if (titem == NULL)
         return;
 
-    if (titem->Item->childCount() > 0)
+    if (titem->childCount() > 0)
         return;
 
-    quint64 parent = titem->Parent;
+    quint64 parent = titem->parentID();
 
-    delete titem->Item;
     delete titem;
 
     m_tasks.remove(id);
 
     if (parent != 0) {
-        TasksItem* pitem = m_tasks.value(parent, NULL);
-        if (pitem != NULL && pitem->Item->childCount() == 0)
+        WidgetTasksItem* pitem = m_tasks.value(parent, NULL);
+        if (pitem != NULL && pitem->childCount() == 0)
             removeTask(parent);
     }
 
     emit onChangeCount(m_tasks.count());
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::abortTask(quint64 id)
+{
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
+    if (titem == NULL)
+        return;
+
+    // TODO:
 }
 //----------------------------------------------------------------------------------------------
 
@@ -95,52 +136,66 @@ quint64 WidgetTasks::rootID(quint64 id)
     quint64 parent = id;
 
     while (parent != 0) {
-        TasksItem* titem = m_tasks.value(parent, NULL);
+        WidgetTasksItem* titem = m_tasks.value(parent, NULL);
         if (titem == NULL)
             return 0;
 
         id = parent;
-        parent = titem->Parent;
+        parent = titem->parentID();
     }
 
     return id;
 }
 //----------------------------------------------------------------------------------------------
 
-QMessageBox::StandardButton WidgetTasks::answer(quint64 id)
+QMessageBox::StandardButton WidgetTasks::reply(quint64 id)
 {
-    TasksItem* titem = m_tasks.value(id, NULL);
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
     if (titem == NULL)
         return QMessageBox::NoButton;
 
-    return titem->Answer;
+    return titem->reply();
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetTasks::setAnswer(quint64 id, QMessageBox::StandardButton answer)
+void WidgetTasks::setReply(quint64 id, QMessageBox::StandardButton reply)
 {
-    TasksItem* titem = m_tasks.value(id, NULL);
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
     if (titem == NULL)
         return;
 
-    titem->Answer = answer;
+    titem->setReply(reply);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::setAPI(quint64 id, EteraAPI* api)
+{
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
+    if (titem == NULL)
+        return;
+
+    titem->setAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
 {
-    TasksItem* titem = m_tasks.value(id, NULL);
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
     if (titem == NULL)
         return;
 
-    if (titem->Bar == NULL) {
-        titem->Bar = new QProgressBar();
-        titem->Bar->setMinimum(0);
+    if (titem->bar() == NULL) {
+        QProgressBar* bar = new QProgressBar();
+        bar->setMinimum(0);
 
-        setItemWidget(titem->Item, 1, titem->Bar);
+        titem->setBar(bar);
+
+        setItemWidget(titem, 1, bar);
     }
 
-    titem->Bar->setMaximum(total);
-    titem->Bar->setValue(done);
+    QProgressBar* bar = titem->bar();
+
+    bar->setMaximum(total);
+    bar->setValue(done);
 }
 //----------------------------------------------------------------------------------------------
