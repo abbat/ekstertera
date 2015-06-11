@@ -335,20 +335,20 @@ class WidgetDisk : public QTabWidget
          * \brief Тип активности получения файла
          */
         typedef enum {
-            egatLS,   /*!< \brief Получение списка (ls) */
-            agatGet   /*!< \brief Загрузка файла (get)  */
+            egatLS,       /*!< \brief Получение списка (ls)  */
+            agatGet,      /*!< \brief Загрузка файла (get)   */
+            agatUnknown   /*!< \brief Неизвестная активность */
         } EteraGetActivityType;
 
-        quint64               m_get_activity_size;    /*!< \brief Текущее количество запросов в активности     */
+        quint64               m_get_activity_ls;      /*!< \brief Текущее количество запросов в активности ls  */
+        quint64               m_get_activity_get;     /*!< \brief Текущее количество запросов в активности get */
         quint64               m_get_activity_limit;   /*!< \brief Масимальное количество запросов в активности */
         EteraGetActivityQueue m_get_queue_ls;         /*!< \brief Очередь ls для получения файлов              */
         EteraGetActivityQueue m_get_queue_get;        /*!< \brief Очередь get для получения файлов             */
 
         void addGetActivity(EteraGetActivityType type, quint64 parent, const QString& source, const QString& target);
 
-        EteraAPI* apiGetActivity(EteraAPI* api, quint64 id);
-
-        void nextGetActivity(EteraAPI* api = NULL);
+        void nextGetActivity(EteraGetActivityType type, EteraAPI* api = NULL);
 
     private slots:
 
