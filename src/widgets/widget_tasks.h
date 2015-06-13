@@ -25,34 +25,12 @@ class WidgetTasks : public QTreeWidget
         ~WidgetTasks();
 
         /*!
-         * \brief Создание экземпляра API и установка токена
-         * \param id ID задачи
-         * \return Экземпляр api
-         */
-        EteraAPI* createAPI(quint64 id = 0);
-
-        /*!
-         * \brief Получение экземпляра API из имеющегося
-         * \param api API или NULL для создания нового экземпляра
-         * \param id ID задачи
-         * \return Экземпляр api
-         */
-        EteraAPI* resetAPI(EteraAPI* api, quint64 id);
-
-        /*!
-         * \brief Освобождение экземпляра API и удаление id задачи из списка задач
-         * \param api API (может быть NULL)
-         */
-        void releaseAPI(EteraAPI* api);
-
-        /*!
          * \brief Добавление задачи
          * \param id ID задачи
          * \param text Текст задачи
          * \param tooltip Всплывающая подсказка
-         * \param api API
          */
-        void addTask(quint64 id, const QString& text, const QString& tooltip = "", EteraAPI* api = NULL);
+        void addTask(quint64 id, const QString& text, const QString& tooltip = "");
 
         /*!
          * \brief Добавление подчиненной задачи
@@ -60,9 +38,8 @@ class WidgetTasks : public QTreeWidget
          * \param id ID задачи
          * \param text Текст задачи
          * \param tooltip Всплывающая подсказка
-         * \param api API
          */
-        void addChildTask(quint64 parent, quint64 id, const QString& text, const QString& tooltip = "", EteraAPI* api = NULL);
+        void addChildTask(quint64 parent, quint64 id, const QString& text, const QString& tooltip = "");
 
         /*!
          * \brief Проверка, что у задачи есть дочерние задачи
@@ -78,11 +55,11 @@ class WidgetTasks : public QTreeWidget
         void removeTask(quint64 id);
 
         /*!
-         * \brief Остановка и удаление задачи
+         * \brief Получение списка ID дочерних задач
          * \param id ID задачи
-         * \param aborted Список id остановленных задач
+         * \param ids Список ID дочерних задач (включительно)
          */
-        void abortTask(quint64 id, QList<quint64>& aborted);
+        void childIDs(quint64 id, QList<quint64>& ids);
 
         /*!
          * \brief Получение ID корневой задачи
@@ -103,13 +80,6 @@ class WidgetTasks : public QTreeWidget
          * \param answer Ответ
          */
         void setReply(quint64 id, QMessageBox::StandardButton answer);
-
-        /*!
-         * \brief Установка API
-         * \param id ID задачи
-         * \param api API
-         */
-        void setAPI(quint64 id, EteraAPI* api);
 
         /*!
          * \brief Обновление прогресса задачи
@@ -135,11 +105,22 @@ class WidgetTasks : public QTreeWidget
         QMap<quint64, WidgetTasksItem*> m_tasks;
 
         /*!
-         * \brief Остановка и удаление задачи
-         * \param elemnt Элемент дерева
-         * \param aborted Список id остановленных задач
+         * \brief Карта ответов по id задачи
          */
-        void abortTask(WidgetTasksItem* element, QList<quint64>& aborted);
+        QMap<quint64, QMessageBox::StandardButton> m_reply;
+
+        /*!
+         * \brief Удаление задачи
+         * \param item Элемент задачи
+         */
+        void removeTask(WidgetTasksItem* item);
+
+        /*!
+         * \brief Получение списка ID дочерних задач
+         * \param elemnt Задача
+         * \param ids Список ID дочерних задач (включительно)
+         */
+        void childIDs(WidgetTasksItem* element, QList<quint64>& ids);
 
     signals:
 

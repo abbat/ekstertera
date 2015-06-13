@@ -13,9 +13,7 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 {
     m_preview_mode = false;
 
-    m_get_activity_ls    = 0;
-    m_get_activity_get   = 0;
-    m_get_activity_limit = (quint64)QThread::idealThreadCount();
+    m_get_activity_limit = QThread::idealThreadCount();
 
     m_explorer = new QListWidget(this);
 
@@ -185,6 +183,23 @@ void WidgetDisk::retranslateUi()
 void WidgetDisk::wheelEvent(QWheelEvent* event)
 {
     m_explorer->horizontalScrollBar()->event(event);
+}
+//----------------------------------------------------------------------------------------------
+
+EteraAPI* WidgetDisk::createAPI(quint64 id)
+{
+    EteraAPI* api = new EteraAPI(this, id);
+    api->setToken(EteraSettings::instance()->token());
+    return api;
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::releaseAPI(EteraAPI* api)
+{
+    if (api != NULL) {
+        m_tasks->removeTask(api->id());
+        api->deleteLater();
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -385,7 +400,7 @@ void WidgetDisk::changePath(const QString& path)
         m_required_path += "/";
     }
 
-    EteraAPI* api = m_tasks->createAPI();
+    EteraAPI* api = createAPI();
 
     ETERA_API_TASK_LS(api, task_on_ls_success, task_on_ls_error);
 
@@ -401,7 +416,7 @@ void WidgetDisk::task_on_ls_error(EteraAPI* api)
 
     m_explorer->setCursor(Qt::ArrowCursor);
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -409,7 +424,7 @@ void WidgetDisk::task_on_ls_success(EteraAPI* api, const EteraItemList& list, qu
 {
     // если загружался большой список, но в это время сменили текущий путь - останавливаем предыдущую работу
     if (api->path() != m_required_path) {
-        m_tasks->releaseAPI(api);
+        releaseAPI(api);
         return;
     }
 
@@ -425,7 +440,7 @@ void WidgetDisk::task_on_ls_success(EteraAPI* api, const EteraItemList& list, qu
 
         emit onPathChanged(api->path());
 
-        m_tasks->releaseAPI(api);
+        releaseAPI(api);
     } else {
         quint64 offset = api->offset() + limit;
         api->ls(api->path(), api->preview(), api->crop(), offset, limit);
@@ -481,7 +496,7 @@ void WidgetDisk::menu_new_triggered()
 
     QString path = m_path + value;
 
-    EteraAPI* api = m_tasks->createAPI();
+    EteraAPI* api = createAPI();
 
     ETERA_API_TASK_MKDIR(api, task_on_mkdir_success, task_on_mkdir_error);
 
@@ -499,7 +514,7 @@ void WidgetDisk::task_on_mkdir_error(EteraAPI* api)
     else
         QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MKDIR.arg(api->path()).arg(api->lastErrorMessage()));
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -516,7 +531,7 @@ void WidgetDisk::task_on_mkdir_success(EteraAPI* api)
 void WidgetDisk::task_on_mkdir_stat_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -525,7 +540,7 @@ void WidgetDisk::task_on_mkdir_stat_success(EteraAPI* api, const EteraItem& item
     if (item.parentPath() == m_path)
         m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -567,7 +582,7 @@ void WidgetDisk::menu_paste_triggered()
             return;
         }
 
-        EteraAPI* api = m_tasks->createAPI();
+        EteraAPI* api = createAPI();
 
         if (clipboard->copyMode() == true) {
             ETERA_API_TASK_CP(api, task_on_copy_paste_success, task_on_copy_paste_error);
@@ -595,7 +610,7 @@ void WidgetDisk::task_on_copy_paste_error(EteraAPI* api)
         QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_CP.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
     // TODO: обработать асинхронную ошибку, т.к. копирование могло быть все же успешным
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -620,7 +635,7 @@ void WidgetDisk::task_on_cut_paste_error(EteraAPI* api)
         QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MV.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
     // TODO: обработать асинхронную ошибку, т.к. вставка могла быть все же успешной
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -639,7 +654,7 @@ void WidgetDisk::task_on_cut_paste_success(EteraAPI* api)
 void WidgetDisk::task_on_copy_cut_paste_stat_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->target()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -648,7 +663,7 @@ void WidgetDisk::task_on_copy_cut_paste_stat_success(EteraAPI* api, const EteraI
     if (item.parentPath() == m_path)
         m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -672,7 +687,7 @@ void WidgetDisk::menu_delete_triggered()
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
         const EteraItem* eitem = witem->item();
 
-        EteraAPI* api = m_tasks->createAPI();
+        EteraAPI* api = createAPI();
 
         ETERA_API_TASK_RM(api, task_on_rm_success, task_on_rm_error);
 
@@ -696,7 +711,7 @@ void WidgetDisk::task_on_rm_error(EteraAPI* api)
         EteraClipboard::instance()->removeByPath(api->path());
     }
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -706,7 +721,7 @@ void WidgetDisk::task_on_rm_success(EteraAPI* api)
 
     EteraClipboard::instance()->removeByPath(api->path());
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -756,7 +771,7 @@ void WidgetDisk::item_end_edit(QWidget* editor, QAbstractItemDelegate::EndEditHi
 
     QString path = m_path + value;
 
-    EteraAPI* api = m_tasks->createAPI();
+    EteraAPI* api = createAPI();
 
     ETERA_API_TASK_MV(api, task_on_rename_success, task_on_rename_error);
 
@@ -778,7 +793,7 @@ void WidgetDisk::task_on_rename_error(EteraAPI* api)
     else
         QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RENAME.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -798,7 +813,7 @@ void WidgetDisk::task_on_rename_stat_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->target()).arg(api->lastErrorMessage()));
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -808,7 +823,7 @@ void WidgetDisk::task_on_rename_stat_success(EteraAPI* api, const EteraItem& ite
     if (witem != NULL)
         witem->replaceItem(item, m_preview_mode);
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -846,7 +861,7 @@ void WidgetDisk::shareObjects(bool share)
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
         const EteraItem* eitem = witem->item();
 
-        EteraAPI* api = m_tasks->createAPI();
+        EteraAPI* api = createAPI();
 
         if (share == true && eitem->isPublic() == false) {
             ETERA_API_TASK_PUBLISH(api, task_on_publish_success, task_on_publish_error);
@@ -868,7 +883,7 @@ void WidgetDisk::shareObjects(bool share)
 void WidgetDisk::task_on_publish_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_PUBLISH.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -877,7 +892,7 @@ void WidgetDisk::task_on_publish_success(EteraAPI* api)
     WidgetDiskItem* witem = findByPath(api->path());
 
     if (witem == NULL)
-        m_tasks->releaseAPI(api);
+        releaseAPI(api);
     else {
         ETERA_API_CONTINUE_TASK_STAT(api, task_on_publish_stat_success, task_on_publish_stat_error, task_on_publish_error);
 
@@ -891,7 +906,7 @@ void WidgetDisk::task_on_publish_success(EteraAPI* api)
 void WidgetDisk::task_on_unpublish_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_UNPUBLISH.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -900,7 +915,7 @@ void WidgetDisk::task_on_unpublish_success(EteraAPI* api)
     WidgetDiskItem* witem = findByPath(api->path());
 
     if (witem == NULL)
-        m_tasks->releaseAPI(api);
+        releaseAPI(api);
     else {
         ETERA_API_CONTINUE_TASK_STAT(api, task_on_unpublish_stat_success, task_on_unpublish_stat_error, task_on_unpublish_error);
 
@@ -914,7 +929,7 @@ void WidgetDisk::task_on_unpublish_success(EteraAPI* api)
 void WidgetDisk::task_on_publish_stat_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -925,14 +940,14 @@ void WidgetDisk::task_on_publish_stat_success(EteraAPI* api, const EteraItem& it
     if (witem != NULL)
         witem->replaceItem(item, m_preview_mode);
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_unpublish_stat_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -943,7 +958,7 @@ void WidgetDisk::task_on_unpublish_stat_success(EteraAPI* api, const EteraItem& 
     if (witem != NULL)
         witem->replaceItem(item, m_preview_mode);
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1026,7 +1041,7 @@ void WidgetDisk::putLocalObject(const QString& path, quint64 parent)
 
 void WidgetDisk::putLocalDir(const QString& source, const QString& target, bool overwrite, quint64 parent)
 {
-    EteraAPI* api = m_tasks->createAPI();
+    EteraAPI* api = createAPI();
 
     api->setSource(source);
     api->setTarget(target);
@@ -1054,7 +1069,7 @@ void WidgetDisk::task_on_put_dir_error(EteraAPI* api)
         api->stat(api->path());
     } else {
         QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MKDIR.arg(api->path()).arg(api->lastErrorMessage()));
-        m_tasks->releaseAPI(api);
+        releaseAPI(api);
     }
 }
 //----------------------------------------------------------------------------------------------
@@ -1076,7 +1091,7 @@ void WidgetDisk::task_on_put_dir_success(EteraAPI* api)
 void WidgetDisk::task_on_put_dir_stat_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1085,7 +1100,7 @@ void WidgetDisk::task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& it
     if (item.parentPath() == m_path)
         m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1106,7 +1121,7 @@ void WidgetDisk::syncLocalDir(const QString& source, const QString& target, bool
 
 void WidgetDisk::putLocalFile(const QString& source, const QString& target, bool overwrite, quint64 parent)
 {
-    EteraAPI* api = m_tasks->createAPI();
+    EteraAPI* api = createAPI();
 
     api->setParentID(parent);
 
@@ -1140,7 +1155,7 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
     } else
         QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_UPLOAD.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1167,7 +1182,7 @@ void WidgetDisk::task_on_put_file_progress(EteraAPI* api, qint64 done, qint64 to
 void WidgetDisk::task_on_put_stat_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1182,14 +1197,14 @@ void WidgetDisk::task_on_put_stat_success(EteraAPI* api, const EteraItem& item)
             witem->replaceItem(item, m_preview_mode);
     }
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_put_ensure_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1259,14 +1274,14 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
         }
     }
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
 void WidgetDisk::task_on_put_rm_error(EteraAPI* api)
 {
     QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RM.arg(api->path()).arg(api->lastErrorMessage()));
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1277,7 +1292,7 @@ void WidgetDisk::task_on_put_rm_success(EteraAPI* api)
     else if (api->ensure() == eitFile)
         putLocalFile(api->source(), api->target(), api->overwrite(), api->parentID());
 
-    m_tasks->releaseAPI(api);
+    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1413,7 +1428,7 @@ QMessageBox::StandardButton WidgetDisk::getRemoteFile(const QString& source, con
 void WidgetDisk::task_on_get_file_error(EteraAPI* api)
 {
     if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
-        m_tasks->releaseAPI(api);
+        releaseAPI(api);
         return;
     }
 
@@ -1432,6 +1447,11 @@ void WidgetDisk::task_on_get_file_error(EteraAPI* api)
 
 void WidgetDisk::task_on_get_file_success(EteraAPI* api)
 {
+    if (api->aborted() == true) {
+        releaseAPI(api);
+        return;
+    }
+
     spawnGetActivity(agatGet, api);
 }
 //----------------------------------------------------------------------------------------------
@@ -1474,7 +1494,7 @@ QMessageBox::StandardButton WidgetDisk::removeDir(QDir dir)
 void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 {
     if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
-        m_tasks->releaseAPI(api);
+        releaseAPI(api);
         return;
     }
 
@@ -1493,6 +1513,11 @@ void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 
 void WidgetDisk::task_on_get_dir_success(EteraAPI* api, const EteraItemList& list, quint64 limit)
 {
+    if (api->aborted() == true) {
+        releaseAPI(api);
+        return;
+    }
+
     for (int i = 0; i < list.count(); i++) {
         EteraItem item = list[i];
 
@@ -1546,47 +1571,46 @@ void WidgetDisk::addGetActivity(EteraGetActivityType type, quint64 parent, const
 
 void WidgetDisk::spawnGetActivity(EteraGetActivityType type, EteraAPI* api)
 {
-    m_tasks->releaseAPI(api);
-
     Q_ASSERT(
-        (type == egatLS  && m_get_activity_ls  > 0) ||
-        (type == agatGet && m_get_activity_get > 0) ||
+        (type == egatLS  && m_get_active_api_ls.count()  > 0) ||
+        (type == agatGet && m_get_active_api_get.count() > 0) ||
         (type == agatUnknown)
     );
 
-    if (type == egatLS)
-        m_get_activity_ls--;
-    else if (type == agatGet)
-        m_get_activity_get--;
+    if (api != NULL) {
+        m_get_active_api_ls.remove(api->id());
+        m_get_active_api_get.remove(api->id());
+        releaseAPI(api);
+    }
 
-    while (m_get_activity_ls + m_get_activity_get < m_get_activity_limit && m_get_queue_get.empty() == false) {
-        m_get_activity_get++;
-
+    while (m_get_active_api_ls.count() + m_get_active_api_get.count() < m_get_activity_limit && m_get_queue_get.empty() == false) {
         EteraGetActivityItem item = m_get_queue_get.dequeue();
 
-        api = m_tasks->createAPI(item.ID);
+        api = createAPI(item.ID);
 
         api->setParentID(item.Parent);
 
         ETERA_API_TASK_GET(api, task_on_get_file_success, task_on_get_file_error, task_on_get_file_progress);
+
+        m_get_active_api_get[item.ID] = api;
 
         api->get(item.Source, item.Target);
     }
 
     // ls активностей должно быть не более одной - это дает возможность не показывать более одного диалога
     // о перезаписи файла плюс более логично (последовательно) обходит директории при скачивании
-    if (m_get_activity_ls == 0 && m_get_activity_get < m_get_activity_limit && m_get_queue_ls.empty() == false) {
-        m_get_activity_ls++;
-
+    if (m_get_active_api_ls.count() == 0 && m_get_active_api_get.count() < m_get_activity_limit && m_get_queue_ls.empty() == false) {
         EteraGetActivityItem item = m_get_queue_ls.dequeue();
 
-        api = m_tasks->createAPI(item.ID);
+        api = createAPI(item.ID);
 
         api->setSource(item.Source);
         api->setTarget(item.Target);
         api->setParentID(item.Parent);
 
         ETERA_API_TASK_LS(api, task_on_get_dir_success, task_on_get_dir_error);
+
+        m_get_active_api_ls[item.ID] = api;
 
         api->ls(item.Source);
     }
@@ -1599,12 +1623,26 @@ void WidgetDisk::abortGetActivity(quint64 id, bool full)
         id = m_tasks->rootID(id);
 
     QList<quint64> aborted;
-    m_tasks->abortTask(id, aborted);
+    m_tasks->childIDs(id, aborted);
 
     removeGetActivity(m_get_queue_ls,  aborted);
     removeGetActivity(m_get_queue_get, aborted);
 
-    m_tasks->removeTask(id);
+    for (int i = 0; i < aborted.count(); i++) {
+        EteraAPI* api = m_get_active_api_ls.value(aborted[i], NULL);
+        if (api != NULL) {
+            m_get_active_api_ls.remove(api->id());
+            if (api->abort() == false)
+                releaseAPI(api);
+        }
+
+        api = m_get_active_api_get.value(aborted[i], NULL);
+        if (api != NULL) {
+            m_get_active_api_get.remove(api->id());
+            if (api->abort() == false)
+                releaseAPI(api);
+        }
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1617,6 +1655,7 @@ void WidgetDisk::removeGetActivity(EteraGetActivityQueue& queue, QList<quint64>&
         if (index != -1) {
             i = queue.erase(i);
             aborted.removeAt(index);
+            m_tasks->removeTask(item.ID);
         } else
             ++i;
     }

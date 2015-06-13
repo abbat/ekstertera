@@ -350,8 +350,15 @@ class EteraAPI : public QObject
 
         /*!
          * \brief Остановка активного запроса
+         * \return true при успешной остановке, false при неактивном запросе
          */
-        void abort() { if (m_reply != NULL) m_reply->abort(); }
+        bool abort();
+
+        /*!
+         * \brief Флаг остановки запроса
+         * \return true, если запрос был остановлен вызововм abort
+         */
+        bool aborted() const { return m_aborted; }
 
         /*!
          * \brief Получение OAuth токена
@@ -548,6 +555,11 @@ class EteraAPI : public QObject
          * \brief Текст последней ошибки
          */
         QString m_error_message;
+
+        /*!
+         * \brief Флаг остановки запроса
+         */
+        bool m_aborted;
 
         /*!
          * \brief Транспорт HTTPS

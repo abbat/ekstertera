@@ -336,6 +336,7 @@ EteraAPI::EteraAPI(QObject* parent, quint64 id) : QObject(parent)
     else
         m_id = id;
 
+    m_aborted     = false;
     m_offset      = 0;
     m_limit       = 0;
     m_crop        = false;
@@ -449,6 +450,19 @@ QString EteraAPI::humanBytes(quint64 val)
     }
 
     return prefix + postfix;
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraAPI::abort()
+{
+    m_aborted = true;
+
+    if (m_reply != NULL) {
+        m_reply->abort();
+        return true;
+    }
+
+    return false;
 }
 //----------------------------------------------------------------------------------------------
 

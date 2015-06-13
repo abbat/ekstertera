@@ -6,6 +6,7 @@
 #ifndef _ekstertera_widgets_widget_disk_h_
 #define _ekstertera_widgets_widget_disk_h_
 
+#include "utils/api.h"
 #include "widget_tasks.h"
 #include "widget_disk_item.h"
 
@@ -214,6 +215,19 @@ class WidgetDisk : public QTabWidget
         QAction* m_menu_info;     /*!< \brief Свойства       */
 
         /*!
+         * \brief Создание экземпляра API и установка токена
+         * \param id ID задачи
+         * \return Экземпляр api
+         */
+        EteraAPI* createAPI(quint64 id = 0);
+
+        /*!
+         * \brief Освобождение экземпляра API и удаление id задачи из списка задач
+         * \param api API (может быть NULL)
+         */
+        void releaseAPI(EteraAPI* api);
+
+        /*!
          * \brief Обновление списка в буфере обмена для cut/copy
          * \param copy_mode Флаг режима копирования
          */
@@ -301,6 +315,11 @@ class WidgetDisk : public QTabWidget
         void shareObjects(bool share);
 
         /*!
+         * \brief Связь id задачи с активным API
+         */
+        typedef QMap<quint64, EteraAPI*> EteraAPIMap;
+
+        /*!
          * \brief Описатель активности получения файла
          */
         typedef struct {
@@ -324,11 +343,11 @@ class WidgetDisk : public QTabWidget
             agatUnknown   /*!< \brief Неизвестная активность */
         } EteraGetActivityType;
 
-        quint64               m_get_activity_ls;      /*!< \brief Текущее количество запросов в активности ls  */
-        quint64               m_get_activity_get;     /*!< \brief Текущее количество запросов в активности get */
-        quint64               m_get_activity_limit;   /*!< \brief Масимальное количество запросов в активности */
+        int                   m_get_activity_limit;   /*!< \brief Масимальное количество запросов в активности */
         EteraGetActivityQueue m_get_queue_ls;         /*!< \brief Очередь ls для получения файлов              */
         EteraGetActivityQueue m_get_queue_get;        /*!< \brief Очередь get для получения файлов             */
+        EteraAPIMap           m_get_active_api_ls;    /*!< \brief Активные ls задачи API                       */
+        EteraAPIMap           m_get_active_api_get;   /*!< \brief Активные get задачи API                      */
 
         /*!
          * \brief Добавление get активности в очередь ожидания

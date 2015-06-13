@@ -6,7 +6,7 @@
 #ifndef _ekstertera_widgets_widget_tasks_item_h_
 #define _ekstertera_widgets_widget_tasks_item_h_
 
-#include "utils/api.h"
+#include "sysheaders.h"
 
 /*!
  * \brief Элемент виджета списка асинхронных задач
@@ -31,29 +31,28 @@ class WidgetTasksItem : public QTreeWidgetItem
 
         ~WidgetTasksItem();
 
-        quint64                     id()       const { return m_id;        }
-        quint64                     parentID() const { return m_parent_id; }
-        QProgressBar*               bar()      const { return m_bar;       }
-        QMessageBox::StandardButton reply()    const { return m_reply;     }
-        EteraAPI*                   api()      const { return m_api;       }
+        /*!
+         * \brief ID задачи
+         * \return ID задачи
+         */
+        quint64 id() const { return m_id; }
 
-        void setParentID(quint64 parent_id)              { m_parent_id = parent_id; }
-        void setBar(QProgressBar* bar)                   { m_bar       = bar;       }
-        void setReply(QMessageBox::StandardButton reply) { m_reply     = reply;     }
-        void setAPI(EteraAPI* api)                       { m_api       = api;       }
+        /*!
+         * \brief Виджет прогресса задачи
+         * \return Виджет прогресса задачи
+         */
+        QProgressBar* bar() const { return m_bar; }
+
+        /*!
+         * \brief Установка виджета прогресса задачи
+         * \param bar Виджет прогресса
+         */
+        void setBar(QProgressBar* bar) { m_bar = bar; }
 
     private:
 
-        quint64                     m_id;          /*!< \brief ID задачи           */
-        quint64                     m_parent_id;   /*!< \brief ID родителя         */
-        QProgressBar*               m_bar;         /*!< \brief Виджет прогресса    */
-        QMessageBox::StandardButton m_reply;       /*!< \brief Стандартный ответ   */
-        EteraAPI*                   m_api;         /*!< \brief API                 */
-
-        /*!
-         * \brief Инициализация полей в значение по умолчанию
-         */
-        void init();
+        quint64       m_id;    /*!< \brief ID задачи        */
+        QProgressBar* m_bar;   /*!< \brief Виджет прогресса */
 };
 
 #endif   // _ekstertera_widgets_widget_tasks_item_h_
