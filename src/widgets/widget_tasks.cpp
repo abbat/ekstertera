@@ -172,8 +172,8 @@ void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
     Q_ASSERT(id != 0);
 
     WidgetTasksItem* item = m_tasks.value(id, NULL);
-
-    Q_ASSERT(item != NULL);
+    if (item == NULL)
+        return;
 
     if (item->bar() == NULL) {
         QProgressBar* bar = new QProgressBar();
