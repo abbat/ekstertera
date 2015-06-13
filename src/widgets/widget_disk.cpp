@@ -1008,14 +1008,13 @@ void WidgetDisk::putLocalObjects(const QStringList& paths)
     if (m_path.isEmpty() == true || paths.isEmpty() == true)
         return;
 
-    quint64 parent = 0;
-    if (paths.count() > 1) {
-        parent = EteraAPI::nextID();
-        m_tasks->addTask(parent, ROOT_MESSAGE_UPLOAD);
-    }
+    quint64 parent = EteraAPI::nextID();
+    m_tasks->addTask(parent, ROOT_MESSAGE_UPLOAD);
 
     for (int i = 0; i < paths.count(); i++)
         putLocalObject(paths[i], parent);
+
+    m_tasks->checkTask(parent);
 }
 //----------------------------------------------------------------------------------------------
 
