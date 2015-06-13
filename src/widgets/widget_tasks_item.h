@@ -17,18 +17,21 @@ class WidgetTasksItem : public QTreeWidgetItem
 
         /*!
          * \brief Конструктор
+         * \param id ID задачи
          * \param parent Родительский виджет
          */
-        WidgetTasksItem(QTreeWidget* parent);
+        WidgetTasksItem(quint64 id, QTreeWidget* parent);
 
         /*!
          * \brief Конструктор
+         * \param id ID задачи
          * \param parent Родительский элемент
          */
-        WidgetTasksItem(WidgetTasksItem* parent);
+        WidgetTasksItem(quint64 id, WidgetTasksItem* parent);
 
         ~WidgetTasksItem();
 
+        quint64                     id()       const { return m_id;        }
         quint64                     parentID() const { return m_parent_id; }
         QProgressBar*               bar()      const { return m_bar;       }
         QMessageBox::StandardButton reply()    const { return m_reply;     }
@@ -41,6 +44,7 @@ class WidgetTasksItem : public QTreeWidgetItem
 
     private:
 
+        quint64                     m_id;          /*!< \brief ID задачи           */
         quint64                     m_parent_id;   /*!< \brief ID родителя         */
         QProgressBar*               m_bar;         /*!< \brief Виджет прогресса    */
         QMessageBox::StandardButton m_reply;       /*!< \brief Стандартный ответ   */

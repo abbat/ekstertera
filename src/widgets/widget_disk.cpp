@@ -1290,21 +1290,30 @@ void WidgetDisk::getRemoteObjects(const QString& path)
     if (count == 0)
         return;
 
-    quint64 parent = 0;
-    if (count > 1) {
-        parent = EteraAPI::nextID();
-        m_tasks->addTask(parent, ROOT_MESSAGE_DOWNLOAD);
-    }
+    quint64 parent = EteraAPI::nextID();
+    m_tasks->addTask(parent, ROOT_MESSAGE_DOWNLOAD);
 
     for (int i = 0; i < count; i++) {
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
         const EteraItem* eitem = witem->item();
 
+        QMessageBox::StandardButton reply = QMessageBox::Ok;
         if (eitem->isDir() == true)
-            getRemoteDir(eitem->path(), path + "/" + eitem->name(), parent);
+            reply = getRemoteDir(eitem->path(), path + "/" + eitem->name(), parent);
         else if (eitem->isFile() == true)
-            getRemoteFile(eitem->path(), path + "/" + eitem->name(), parent);
+            reply = getRemoteFile(eitem->path(), path + "/" + eitem->name(), parent);
+
+        Q_ASSERT(reply == QMessageBox::NoButton || reply == QMessageBox::Abort);
+
+        if (reply == QMessageBox::NoButton)
+            continue;
+        else if (reply == QMessageBox::Abort) {
+            abortGetActivity(parent, true);
+            break;
+        }
     }
+
+    m_tasks->checkTask(parent);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1403,12 +1412,19 @@ QMessageBox::StandardButton WidgetDisk::getRemoteFile(const QString& source, con
 
 void WidgetDisk::task_on_get_file_error(EteraAPI* api)
 {
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        m_tasks->releaseAPI(api);
+        return;
+    }
+
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_DOWNLOAD.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+
+    Q_ASSERT(reply == QMessageBox::Retry || reply == QMessageBox::Abort || reply == QMessageBox::Ignore);
 
     if (reply == QMessageBox::Retry)
         api->get(api->source(), api->target());
     else if (reply == QMessageBox::Abort) {
-        // TODO:
+        abortGetActivity(api->id(), true);
     } else if (reply == QMessageBox::Ignore)
         spawnGetActivity(agatGet, api);
 }
@@ -1457,13 +1473,20 @@ QMessageBox::StandardButton WidgetDisk::removeDir(QDir dir)
 
 void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 {
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        m_tasks->releaseAPI(api);
+        return;
+    }
+
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_LS.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+
+    Q_ASSERT(reply == QMessageBox::Retry || reply == QMessageBox::Abort || reply == QMessageBox::Ignore);
 
     if (reply == QMessageBox::Retry)
         api->ls(api->path(), api->preview(), api->crop(), api->offset(), api->limit());
-    else if (reply == QMessageBox::Abort) {
-        // TODO:
-    } else if (reply == QMessageBox::Ignore)
+    else if (reply == QMessageBox::Abort)
+        abortGetActivity(api->id(), true);
+    else if (reply == QMessageBox::Ignore)
         spawnGetActivity(egatLS, api);
 }
 //----------------------------------------------------------------------------------------------
@@ -1472,10 +1495,21 @@ void WidgetDisk::task_on_get_dir_success(EteraAPI* api, const EteraItemList& lis
 {
     for (int i = 0; i < list.count(); i++) {
         EteraItem item = list[i];
+
+        QMessageBox::StandardButton reply = QMessageBox::Ok;
         if (item.isDir() == true)
-            getRemoteDir(item.path(), api->target() + "/" + item.name(), api->id());
+            reply = getRemoteDir(item.path(), api->target() + "/" + item.name(), api->id());
         else if (item.isFile() == true)
-            getRemoteFile(item.path(), api->target() + "/" + item.name(), api->id());
+            reply = getRemoteFile(item.path(), api->target() + "/" + item.name(), api->id());
+
+        Q_ASSERT(reply == QMessageBox::NoButton || reply == QMessageBox::Abort);
+
+        if (reply == QMessageBox::NoButton)
+            continue;
+        else if (reply == QMessageBox::Abort) {
+            abortGetActivity(api->id(), true);
+            return;
+        }
     }
 
     if ((quint64)list.count() < limit)
@@ -1513,6 +1547,12 @@ void WidgetDisk::addGetActivity(EteraGetActivityType type, quint64 parent, const
 void WidgetDisk::spawnGetActivity(EteraGetActivityType type, EteraAPI* api)
 {
     m_tasks->releaseAPI(api);
+
+    Q_ASSERT(
+        (type == egatLS  && m_get_activity_ls  > 0) ||
+        (type == agatGet && m_get_activity_get > 0) ||
+        (type == agatUnknown)
+    );
 
     if (type == egatLS)
         m_get_activity_ls--;
@@ -1555,6 +1595,30 @@ void WidgetDisk::spawnGetActivity(EteraGetActivityType type, EteraAPI* api)
 
 void WidgetDisk::abortGetActivity(quint64 id, bool full)
 {
-    // TODO:
+    if (full == true)
+        id = m_tasks->rootID(id);
+
+    QList<quint64> aborted;
+    m_tasks->abortTask(id, aborted);
+
+    removeGetActivity(m_get_queue_ls,  aborted);
+    removeGetActivity(m_get_queue_get, aborted);
+
+    m_tasks->removeTask(id);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::removeGetActivity(EteraGetActivityQueue& queue, QList<quint64>& aborted)
+{
+    EteraGetActivityQueue::iterator i = queue.begin();
+    while (i != queue.end()) {
+        EteraGetActivityItem item = *i;
+        int index = aborted.indexOf(item.ID);
+        if (index != -1) {
+            i = queue.erase(i);
+            aborted.removeAt(index);
+        } else
+            ++i;
+    }
 }
 //----------------------------------------------------------------------------------------------

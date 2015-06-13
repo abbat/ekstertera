@@ -65,6 +65,13 @@ class WidgetTasks : public QTreeWidget
         void addChildTask(quint64 parent, quint64 id, const QString& text, const QString& tooltip = "", EteraAPI* api = NULL);
 
         /*!
+         * \brief Проверка, что у задачи есть дочерние задачи
+         * и удаление ее в случае отсуствия дочерних задач
+         * \param id ID задачи
+         */
+        void checkTask(quint64 id);
+
+        /*!
          * \brief Удаление задачи
          * \param id ID задачи
          */
@@ -73,8 +80,9 @@ class WidgetTasks : public QTreeWidget
         /*!
          * \brief Остановка и удаление задачи
          * \param id ID задачи
+         * \param aborted Список id остановленных задач
          */
-        void abortTask(quint64 id);
+        void abortTask(quint64 id, QList<quint64>& aborted);
 
         /*!
          * \brief Получение ID корневой задачи
@@ -125,6 +133,13 @@ class WidgetTasks : public QTreeWidget
          * \brief Карта задач по id задачи
          */
         QMap<quint64, WidgetTasksItem*> m_tasks;
+
+        /*!
+         * \brief Остановка и удаление задачи
+         * \param elemnt Элемент дерева
+         * \param aborted Список id остановленных задач
+         */
+        void abortTask(WidgetTasksItem* element, QList<quint64>& aborted);
 
     signals:
 

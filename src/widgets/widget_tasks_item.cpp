@@ -1,15 +1,17 @@
 #include "widget_tasks_item.h"
 //----------------------------------------------------------------------------------------------
 
-WidgetTasksItem::WidgetTasksItem(QTreeWidget* parent) : QTreeWidgetItem(parent)
+WidgetTasksItem::WidgetTasksItem(quint64 id, QTreeWidget* parent) : QTreeWidgetItem(parent)
 {
     init();
+    m_id = id;
 }
 //----------------------------------------------------------------------------------------------
 
-WidgetTasksItem::WidgetTasksItem(WidgetTasksItem* parent) : QTreeWidgetItem(parent)
+WidgetTasksItem::WidgetTasksItem(quint64 id, WidgetTasksItem* parent) : QTreeWidgetItem(parent)
 {
     init();
+    m_id = id;
 }
 //----------------------------------------------------------------------------------------------
 

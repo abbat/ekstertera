@@ -73,11 +73,11 @@ void WidgetTasks::addChildTask(quint64 parent, quint64 id, const QString& text, 
 
     if (titem == NULL) {
         if (pitem != NULL) {
-            titem = new WidgetTasksItem(pitem);
+            titem = new WidgetTasksItem(id, pitem);
             if (pitem->isExpanded() == false)
                 pitem->setExpanded(true);
         } else
-            titem = new WidgetTasksItem(this);
+            titem = new WidgetTasksItem(id, this);
 
         titem->setText(0, text);
         titem->setToolTip(0, tooltip);
@@ -95,10 +95,22 @@ void WidgetTasks::addChildTask(quint64 parent, quint64 id, const QString& text, 
 }
 //----------------------------------------------------------------------------------------------
 
+void WidgetTasks::checkTask(quint64 id)
+{
+    WidgetTasksItem* titem = m_tasks.value(id, NULL);
+    if (titem == NULL)
+        return;
+
+    if (titem->childCount() > 0)
+        return;
+
+    removeTask(id);
+}
+//----------------------------------------------------------------------------------------------
+
 void WidgetTasks::removeTask(quint64 id)
 {
     WidgetTasksItem* titem = m_tasks.value(id, NULL);
-
     if (titem == NULL)
         return;
 
@@ -121,13 +133,28 @@ void WidgetTasks::removeTask(quint64 id)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetTasks::abortTask(quint64 id)
+void WidgetTasks::abortTask(quint64 id, QList<quint64>& aborted)
 {
     WidgetTasksItem* titem = m_tasks.value(id, NULL);
     if (titem == NULL)
         return;
 
-    // TODO:
+    abortTask(titem, aborted);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetTasks::abortTask(WidgetTasksItem* element, QList<quint64>& aborted)
+{
+    for (int i = 0; i < element->childCount(); i++) {
+        WidgetTasksItem* item = static_cast<WidgetTasksItem*>(element->child(i));
+        abortTask(item, aborted);
+    }
+
+    aborted.append(element->id());
+
+    EteraAPI* api = element->api();
+    if (api != NULL)
+        api->abort();
 }
 //----------------------------------------------------------------------------------------------
 

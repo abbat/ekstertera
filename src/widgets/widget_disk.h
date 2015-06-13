@@ -353,6 +353,13 @@ class WidgetDisk : public QTabWidget
          */
         void abortGetActivity(quint64 id, bool full = false);
 
+        /*!
+         * \brief Удаление get активностей из очереди ожидания
+         * \param queue Очередь ожидания
+         * \param ids ID задач для удаления
+         */
+        void removeGetActivity(EteraGetActivityQueue& queue, QList<quint64>& aborted);
+
     private slots:
 
         /*!
