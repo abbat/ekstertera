@@ -463,7 +463,7 @@ QString EteraAPI::humanBytes(quint64 val)
 
 void EteraAPI::abort()
 {
-    if (m_reply != NULL)
+    if (m_reply != NULL && m_deleted == false)
         m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
