@@ -13,6 +13,7 @@
 #include <QSet>
 #include <QDir>
 #include <QMenu>
+#include <QTimer>
 #include <QLabel>
 #include <QDebug>
 #include <QQueue>

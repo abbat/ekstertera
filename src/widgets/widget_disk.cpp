@@ -13,6 +13,8 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 {
     m_preview_mode = false;
 
+    m_message_box_active = false;
+
     m_put_activity_limit = QThread::idealThreadCount();
     m_get_activity_limit = QThread::idealThreadCount();
 
@@ -103,6 +105,10 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 
     // включение / выключение пунктов контекстного меню
     on_item_selection_changed();
+
+    m_emit_timer = new QTimer(this);
+    connect(m_emit_timer, SIGNAL(timeout()), SLOT(emit_delayed_signals()));
+    m_emit_timer->start(5000);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1063,7 +1069,14 @@ void WidgetDisk::task_on_put_mkdir_error(EteraAPI* api)
         return;
     }
 
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_put_mkdir_error, api);
+        return;
+    }
+
+    messageBoxLock();
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MKDIR.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -1125,6 +1138,11 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
         return;
     }
 
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_put_file_error, api);
+        return;
+    }
+
     // если объект существует, нужно убедиться, что это файл и тогда можно продолжить работу
     if (api->lastErrorCode() == 409) {
         quint64                     rootid = m_tasks->rootID(api->id());
@@ -1143,7 +1161,9 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
         return;
     }
 
+    messageBoxLock();
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_UPLOAD.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -1193,7 +1213,14 @@ void WidgetDisk::task_on_put_stat_error(EteraAPI* api)
         return;
     }
 
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_put_stat_error, api);
+        return;
+    }
+
+    messageBoxLock();
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -1239,7 +1266,14 @@ void WidgetDisk::task_on_put_ensure_error(EteraAPI* api)
         return;
     }
 
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_put_ensure_error, api);
+        return;
+    }
+
+    messageBoxLock();
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -1270,7 +1304,14 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
             if (reply != QMessageBox::NoToAll) {
                 // что делать с конфликтами?
                 if (reply != QMessageBox::YesToAll) {
+                    if (messageBoxLocked() == true) {
+                        delayEmit(slot_task_on_put_ensure_success, api, item);
+                        return;
+                    }
+
+                    messageBoxLock();
                     reply = QMessageBox::question(this, START_MESSAGE_UPLOAD_CAPTION, START_MESSAGE_UPLOAD_TEXT.arg(api->path()), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
+                    messageBoxUnlock();
 
                     if (api->deleted() == true)
                         return;
@@ -1302,7 +1343,14 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
         if (reply != QMessageBox::NoToAll) {
             // что делать с конфликтами?
             if (reply != QMessageBox::YesToAll) {
+                if (messageBoxLocked() == true) {
+                    delayEmit(slot_task_on_put_ensure_success, api, item);
+                    return;
+                }
+
+                messageBoxLock();
                 reply = QMessageBox::question(this, START_MESSAGE_UPLOAD_CAPTION, START_MESSAGE_UPLOAD_TEXT.arg(api->path()), QMessageBox::Yes | QMessageBox::No | QMessageBox::YesToAll | QMessageBox::NoToAll);
+                messageBoxUnlock();
 
                 if (api->deleted() == true)
                     return;
@@ -1349,7 +1397,14 @@ void WidgetDisk::task_on_put_rm_error(EteraAPI* api)
         return;
     }
 
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_put_rm_error, api);
+        return;
+    }
+
+    messageBoxLock();
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RM.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -1476,6 +1531,7 @@ void WidgetDisk::abortPutActivity(quint64 id, bool full)
     for (int i = 0; i < aborted.count(); i++) {
         EteraAPI* api = m_put_active_api_mkdir.value(aborted[i], NULL);
         if (api != NULL) {
+            removeDelayed(api);
             m_put_active_api_mkdir.remove(api->id());
             api->abort();
             releaseAPI(api);
@@ -1483,6 +1539,7 @@ void WidgetDisk::abortPutActivity(quint64 id, bool full)
 
         api = m_put_active_api_put.value(aborted[i], NULL);
         if (api != NULL) {
+            removeDelayed(api);
             m_put_active_api_put.remove(api->id());
             api->abort();
             releaseAPI(api);
@@ -1643,7 +1700,14 @@ void WidgetDisk::task_on_get_file_error(EteraAPI* api)
         return;
     }
 
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_get_file_error, api);
+        return;
+    }
+
+    messageBoxLock();
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_DOWNLOAD.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -1711,7 +1775,14 @@ void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
         return;
     }
 
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_get_dir_error, api);
+        return;
+    }
+
+    messageBoxLock();
     QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_LS.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Abort | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -1842,6 +1913,7 @@ void WidgetDisk::abortGetActivity(quint64 id, bool full)
     for (int i = 0; i < aborted.count(); i++) {
         EteraAPI* api = m_get_active_api_ls.value(aborted[i], NULL);
         if (api != NULL) {
+            removeDelayed(api);
             m_get_active_api_ls.remove(api->id());
             api->abort();
             releaseAPI(api);
@@ -1849,6 +1921,7 @@ void WidgetDisk::abortGetActivity(quint64 id, bool full)
 
         api = m_get_active_api_get.value(aborted[i], NULL);
         if (api != NULL) {
+            removeDelayed(api);
             m_get_active_api_get.remove(api->id());
             api->abort();
             releaseAPI(api);
@@ -1870,5 +1943,68 @@ void WidgetDisk::removeGetActivity(EteraGetActivityQueue& queue, QList<quint64>&
         } else
             ++i;
     }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::delayEmit(EteraTaskSlot slot, EteraAPI* api)
+{
+    EteraTaskSignal signal;
+
+    signal.Slot = slot;
+    signal.API  = api;
+
+    m_delayed_queue.enqueue(signal);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::delayEmit(EteraTaskSlotStat slot, EteraAPI* api, const EteraItem& item)
+{
+    EteraTaskSignalStat signal;
+
+    signal.Slot = slot;
+    signal.API  = api;
+    signal.Item = item;
+
+    m_delayed_stat_queue.enqueue(signal);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::emit_delayed_signals()
+{
+    while (m_message_box_active == false && m_delayed_queue.count() > 0) {
+        EteraTaskSignal signal = m_delayed_queue.dequeue();
+        switch (signal.Slot) {
+            case slot_task_on_put_mkdir_error:  task_on_put_mkdir_error(signal.API);  break;
+            case slot_task_on_put_file_error:   task_on_put_file_error(signal.API);   break;
+            case slot_task_on_put_stat_error:   task_on_put_stat_error(signal.API);   break;
+            case slot_task_on_put_ensure_error: task_on_put_ensure_error(signal.API); break;
+            case slot_task_on_put_rm_error:     task_on_put_rm_error(signal.API);     break;
+            case slot_task_on_get_dir_error:    task_on_get_dir_error(signal.API);    break;
+            case slot_task_on_get_file_error:   task_on_get_file_error(signal.API);   break;
+        }
+    }
+
+    while (m_message_box_active == false && m_delayed_stat_queue.count() > 0) {
+        EteraTaskSignalStat signal = m_delayed_stat_queue.dequeue();
+        switch (signal.Slot) {
+            case slot_task_on_put_ensure_success: task_on_put_ensure_success(signal.API, signal.Item);  break;
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::removeDelayed(const EteraAPI* api)
+{
+    for (int i = 0; i < m_delayed_queue.count(); i++)
+        if (m_delayed_queue[i].API == api) {
+            m_delayed_queue.removeAt(i);
+            return;
+        }
+
+    for (int i = 0; i < m_delayed_stat_queue.count(); i++)
+        if (m_delayed_stat_queue[i].API == api) {
+            m_delayed_stat_queue.removeAt(i);
+            return;
+        }
 }
 //----------------------------------------------------------------------------------------------

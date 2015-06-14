@@ -441,6 +441,111 @@ class WidgetDisk : public QTabWidget
          */
         void removeGetActivity(EteraGetActivityQueue& queue, QList<quint64>& aborted);
 
+        /*!
+         * \brief Таймер для отложенных сигналов
+         */
+        QTimer* m_emit_timer;
+
+        /*!
+         * \brief Флаг отображения пользователю QMessageBox
+         */
+        bool m_message_box_active;
+
+        /*!
+         * \brief Проверка, что UI заблокирован QMessageBox
+         * \return true, если UI заблокирован, откладываем выполнение
+         * сигнала через вызов delayEmit
+         */
+        bool messageBoxLocked() const { return m_message_box_active; }
+
+        /*!
+         * \brief Блокирование UI перед вызовом QMessageBox
+         */
+        void messageBoxLock() { m_message_box_active = true; }
+
+        /*!
+         * \brief Разблокирование UI после вызова QMessageBox
+         */
+        void messageBoxUnlock() { m_message_box_active = false; }
+
+        /*!
+         * \brief Имя слота для вызова отложенных сигналов
+         */
+        typedef enum {
+            slot_task_on_put_mkdir_error,    /*!< \brief task_on_put_mkdir_error  */
+            slot_task_on_put_file_error,     /*!< \brief task_on_put_file_error   */
+            slot_task_on_put_stat_error,     /*!< \brief task_on_put_stat_error   */
+            slot_task_on_put_ensure_error,   /*!< \brief task_on_put_ensure_error */
+            slot_task_on_put_rm_error,       /*!< \brief task_on_put_rm_error     */
+            slot_task_on_get_dir_error,      /*!< \brief task_on_get_dir_error    */
+            slot_task_on_get_file_error      /*!< \brief task_on_get_file_error   */
+        } EteraTaskSlot;
+
+        /*!
+         * \brief Описатель сигнала для отложенного вызова
+         */
+        typedef struct {
+            EteraTaskSlot Slot;   /*!< \brief Имя слота */
+            EteraAPI*     API;    /*!< \brief API       */
+        } EteraTaskSignal;
+
+        /*!
+         * \brief Тип для очереди отложенных сигналов
+         */
+        typedef QQueue<EteraTaskSignal> EteraSignalQueue;
+
+        /*!
+         * \brief Очередь отложенных сигналов
+         */
+        EteraSignalQueue m_delayed_queue;
+
+        /*!
+         * \brief Имя слота для вызова отложенных сигналов
+         */
+        typedef enum {
+            slot_task_on_put_ensure_success   /*!< \brief task_on_put_ensure_success */
+        } EteraTaskSlotStat;
+
+        /*!
+         * \brief Описатель сигнала для отложенного вызова stat
+         */
+        typedef struct {
+            EteraTaskSlotStat Slot;   /*!< \brief Имя слота */
+            EteraAPI*         API;    /*!< \brief API       */
+            EteraItem         Item;   /*!< \brief Элемент   */
+        } EteraTaskSignalStat;
+
+        /*!
+         * \brief Тип для очереди отложенных сигналов stat
+         */
+        typedef QQueue<EteraTaskSignalStat> EteraSignalStatQueue;
+
+        /*!
+         * \brief Очередь отложенных сигналов
+         */
+        EteraSignalStatQueue m_delayed_stat_queue;
+
+        /*!
+         * \brief Поставить сигнал в очередь
+         * \param slot Слот для отложенного вызова
+         * \param api API
+         */
+        void delayEmit(EteraTaskSlot slot, EteraAPI* api);
+
+        /*!
+         * \brief Поставить сигнал в очередь stat
+         * \param slot Слот для отложенного вызова
+         * \param api API
+         * \param item Элемент
+         */
+        void delayEmit(EteraTaskSlotStat slot, EteraAPI* api, const EteraItem& item);
+
+        /*!
+         * \brief Удаление отложенных сигналов
+         * \param api API
+         */
+        void removeDelayed(const EteraAPI* api);
+
     private slots:
 
         /*!
@@ -578,6 +683,9 @@ class WidgetDisk : public QTabWidget
         void task_on_get_file_error(EteraAPI* api);
         void task_on_get_file_success(EteraAPI* api);
         void task_on_get_file_progress(EteraAPI* api, qint64 done, qint64 total);
+
+        // отложенные сигналы
+        void emit_delayed_signals();
 
     signals:
 
