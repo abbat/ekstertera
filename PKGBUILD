@@ -59,10 +59,10 @@ package() {
     install -d "${pkgdir}/usr/share/applications"
 
     install -D -m755 "${srcdir}/${pkgname}/${pkgname}-qt${QT_SELECT}" "${pkgdir}/usr/bin/${pkgname}-qt${QT_SELECT}"
-    install -D -m644 "${srcdir}/${pkgname}/${pkgname}.desktop"         "${pkgdir}/usr/share/applications/${pkgname}.desktop"
-    install -D -m644 "${srcdir}/${pkgname}/src/icons/${pkgname}.xpm"   "${pkgdir}/usr/share/pixmaps/${pkgname}.xpm"
-    install -D -m644 "${srcdir}/${pkgname}/README.md"                  "${pkgdir}/usr/share/doc/${pkgname}/README.md"
-    install -D -m644 "${srcdir}/${pkgname}/debian/copyright"           "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
+    install -D -m644 "${srcdir}/${pkgname}/${pkgname}.desktop"        "${pkgdir}/usr/share/applications/${pkgname}.desktop"
+    install -D -m644 "${srcdir}/${pkgname}/src/icons/${pkgname}.xpm"  "${pkgdir}/usr/share/pixmaps/${pkgname}.xpm"
+    install -D -m644 "${srcdir}/${pkgname}/README.md"                 "${pkgdir}/usr/share/doc/${pkgname}/README.md"
+    install -D -m644 "${srcdir}/${pkgname}/debian/copyright"          "${pkgdir}/usr/share/licenses/${pkgname}/LICENSE"
 
     ln -s "/usr/bin/${pkgname}-qt${QT_SELECT}" "${pkgdir}/usr/bin/${pkgname}"
 }
