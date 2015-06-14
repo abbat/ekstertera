@@ -331,12 +331,13 @@ EteraAPI::EteraAPI(QObject* parent, quint64 id) : QObject(parent)
     m_io    = NULL;
     m_reply = NULL;
 
+    m_deleted = false;
+
     if (id == 0)
         m_id = nextID();
     else
         m_id = id;
 
-    m_aborted     = false;
     m_offset      = 0;
     m_limit       = 0;
     m_crop        = false;
@@ -365,6 +366,13 @@ void EteraAPI::retranslateUi()
     MALFORMED_LINK_URL      = trUtf8("Неподдерживаемый URL объекта Link");
     UNSUPPORTED_LINK_METHOD = trUtf8("Неподдерживаемый метод объекта Link");
     FILE_OPEN_ERROR         = trUtf8("Ошибка открытия файла");
+}
+//----------------------------------------------------------------------------------------------
+
+void EteraAPI::deleteLater()
+{
+    m_deleted = true;
+    QObject::deleteLater();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -453,16 +461,10 @@ QString EteraAPI::humanBytes(quint64 val)
 }
 //----------------------------------------------------------------------------------------------
 
-bool EteraAPI::abort()
+void EteraAPI::abort()
 {
-    m_aborted = true;
-
-    if (m_reply != NULL) {
+    if (m_reply != NULL)
         m_reply->abort();
-        return true;
-    }
-
-    return false;
 }
 //----------------------------------------------------------------------------------------------
 

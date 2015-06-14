@@ -116,8 +116,8 @@ void WidgetTasks::childIDs(quint64 id, QList<quint64>& ids)
     Q_ASSERT(id != 0);
 
     WidgetTasksItem* item = m_tasks.value(id, NULL);
-
-    Q_ASSERT(item != NULL);
+    if (item == NULL)
+        return;
 
     childIDs(item, ids);
 }
@@ -141,8 +141,8 @@ quint64 WidgetTasks::rootID(quint64 id)
     quint64 root = 0;
 
     WidgetTasksItem* item = m_tasks.value(id, NULL);
-
-    Q_ASSERT(item != NULL);
+    if (item == NULL)
+        return 0;
 
     while (item != NULL) {
         root = item->id();

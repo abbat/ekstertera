@@ -340,8 +340,8 @@ class WidgetDisk : public QTabWidget
          */
         typedef enum {
             epatDir,      /*!< \brief Отправка директории (mkdir) */
-            apatFile,     /*!< \brief Отправка файла (put)        */
-            apatUnknown   /*!< \brief Неизвестная активность      */
+            epatFile,     /*!< \brief Отправка файла (put)        */
+            epatUnknown   /*!< \brief Неизвестная активность      */
         } EteraPutActivityType;
 
         int                   m_put_activity_limit;     /*!< \brief Масимальное количество запросов в активности */
