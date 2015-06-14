@@ -472,13 +472,17 @@ class WidgetDisk : public QTabWidget
          * \brief Имя слота для вызова отложенных сигналов
          */
         typedef enum {
-            slot_task_on_put_mkdir_error,    /*!< \brief task_on_put_mkdir_error  */
-            slot_task_on_put_file_error,     /*!< \brief task_on_put_file_error   */
-            slot_task_on_put_stat_error,     /*!< \brief task_on_put_stat_error   */
-            slot_task_on_put_ensure_error,   /*!< \brief task_on_put_ensure_error */
-            slot_task_on_put_rm_error,       /*!< \brief task_on_put_rm_error     */
-            slot_task_on_get_dir_error,      /*!< \brief task_on_get_dir_error    */
-            slot_task_on_get_file_error      /*!< \brief task_on_get_file_error   */
+            slot_task_on_publish_error,          /*!< \brief task_on_publish_error        */
+            slot_task_on_unpublish_error,        /*!< \brief task_on_publish_error        */
+            slot_task_on_publish_stat_error,     /*!< \brief task_on_publish_stat_error   */
+            slot_task_on_unpublish_stat_error,   /*!< \brief task_on_unpublish_stat_error */
+            slot_task_on_put_mkdir_error,        /*!< \brief task_on_put_mkdir_error      */
+            slot_task_on_put_file_error,         /*!< \brief task_on_put_file_error       */
+            slot_task_on_put_stat_error,         /*!< \brief task_on_put_stat_error       */
+            slot_task_on_put_ensure_error,       /*!< \brief task_on_put_ensure_error     */
+            slot_task_on_put_rm_error,           /*!< \brief task_on_put_rm_error         */
+            slot_task_on_get_dir_error,          /*!< \brief task_on_get_dir_error        */
+            slot_task_on_get_file_error          /*!< \brief task_on_get_file_error       */
         } EteraTaskSlot;
 
         /*!
@@ -557,6 +561,13 @@ class WidgetDisk : public QTabWidget
          * \param api API
          */
         void removeDelayed(const EteraAPI* api);
+
+        /*!
+         * \brief Проверка, что код ошибки позволяет отложить задачу
+         * \param code Код HTTP
+         * \return true, если задачу можно отложить (восстановимая ошибка)
+         */
+        bool canDelayTask(int code);
 
     private slots:
 
