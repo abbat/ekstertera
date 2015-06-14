@@ -1047,7 +1047,7 @@ void WidgetDisk::putLocalDir(const QString& source, const QString& target, bool 
     api->setParentID(parent);
     api->setOverwrite(overwrite);
 
-    ETERA_API_TASK_MKDIR(api, task_on_put_dir_success, task_on_put_dir_error);
+    ETERA_API_TASK_MKDIR(api, task_on_put_mkdir_success, task_on_put_mkdir_error);
 
     m_tasks->addChildTask(parent, api->id(), START_MESSAGE_MKDIR.arg(target));
 
@@ -1055,13 +1055,13 @@ void WidgetDisk::putLocalDir(const QString& source, const QString& target, bool 
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_put_dir_error(EteraAPI* api)
+void WidgetDisk::task_on_put_mkdir_error(EteraAPI* api)
 {
     // если объект существует, нужно убедиться, что это директория и тогда можно продолжить работу
     if (api->lastErrorCode() == 409) {
         api->setEnsure(eitDir);
 
-        ETERA_API_CONTINUE_TASK_STAT(api, task_on_put_ensure_success, task_on_put_ensure_error, task_on_put_dir_error);
+        ETERA_API_CONTINUE_TASK_STAT(api, task_on_put_ensure_success, task_on_put_ensure_error, task_on_put_mkdir_error);
 
         m_tasks->addChildTask(api->parentID(), api->id(), START_MESSAGE_STAT.arg(api->path()));
 
@@ -1073,10 +1073,10 @@ void WidgetDisk::task_on_put_dir_error(EteraAPI* api)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::task_on_put_dir_success(EteraAPI* api)
+void WidgetDisk::task_on_put_mkdir_success(EteraAPI* api)
 {
     { // TODO: блок нужен только если директория создана в текущей области видимости
-        ETERA_API_CONTINUE_TASK_STAT(api, task_on_put_dir_stat_success, task_on_put_dir_stat_error, task_on_put_dir_error);
+        ETERA_API_CONTINUE_TASK_STAT(api, task_on_put_stat_success, task_on_put_stat_error, task_on_put_mkdir_error);
 
         m_tasks->addChildTask(api->parentID(), api->id(), START_MESSAGE_STAT.arg(api->path()));
 
@@ -1084,22 +1084,6 @@ void WidgetDisk::task_on_put_dir_success(EteraAPI* api)
     }
 
     syncLocalDir(api->source(), api->target(), api->overwrite(), api->parentID());
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_put_dir_stat_error(EteraAPI* api)
-{
-    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    releaseAPI(api);
-}
-//----------------------------------------------------------------------------------------------
-
-void WidgetDisk::task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& item)
-{
-    if (item.parentPath() == m_path)
-        m_explorer->setCurrentItem(new WidgetDiskItem(m_explorer, item, m_preview_mode), QItemSelectionModel::ClearAndSelect);
-
-    releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1295,6 +1279,125 @@ void WidgetDisk::task_on_put_rm_success(EteraAPI* api)
 }
 //----------------------------------------------------------------------------------------------
 
+void WidgetDisk::addPutActivity(EteraPutActivityType type, quint64 parent, const QString& source, const QString& target)
+{
+    if (type != apatUnknown) {
+        EteraPutActivityItem item;
+
+        item.ID     = EteraAPI::nextID();
+        item.Parent = parent;
+        item.Source = source;
+        item.Target = target;
+
+        if (type == epatDir) {
+            m_put_queue_mkdir.enqueue(item);
+            m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_MKDIR.arg(item.Source));
+        } else if (type == apatFile) {
+            m_put_queue_put.enqueue(item);
+            m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_UPLOAD.arg(item.Source).arg(item.Target));
+        }
+    }
+
+    spawnPutActivity(apatUnknown);
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::spawnPutActivity(EteraPutActivityType type, EteraAPI* api)
+{
+    Q_ASSERT(
+        (type == epatDir  && m_put_queue_mkdir.count() > 0) ||
+        (type == apatFile && m_put_queue_put.count()   > 0) ||
+        (type == apatUnknown)
+    );
+
+    Q_UNUSED(type);
+
+    if (api != NULL) {
+        m_put_active_api_mkdir.remove(api->id());
+        m_put_active_api_put.remove(api->id());
+        releaseAPI(api);
+    }
+
+    while (m_put_active_api_mkdir.count() + m_put_active_api_put.count() < m_put_activity_limit && m_put_queue_put.empty() == false) {
+        EteraPutActivityItem item = m_put_queue_put.dequeue();
+
+        api = createAPI(item.ID);
+
+        api->setParentID(item.Parent);
+
+        ETERA_API_TASK_PUT(api, task_on_put_file_success, task_on_put_file_error, task_on_put_file_progress);
+
+        m_put_active_api_put[item.ID] = api;
+
+        bool overwrite = false; // FIXME:
+
+        api->put(item.Source, item.Target, overwrite);
+    }
+
+    // mkdir активностей должно быть не более одной - более логично (последовательно) обходит директории при записи
+    if (m_put_active_api_mkdir.count() == 0 && m_put_active_api_put.count() < m_put_activity_limit && m_put_queue_mkdir.empty() == false) {
+        EteraPutActivityItem item = m_put_queue_mkdir.dequeue();
+
+        api = createAPI(item.ID);
+
+        api->setSource(item.Source);
+        api->setTarget(item.Target);
+        api->setParentID(item.Parent);
+
+        ETERA_API_TASK_MKDIR(api, task_on_put_mkdir_success, task_on_put_mkdir_error);
+
+        m_put_active_api_mkdir[item.ID] = api;
+
+        api->mkdir(item.Target);
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::abortPutActivity(quint64 id, bool full)
+{
+    if (full == true)
+        id = m_tasks->rootID(id);
+
+    QList<quint64> aborted;
+    m_tasks->childIDs(id, aborted);
+
+    removePutActivity(m_put_queue_mkdir, aborted);
+    removePutActivity(m_put_queue_put,   aborted);
+
+    for (int i = 0; i < aborted.count(); i++) {
+        EteraAPI* api = m_put_active_api_mkdir.value(aborted[i], NULL);
+        if (api != NULL) {
+            m_put_active_api_mkdir.remove(api->id());
+            if (api->abort() == false)
+                releaseAPI(api);
+        }
+
+        api = m_put_active_api_put.value(aborted[i], NULL);
+        if (api != NULL) {
+            m_put_active_api_put.remove(api->id());
+            if (api->abort() == false)
+                releaseAPI(api);
+        }
+    }
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::removePutActivity(EteraPutActivityQueue& queue, QList<quint64>& aborted)
+{
+    EteraPutActivityQueue::iterator i = queue.begin();
+    while (i != queue.end()) {
+        EteraPutActivityItem item = *i;
+        int index = aborted.indexOf(item.ID);
+        if (index != -1) {
+            i = queue.erase(i);
+            aborted.removeAt(index);
+            m_tasks->removeTask(item.ID);
+        } else
+            ++i;
+    }
+}
+//----------------------------------------------------------------------------------------------
+
 void WidgetDisk::getRemoteObjects(const QString& path)
 {
     QList<QListWidgetItem*> selected = m_explorer->selectedItems();
@@ -1370,7 +1473,7 @@ QMessageBox::StandardButton WidgetDisk::getRemoteDir(const QString& source, cons
             return reply;
     }
 
-    addGetActivity(egatLS, parent, source, target);
+    addGetActivity(egatList, parent, source, target);
 
     return QMessageBox::NoButton;
 }
@@ -1506,7 +1609,7 @@ void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
     else if (reply == QMessageBox::Abort)
         abortGetActivity(api->id(), true);
     else if (reply == QMessageBox::Ignore)
-        spawnGetActivity(egatLS, api);
+        spawnGetActivity(egatList, api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1537,7 +1640,7 @@ void WidgetDisk::task_on_get_dir_success(EteraAPI* api, const EteraItemList& lis
     }
 
     if ((quint64)list.count() < limit)
-        spawnGetActivity(egatLS, api);
+        spawnGetActivity(egatList, api);
     else {
         quint64 offset = api->offset() + limit;
         api->ls(api->path(), api->preview(), api->crop(), offset, limit);
@@ -1555,7 +1658,7 @@ void WidgetDisk::addGetActivity(EteraGetActivityType type, quint64 parent, const
         item.Source = source;
         item.Target = target;
 
-        if (type == egatLS) {
+        if (type == egatList) {
             m_get_queue_ls.enqueue(item);
             m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_LS.arg(item.Source));
         } else if (type == agatGet) {
@@ -1571,10 +1674,12 @@ void WidgetDisk::addGetActivity(EteraGetActivityType type, quint64 parent, const
 void WidgetDisk::spawnGetActivity(EteraGetActivityType type, EteraAPI* api)
 {
     Q_ASSERT(
-        (type == egatLS  && m_get_active_api_ls.count()  > 0) ||
-        (type == agatGet && m_get_active_api_get.count() > 0) ||
+        (type == egatList && m_get_active_api_ls.count()  > 0) ||
+        (type == agatGet  && m_get_active_api_get.count() > 0) ||
         (type == agatUnknown)
     );
+
+    Q_UNUSED(type);
 
     if (api != NULL) {
         m_get_active_api_ls.remove(api->id());

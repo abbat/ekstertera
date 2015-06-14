@@ -320,6 +320,66 @@ class WidgetDisk : public QTabWidget
         typedef QMap<quint64, EteraAPI*> EteraAPIMap;
 
         /*!
+         * \brief Описатель активности отправки объектов
+         */
+        typedef struct {
+            quint64 ID;       /*!< \brief ID задачи              */
+            quint64 Parent;   /*!< \brief ID родительской задачи */
+            QString Source;   /*!< \brief Источник               */
+            QString Target;   /*!< \brief Приемник               */
+        } EteraPutActivityItem;
+
+        /*!
+         * \brief Очередь задач отправки объектов (put)
+         */
+        typedef QQueue<EteraPutActivityItem> EteraPutActivityQueue;
+
+        /*!
+         * \brief Тип активности отправки объекта
+         */
+        typedef enum {
+            epatDir,      /*!< \brief Отправка директории (mkdir) */
+            apatFile,     /*!< \brief Отправка файла (put)        */
+            apatUnknown   /*!< \brief Неизвестная активность      */
+        } EteraPutActivityType;
+
+        int                   m_put_activity_limit;     /*!< \brief Масимальное количество запросов в активности */
+        EteraPutActivityQueue m_put_queue_mkdir;        /*!< \brief Очередь mkdir для отправки файлов            */
+        EteraPutActivityQueue m_put_queue_put;          /*!< \brief Очередь put для отправки файлов              */
+        EteraAPIMap           m_put_active_api_mkdir;   /*!< \brief Активные mkdir задачи API                    */
+        EteraAPIMap           m_put_active_api_put;     /*!< \brief Активные put задачи API                      */
+
+        /*!
+         * \brief Добавление put активности в очередь ожидания
+         * \param type Тип активности
+         * \param parent ID родительской задачи
+         * \param source Источник
+         * \param target Приемник
+         */
+        void addPutActivity(EteraPutActivityType type, quint64 parent, const QString& source, const QString& target);
+
+        /*!
+         * \brief Запуск get активностей
+         * \param type Тип активности, которая была завершена параметром api
+         * \param api API для удаления или NULL для активности apatUnknown
+         */
+        void spawnPutActivity(EteraPutActivityType type, EteraAPI* api = NULL);
+
+        /*!
+         * \brief Остановка put активностей
+         * \param id ID активности
+         * \param full Флаг полного удаления дерева активностей
+         */
+        void abortPutActivity(quint64 id, bool full = false);
+
+        /*!
+         * \brief Удаление put активностей из очереди ожидания
+         * \param queue Очередь ожидания
+         * \param ids ID задач для удаления
+         */
+        void removePutActivity(EteraPutActivityQueue& queue, QList<quint64>& aborted);
+
+        /*!
          * \brief Описатель активности получения файла
          */
         typedef struct {
@@ -338,7 +398,7 @@ class WidgetDisk : public QTabWidget
          * \brief Тип активности получения файла
          */
         typedef enum {
-            egatLS,       /*!< \brief Получение списка (ls)  */
+            egatList,     /*!< \brief Получение списка (ls)  */
             agatGet,      /*!< \brief Загрузка файла (get)   */
             agatUnknown   /*!< \brief Неизвестная активность */
         } EteraGetActivityType;
@@ -484,11 +544,8 @@ class WidgetDisk : public QTabWidget
          *                                                   +-> EteraAPI::stat (?)
          */
 
-        void task_on_put_dir_error(EteraAPI* api);
-        void task_on_put_dir_success(EteraAPI* api);
-
-        void task_on_put_dir_stat_error(EteraAPI* api);
-        void task_on_put_dir_stat_success(EteraAPI* api, const EteraItem& item);
+        void task_on_put_mkdir_error(EteraAPI* api);
+        void task_on_put_mkdir_success(EteraAPI* api);
 
         void task_on_put_file_error(EteraAPI* api);
         void task_on_put_file_success(EteraAPI* api);
