@@ -541,6 +541,18 @@ class WidgetDisk : public QTabWidget
         void delayEmit(EteraTaskSlotStat slot, EteraAPI* api, const EteraItem& item);
 
         /*!
+         * \brief Очередь отложенных задач
+         */
+        EteraSignalQueue m_delayed_task_queue;
+
+        /*!
+         * \brief Поставить задачу в очередь отложенных задач
+         * \param slot Слот для отложенного вызова
+         * \param api API
+         */
+        void delayTask(EteraTaskSlot slot, EteraAPI* api);
+
+        /*!
          * \brief Удаление отложенных сигналов
          * \param api API
          */
@@ -686,6 +698,9 @@ class WidgetDisk : public QTabWidget
 
         // отложенные сигналы
         void emit_delayed_signals();
+
+        // отложенные задачи
+        void emit_delayed_tasks();
 
     signals:
 

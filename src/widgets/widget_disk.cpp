@@ -1058,6 +1058,12 @@ void WidgetDisk::task_on_put_mkdir_error(EteraAPI* api)
         return;
     }
 
+    // HTTP-429 - Too Many Requests
+    if (api->lastErrorCode() == 429 || api->lastErrorCode() >= 500) {
+        delayTask(slot_task_on_put_mkdir_error, api);
+        return;
+    }
+
     // если объект существует, нужно убедиться, что это директория и тогда можно продолжить работу
     if (api->lastErrorCode() == 409) {
         ETERA_API_TASK_STAT(api, task_on_put_ensure_success, task_on_put_ensure_error);
@@ -1138,6 +1144,12 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
         return;
     }
 
+    // HTTP-429 - Too Many Requests
+    if (api->lastErrorCode() == 429 || api->lastErrorCode() >= 500) {
+        delayTask(slot_task_on_put_file_error, api);
+        return;
+    }
+
     if (messageBoxLocked() == true) {
         delayEmit(slot_task_on_put_file_error, api);
         return;
@@ -1213,6 +1225,12 @@ void WidgetDisk::task_on_put_stat_error(EteraAPI* api)
         return;
     }
 
+    // HTTP-429 - Too Many Requests
+    if (api->lastErrorCode() == 429 || api->lastErrorCode() >= 500) {
+        delayTask(slot_task_on_put_stat_error, api);
+        return;
+    }
+
     if (messageBoxLocked() == true) {
         delayEmit(slot_task_on_put_stat_error, api);
         return;
@@ -1263,6 +1281,12 @@ void WidgetDisk::task_on_put_ensure_error(EteraAPI* api)
 {
     if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
         releaseAPI(api);
+        return;
+    }
+
+    // HTTP-429 - Too Many Requests
+    if (api->lastErrorCode() == 429 || api->lastErrorCode() >= 500) {
+        delayTask(slot_task_on_put_ensure_error, api);
         return;
     }
 
@@ -1394,6 +1418,12 @@ void WidgetDisk::task_on_put_rm_error(EteraAPI* api)
 {
     if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
         releaseAPI(api);
+        return;
+    }
+
+    // HTTP-429 - Too Many Requests
+    if (api->lastErrorCode() == 429 || api->lastErrorCode() >= 500) {
+        delayTask(slot_task_on_put_rm_error, api);
         return;
     }
 
@@ -1700,6 +1730,12 @@ void WidgetDisk::task_on_get_file_error(EteraAPI* api)
         return;
     }
 
+    // HTTP-429 - Too Many Requests
+    if (api->lastErrorCode() == 429 || api->lastErrorCode() >= 500) {
+        delayTask(slot_task_on_get_file_error, api);
+        return;
+    }
+
     if (messageBoxLocked() == true) {
         delayEmit(slot_task_on_get_file_error, api);
         return;
@@ -1772,6 +1808,12 @@ void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
 {
     if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
         releaseAPI(api);
+        return;
+    }
+
+    // HTTP-429 - Too Many Requests
+    if (api->lastErrorCode() == 429 || api->lastErrorCode() >= 500) {
+        delayTask(slot_task_on_get_dir_error, api);
         return;
     }
 
@@ -1969,6 +2011,17 @@ void WidgetDisk::delayEmit(EteraTaskSlotStat slot, EteraAPI* api, const EteraIte
 }
 //----------------------------------------------------------------------------------------------
 
+void WidgetDisk::delayTask(EteraTaskSlot slot, EteraAPI* api)
+{
+    EteraTaskSignal signal;
+
+    signal.Slot = slot;
+    signal.API  = api;
+
+    m_delayed_task_queue.enqueue(signal);
+}
+//----------------------------------------------------------------------------------------------
+
 void WidgetDisk::emit_delayed_signals()
 {
     while (m_message_box_active == false && m_delayed_queue.count() > 0) {
@@ -1990,6 +2043,46 @@ void WidgetDisk::emit_delayed_signals()
             case slot_task_on_put_ensure_success: task_on_put_ensure_success(signal.API, signal.Item);  break;
         }
     }
+
+    emit_delayed_tasks();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetDisk::emit_delayed_tasks()
+{
+    if (m_delayed_task_queue.count() == 0)
+        return;
+
+    EteraTaskSignal signal = m_delayed_task_queue.dequeue();
+
+    EteraAPI* api = signal.API;
+
+    if (api->deleted() == true)
+        return;
+
+    switch (signal.Slot) {
+        case slot_task_on_put_mkdir_error:
+            api->mkdir(api->path());
+            break;
+        case slot_task_on_put_file_error:
+            api->put(api->source(), api->target(), api->overwrite());
+            break;
+        case slot_task_on_put_stat_error:
+            api->stat(api->path());
+            break;
+        case slot_task_on_put_ensure_error:
+            api->stat(api->path());
+            break;
+        case slot_task_on_put_rm_error:
+            api->rm(api->path(), true);
+            break;
+        case slot_task_on_get_dir_error:
+            api->ls(api->path(), api->preview(), api->crop(), api->offset(), api->limit());
+            break;
+        case slot_task_on_get_file_error:
+            api->get(api->source(), api->target());
+            break;
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -2004,6 +2097,12 @@ void WidgetDisk::removeDelayed(const EteraAPI* api)
     for (int i = 0; i < m_delayed_stat_queue.count(); i++)
         if (m_delayed_stat_queue[i].API == api) {
             m_delayed_stat_queue.removeAt(i);
+            return;
+        }
+
+    for (int i = 0; i < m_delayed_task_queue.count(); i++)
+        if (m_delayed_task_queue[i].API == api) {
+            m_delayed_task_queue.removeAt(i);
             return;
         }
 }
