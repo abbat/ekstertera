@@ -323,10 +323,11 @@ class WidgetDisk : public QTabWidget
          * \brief Описатель активности отправки объектов
          */
         typedef struct {
-            quint64 ID;       /*!< \brief ID задачи              */
-            quint64 Parent;   /*!< \brief ID родительской задачи */
-            QString Source;   /*!< \brief Источник               */
-            QString Target;   /*!< \brief Приемник               */
+            quint64 ID;          /*!< \brief ID задачи              */
+            quint64 Parent;      /*!< \brief ID родительской задачи */
+            QString Source;      /*!< \brief Источник               */
+            QString Target;      /*!< \brief Приемник               */
+            bool    Overwrite;   /*!< \brief Флаг перезаписи        */
         } EteraPutActivityItem;
 
         /*!
@@ -355,8 +356,9 @@ class WidgetDisk : public QTabWidget
          * \param parent ID родительской задачи
          * \param source Источник
          * \param target Приемник
+         * \param overwrite Флаг перезаписи
          */
-        void addPutActivity(EteraPutActivityType type, quint64 parent, const QString& source, const QString& target);
+        void addPutActivity(EteraPutActivityType type, quint64 parent, const QString& source, const QString& target, bool overwrite);
 
         /*!
          * \brief Запуск get активностей

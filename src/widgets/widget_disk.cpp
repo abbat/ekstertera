@@ -1279,15 +1279,16 @@ void WidgetDisk::task_on_put_rm_success(EteraAPI* api)
 }
 //----------------------------------------------------------------------------------------------
 
-void WidgetDisk::addPutActivity(EteraPutActivityType type, quint64 parent, const QString& source, const QString& target)
+void WidgetDisk::addPutActivity(EteraPutActivityType type, quint64 parent, const QString& source, const QString& target, bool overwrite)
 {
     if (type != apatUnknown) {
         EteraPutActivityItem item;
 
-        item.ID     = EteraAPI::nextID();
-        item.Parent = parent;
-        item.Source = source;
-        item.Target = target;
+        item.ID        = EteraAPI::nextID();
+        item.Parent    = parent;
+        item.Source    = source;
+        item.Target    = target;
+        item.Overwrite = overwrite;
 
         if (type == epatDir) {
             m_put_queue_mkdir.enqueue(item);
@@ -1324,14 +1325,13 @@ void WidgetDisk::spawnPutActivity(EteraPutActivityType type, EteraAPI* api)
         api = createAPI(item.ID);
 
         api->setParentID(item.Parent);
+        api->setEnsure(eitFile);
 
         ETERA_API_TASK_PUT(api, task_on_put_file_success, task_on_put_file_error, task_on_put_file_progress);
 
         m_put_active_api_put[item.ID] = api;
 
-        bool overwrite = false; // FIXME:
-
-        api->put(item.Source, item.Target, overwrite);
+        api->put(item.Source, item.Target, item.Overwrite);
     }
 
     // mkdir активностей должно быть не более одной - более логично (последовательно) обходит директории при записи
@@ -1343,6 +1343,8 @@ void WidgetDisk::spawnPutActivity(EteraPutActivityType type, EteraAPI* api)
         api->setSource(item.Source);
         api->setTarget(item.Target);
         api->setParentID(item.Parent);
+        api->setOverwrite(item.Overwrite);
+        api->setEnsure(eitDir);
 
         ETERA_API_TASK_MKDIR(api, task_on_put_mkdir_success, task_on_put_mkdir_error);
 
