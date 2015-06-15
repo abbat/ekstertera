@@ -73,8 +73,9 @@ class FormMain : public FormMainUI
         // обработчики виджета диска
         //
 
-        void widget_disk_on_path_changed(const QString& path);        /*!< \brief Смена пути в виджете     */
-        void widget_disk_on_change_possible_actions(bool download);   /*!< \brief Смена возможных действий */
+        void widget_disk_on_path_changed(const QString& path);                      /*!< \brief Смена пути в виджете     */
+        void widget_disk_on_change_possible_actions(bool download);                 /*!< \brief Смена возможных действий */
+        void widget_disk_on_selection_changed(int files, int dirs, quint64 size);   /*!< \brief Смена выделения          */
 
         //
         // обработчики виджета путей

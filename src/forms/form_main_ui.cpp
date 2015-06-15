@@ -120,6 +120,10 @@ FormMainUI::FormMainUI() : QMainWindow()
     m_label_total = new QLabel(m_status_bar);
     m_status_bar->addWidget(m_label_total);
 
+    m_label_selected = new QLabel(m_status_bar);
+    m_status_bar->addWidget(m_label_selected);
+    m_label_selected->setVisible(false);
+
     setStatusBar(m_status_bar);
 
     // меню трея

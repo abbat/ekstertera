@@ -70,8 +70,9 @@ class FormMainUI : public QMainWindow
          * \brief Статусбар
          */
         QStatusBar* m_status_bar;
-          QLabel*   m_label_used;    /*!< \brief Размер используемого пространства */
-          QLabel*   m_label_total;   /*!< \brief Общий размер диска                */
+          QLabel*   m_label_used;       /*!< \brief Размер используемого пространства */
+          QLabel*   m_label_total;      /*!< \brief Общий размер диска                */
+          QLabel*   m_label_selected;   /*!< \brief Статус выделения                  */
 
         /*!
          * \brief Иконка в трее

@@ -106,6 +106,7 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     // включение / выключение пунктов контекстного меню
     on_item_selection_changed();
 
+    // таймер отложенных сигналов / задач
     m_emit_timer = new QTimer(this);
     connect(m_emit_timer, SIGNAL(timeout()), SLOT(emit_delayed_signals()));
     m_emit_timer->start(5000);
@@ -302,8 +303,13 @@ void WidgetDisk::on_item_selection_changed()
         m_menu_info->setEnabled(false);
     }
 
+    int     files = 0;
+    int     dirs  = 0;
+    quint64 size  = 0;
+
     bool can_share  = false;
     bool can_revoke = false;
+
     for (int i = 0; i < selected.count(); i++) {
         WidgetDiskItem*  witem = static_cast<WidgetDiskItem*>(selected[i]);
         const EteraItem* eitem = witem->item();
@@ -313,8 +319,12 @@ void WidgetDisk::on_item_selection_changed()
         else
             can_share = true;
 
-        if (can_share == true && can_revoke == true)
-            break;
+        if (eitem->isDir() == true)
+            dirs++;
+        else if (eitem->isFile() == true) {
+            files++;
+            size += eitem->size();
+        }
     }
 
     m_menu_share->setEnabled(can_share);
@@ -323,6 +333,8 @@ void WidgetDisk::on_item_selection_changed()
     EteraClipboard* clipboard = EteraClipboard::instance();
 
     m_menu_paste->setEnabled(clipboard->isEmpty() == false);
+
+    emit onSelectionChanged(files, dirs, size);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -707,22 +719,40 @@ void WidgetDisk::menu_delete_triggered()
 
 void WidgetDisk::task_on_rm_error(EteraAPI* api)
 {
-    // если объект не существует, то и удалять нечего
-    if (api->lastErrorCode() == 404) {
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
         releaseAPI(api);
         return;
     }
 
-    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RM.arg(api->path()).arg(api->lastErrorMessage()));
-
-    // если ошибка во время ожидания операции, то скорее всего объект будет удален
-    // если объект был удален ранее, то его нужно удалить из виджета
-    if (/* TODO: async == true ||*/ api->lastErrorCode() == 404) {
-        removeByPath(api->path());
-        EteraClipboard::instance()->removeByPath(api->path());
+    if (canDelayTask(api->lastErrorCode()) == true) {
+        delayTask(slot_task_on_rm_error, api);
+        return;
     }
 
-    releaseAPI(api);
+    // если объект (уже?) не существует, то операция успешна
+    if (api->lastErrorCode() == 404) {
+        removeByPath(api->path());
+        EteraClipboard::instance()->removeByPath(api->path());
+        releaseAPI(api);
+        return;
+    }
+
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_rm_error, api);
+        return;
+    }
+
+    messageBoxLock();
+    QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_RM.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Ignore);
+    messageBoxUnlock();
+
+    if (api->deleted() == true)
+        return;
+
+    if (reply == QMessageBox::Retry)
+        api->rm(api->path(), true);
+    else if (reply == QMessageBox::Ignore)
+        releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -2120,6 +2150,7 @@ void WidgetDisk::emit_delayed_signals()
     while (m_message_box_active == false && m_delayed_queue.count() > 0) {
         EteraTaskSignal signal = m_delayed_queue.dequeue();
         switch (signal.Slot) {
+            case slot_task_on_rm_error:             task_on_rm_error(signal.API);             break;
             case slot_task_on_publish_error:        task_on_publish_error(signal.API);        break;
             case slot_task_on_unpublish_error:      task_on_unpublish_error(signal.API);      break;
             case slot_task_on_publish_stat_error:   task_on_publish_stat_error(signal.API);   break;
@@ -2158,6 +2189,9 @@ void WidgetDisk::emit_delayed_tasks()
         return;
 
     switch (signal.Slot) {
+        case slot_task_on_rm_error:
+            api->rm(api->path(), true);
+            break;
         case slot_task_on_publish_error:
             api->publish(api->path());
             break;

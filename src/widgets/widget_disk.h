@@ -472,6 +472,7 @@ class WidgetDisk : public QTabWidget
          * \brief Имя слота для вызова отложенных сигналов
          */
         typedef enum {
+            slot_task_on_rm_error,               /*!< \brief task_on_rm_error             */
             slot_task_on_publish_error,          /*!< \brief task_on_publish_error        */
             slot_task_on_unpublish_error,        /*!< \brief task_on_publish_error        */
             slot_task_on_publish_stat_error,     /*!< \brief task_on_publish_stat_error   */
@@ -726,6 +727,14 @@ class WidgetDisk : public QTabWidget
          * \param download Возможность загрузить с диска
          */
         void onChangePossibleActions(bool download);
+
+        /*!
+         * \brief Смена выделения
+         * \param file Количество выделенных файлов
+         * \param dirs Количество выделенных директорий
+         * \param size Размер выделенных файлов
+         */
+        void onSelectionChanged(int files, int dirs, quint64 size);
 };
 
 #endif   // _ekstertera_widgets_widget_disk_h_

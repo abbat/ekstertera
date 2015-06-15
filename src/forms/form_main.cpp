@@ -34,8 +34,9 @@ FormMain::FormMain() : FormMainUI()
     connect(m_widget_path, SIGNAL(onPathChangeRequest(const QString&)), this, SLOT(widget_path_on_path_change_request(const QString&)));
 
     // виджет диска
-    connect(m_widget_disk, SIGNAL(onPathChanged(const QString&)),   this, SLOT(widget_disk_on_path_changed(const QString&)));
-    connect(m_widget_disk, SIGNAL(onChangePossibleActions(bool)),   this, SLOT(widget_disk_on_change_possible_actions(bool)));
+    connect(m_widget_disk, SIGNAL(onPathChanged(const QString&)),         this, SLOT(widget_disk_on_path_changed(const QString&)));
+    connect(m_widget_disk, SIGNAL(onChangePossibleActions(bool)),         this, SLOT(widget_disk_on_change_possible_actions(bool)));
+    connect(m_widget_disk, SIGNAL(onSelectionChanged(int, int, quint64)), this, SLOT(widget_disk_on_selection_changed(int, int, quint64)));
 
     // обновление статуса
     updateInfoStatus();
@@ -195,6 +196,26 @@ void FormMain::widget_disk_on_path_changed(const QString& path)
 void FormMain::widget_disk_on_change_possible_actions(bool download)
 {
     m_action_download->setEnabled(download);
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::widget_disk_on_selection_changed(int files, int dirs, quint64 size)
+{
+    if (files + dirs == 0) {
+        m_label_selected->setVisible(false);
+        return;
+    }
+
+    QString info;
+    if (files == 0)
+        info = trUtf8("директорий: %1").arg(dirs);
+    else if (dirs == 0)
+        info = trUtf8("файлов: %1 (%2)").arg(files).arg(EteraAPI::humanBytes(size));
+    else
+        info = trUtf8("директорий: %1, файлов: %2 (%3)").arg(dirs).arg(files).arg(EteraAPI::humanBytes(size));
+
+    m_label_selected->setVisible(true);
+    m_label_selected->setText(info);
 }
 //----------------------------------------------------------------------------------------------
 
