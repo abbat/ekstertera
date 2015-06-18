@@ -472,18 +472,24 @@ class WidgetDisk : public QTabWidget
          * \brief Имя слота для вызова отложенных сигналов
          */
         typedef enum {
-            slot_task_on_rm_error,               /*!< \brief task_on_rm_error             */
-            slot_task_on_publish_error,          /*!< \brief task_on_publish_error        */
-            slot_task_on_unpublish_error,        /*!< \brief task_on_publish_error        */
-            slot_task_on_publish_stat_error,     /*!< \brief task_on_publish_stat_error   */
-            slot_task_on_unpublish_stat_error,   /*!< \brief task_on_unpublish_stat_error */
-            slot_task_on_put_mkdir_error,        /*!< \brief task_on_put_mkdir_error      */
-            slot_task_on_put_file_error,         /*!< \brief task_on_put_file_error       */
-            slot_task_on_put_stat_error,         /*!< \brief task_on_put_stat_error       */
-            slot_task_on_put_ensure_error,       /*!< \brief task_on_put_ensure_error     */
-            slot_task_on_put_rm_error,           /*!< \brief task_on_put_rm_error         */
-            slot_task_on_get_dir_error,          /*!< \brief task_on_get_dir_error        */
-            slot_task_on_get_file_error          /*!< \brief task_on_get_file_error       */
+            slot_task_on_ls_error,                    /*!< \brief task_on_ls_error                  */
+            slot_task_on_mkdir_error,                 /*!< \brief task_on_mkdir_error               */
+            slot_task_on_mkdir_stat_error,            /*!< \brief task_on_mkdir_stat_error          */
+            slot_task_on_copy_paste_error,            /*!< \brief task_on_copy_paste_error          */
+            slot_task_on_cut_paste_error,             /*!< \brief task_on_cut_paste_error           */
+            slot_task_on_copy_cut_paste_stat_error,   /*!< \brief task_on_copy_cut_paste_stat_error */
+            slot_task_on_rm_error,                    /*!< \brief task_on_rm_error                  */
+            slot_task_on_publish_error,               /*!< \brief task_on_publish_error             */
+            slot_task_on_unpublish_error,             /*!< \brief task_on_publish_error             */
+            slot_task_on_publish_stat_error,          /*!< \brief task_on_publish_stat_error        */
+            slot_task_on_unpublish_stat_error,        /*!< \brief task_on_unpublish_stat_error      */
+            slot_task_on_put_mkdir_error,             /*!< \brief task_on_put_mkdir_error           */
+            slot_task_on_put_file_error,              /*!< \brief task_on_put_file_error            */
+            slot_task_on_put_stat_error,              /*!< \brief task_on_put_stat_error            */
+            slot_task_on_put_ensure_error,            /*!< \brief task_on_put_ensure_error          */
+            slot_task_on_put_rm_error,                /*!< \brief task_on_put_rm_error              */
+            slot_task_on_get_dir_error,               /*!< \brief task_on_get_dir_error             */
+            slot_task_on_get_file_error               /*!< \brief task_on_get_file_error            */
         } EteraTaskSlot;
 
         /*!

@@ -431,11 +431,37 @@ void WidgetDisk::changePath(const QString& path)
 
 void WidgetDisk::task_on_ls_error(EteraAPI* api)
 {
-    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_LS.arg(api->path()).arg(api->lastErrorMessage()));
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        m_explorer->setCursor(Qt::ArrowCursor);
+        releaseAPI(api);
+        return;
+    }
 
-    m_explorer->setCursor(Qt::ArrowCursor);
+    if (canDelayTask(api->lastErrorCode()) == true) {
+        delayTask(slot_task_on_ls_error, api);
+        return;
+    }
 
-    releaseAPI(api);
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_ls_error, api);
+        return;
+    }
+
+    messageBoxLock();
+    QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_LS.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Ignore);
+    messageBoxUnlock();
+
+    if (api->deleted() == true) {
+        m_explorer->setCursor(Qt::ArrowCursor);
+        return;
+    }
+
+    if (reply == QMessageBox::Retry)
+        api->ls(api->path(), api->preview(), api->crop(), api->offset(), api->limit());
+    else if (reply == QMessageBox::Ignore) {
+        m_explorer->setCursor(Qt::ArrowCursor);
+        releaseAPI(api);
+    }
 }
 //----------------------------------------------------------------------------------------------
 
@@ -527,13 +553,36 @@ void WidgetDisk::menu_new_triggered()
 
 void WidgetDisk::task_on_mkdir_error(EteraAPI* api)
 {
-    // CONFLICT, директория уже существует
-    if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_MKDIR_ALREADY_EXISTS.arg(api->path()));
-    else
-        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MKDIR.arg(api->path()).arg(api->lastErrorMessage()));
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        releaseAPI(api);
+        return;
+    }
 
-    releaseAPI(api);
+    if (canDelayTask(api->lastErrorCode()) == true) {
+        delayTask(slot_task_on_mkdir_error, api);
+        return;
+    }
+
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_mkdir_error, api);
+        return;
+    }
+
+    messageBoxLock();
+    QMessageBox::StandardButton reply;
+    if (api->lastErrorCode() == 409)   // CONFLICT, директория уже существует
+        reply = QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_MKDIR_ALREADY_EXISTS.arg(api->path()));
+    else
+        reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MKDIR.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Ignore);
+    messageBoxUnlock();
+
+    if (api->deleted() == true)
+        return;
+
+    if (reply == QMessageBox::Retry)
+        api->mkdir(api->path());
+    else if (reply == QMessageBox::Ignore || reply == QMessageBox::Ok)
+        releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -549,8 +598,32 @@ void WidgetDisk::task_on_mkdir_success(EteraAPI* api)
 
 void WidgetDisk::task_on_mkdir_stat_error(EteraAPI* api)
 {
-    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()));
-    releaseAPI(api);
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        releaseAPI(api);
+        return;
+    }
+
+    if (canDelayTask(api->lastErrorCode()) == true) {
+        delayTask(slot_task_on_mkdir_stat_error, api);
+        return;
+    }
+
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_mkdir_stat_error, api);
+        return;
+    }
+
+    messageBoxLock();
+    QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->path()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Ignore);
+    messageBoxUnlock();
+
+    if (api->deleted() == true)
+        return;
+
+    if (reply == QMessageBox::Retry)
+        api->stat(api->path());
+    else if (reply == QMessageBox::Ignore)
+        releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -622,14 +695,37 @@ void WidgetDisk::menu_paste_triggered()
 
 void WidgetDisk::task_on_copy_paste_error(EteraAPI* api)
 {
-    // CONFLICT, объект уже существует
-    if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_CP_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        releaseAPI(api);
+        return;
+    }
+
+    if (canDelayTask(api->lastErrorCode()) == true) {
+        delayTask(slot_task_on_copy_paste_error, api);
+        return;
+    }
+
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_copy_paste_error, api);
+        return;
+    }
+
+    messageBoxLock();
+    QMessageBox::StandardButton reply;
+    if (api->lastErrorCode() == 409)   // CONFLICT, объект уже существует
+        reply = QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_CP_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
     else
-        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_CP.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
+        reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_CP.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Ignore);
+    messageBoxUnlock();
+
+    if (api->deleted() == true)
+        return;
 
     // TODO: обработать асинхронную ошибку, т.к. копирование могло быть все же успешным
-    releaseAPI(api);
+    if (reply == QMessageBox::Retry)
+        api->cp(api->source(), api->target(), false);
+    else if (reply == QMessageBox::Ignore || reply == QMessageBox::Ok)
+        releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -647,14 +743,36 @@ void WidgetDisk::task_on_copy_paste_success(EteraAPI* api)
 
 void WidgetDisk::task_on_cut_paste_error(EteraAPI* api)
 {
-    // CONFLICT, объект уже существует
-    if (api->lastErrorCode() == 409)
-        QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_MV_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        releaseAPI(api);
+        return;
+    }
+
+    if (canDelayTask(api->lastErrorCode()) == true) {
+        delayTask(slot_task_on_cut_paste_error, api);
+        return;
+    }
+
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_cut_paste_error, api);
+        return;
+    }
+
+    messageBoxLock();
+    QMessageBox::StandardButton reply;
+    if (api->lastErrorCode() == 409)   // CONFLICT, объект уже существует
+        reply = QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_MV_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
     else
-        QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MV.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()));
+        reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MV.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Ignore);
+
+    if (api->deleted() == true)
+        return;
 
     // TODO: обработать асинхронную ошибку, т.к. вставка могла быть все же успешной
-    releaseAPI(api);
+    if (reply == QMessageBox::Retry)
+        api->mv(api->source(), api->target(), false);
+    else if (reply == QMessageBox::Ignore || QMessageBox::Ok)
+        releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -672,8 +790,32 @@ void WidgetDisk::task_on_cut_paste_success(EteraAPI* api)
 
 void WidgetDisk::task_on_copy_cut_paste_stat_error(EteraAPI* api)
 {
-    QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->target()).arg(api->lastErrorMessage()));
-    releaseAPI(api);
+    if (api->lastErrorCode() == QNetworkReply::OperationCanceledError) {
+        releaseAPI(api);
+        return;
+    }
+
+    if (canDelayTask(api->lastErrorCode()) == true) {
+        delayTask(slot_task_on_copy_cut_paste_stat_error, api);
+        return;
+    }
+
+    if (messageBoxLocked() == true) {
+        delayEmit(slot_task_on_copy_cut_paste_stat_error, api);
+        return;
+    }
+
+    messageBoxLock();
+    QMessageBox::StandardButton reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_STAT.arg(api->target()).arg(api->lastErrorMessage()));
+    messageBoxUnlock();
+
+    if (api->deleted() == true)
+        return;
+
+    if (reply == QMessageBox::Retry)
+        api->stat(api->path(), m_preview_arg, true);
+    else if (reply == QMessageBox::Ignore)
+        releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
 
@@ -2150,18 +2292,24 @@ void WidgetDisk::emit_delayed_signals()
     while (m_message_box_active == false && m_delayed_queue.count() > 0) {
         EteraTaskSignal signal = m_delayed_queue.dequeue();
         switch (signal.Slot) {
-            case slot_task_on_rm_error:             task_on_rm_error(signal.API);             break;
-            case slot_task_on_publish_error:        task_on_publish_error(signal.API);        break;
-            case slot_task_on_unpublish_error:      task_on_unpublish_error(signal.API);      break;
-            case slot_task_on_publish_stat_error:   task_on_publish_stat_error(signal.API);   break;
-            case slot_task_on_unpublish_stat_error: task_on_unpublish_stat_error(signal.API); break;
-            case slot_task_on_put_mkdir_error:      task_on_put_mkdir_error(signal.API);      break;
-            case slot_task_on_put_file_error:       task_on_put_file_error(signal.API);       break;
-            case slot_task_on_put_stat_error:       task_on_put_stat_error(signal.API);       break;
-            case slot_task_on_put_ensure_error:     task_on_put_ensure_error(signal.API);     break;
-            case slot_task_on_put_rm_error:         task_on_put_rm_error(signal.API);         break;
-            case slot_task_on_get_dir_error:        task_on_get_dir_error(signal.API);        break;
-            case slot_task_on_get_file_error:       task_on_get_file_error(signal.API);       break;
+            case slot_task_on_ls_error:                  task_on_ls_error(signal.API);                  break;
+            case slot_task_on_mkdir_error:               task_on_mkdir_error(signal.API);               break;
+            case slot_task_on_mkdir_stat_error:          task_on_mkdir_stat_error(signal.API);          break;
+            case slot_task_on_copy_paste_error:          task_on_copy_paste_error(signal.API);          break;
+            case slot_task_on_cut_paste_error:           task_on_cut_paste_error(signal.API);           break;
+            case slot_task_on_copy_cut_paste_stat_error: task_on_copy_cut_paste_stat_error(signal.API); break;
+            case slot_task_on_rm_error:                  task_on_rm_error(signal.API);                  break;
+            case slot_task_on_publish_error:             task_on_publish_error(signal.API);             break;
+            case slot_task_on_unpublish_error:           task_on_unpublish_error(signal.API);           break;
+            case slot_task_on_publish_stat_error:        task_on_publish_stat_error(signal.API);        break;
+            case slot_task_on_unpublish_stat_error:      task_on_unpublish_stat_error(signal.API);      break;
+            case slot_task_on_put_mkdir_error:           task_on_put_mkdir_error(signal.API);           break;
+            case slot_task_on_put_file_error:            task_on_put_file_error(signal.API);            break;
+            case slot_task_on_put_stat_error:            task_on_put_stat_error(signal.API);            break;
+            case slot_task_on_put_ensure_error:          task_on_put_ensure_error(signal.API);          break;
+            case slot_task_on_put_rm_error:              task_on_put_rm_error(signal.API);              break;
+            case slot_task_on_get_dir_error:             task_on_get_dir_error(signal.API);             break;
+            case slot_task_on_get_file_error:            task_on_get_file_error(signal.API);            break;
         }
     }
 
@@ -2189,6 +2337,24 @@ void WidgetDisk::emit_delayed_tasks()
         return;
 
     switch (signal.Slot) {
+        case slot_task_on_ls_error:
+            api->ls(api->path(), api->preview(), api->crop(), api->offset(), api->limit());
+            break;
+        case slot_task_on_mkdir_error:
+            api->mkdir(api->path());
+            break;
+        case slot_task_on_mkdir_stat_error:
+            api->stat(api->path());
+            break;
+        case slot_task_on_copy_paste_error:
+            api->cp(api->source(), api->target(), false);
+            break;
+        case slot_task_on_cut_paste_error:
+            api->mv(api->source(), api->target(), false);
+            break;
+        case slot_task_on_copy_cut_paste_stat_error:
+            api->stat(api->path(), m_preview_arg, true);
+            break;
         case slot_task_on_rm_error:
             api->rm(api->path(), true);
             break;
