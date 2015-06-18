@@ -764,6 +764,7 @@ void WidgetDisk::task_on_cut_paste_error(EteraAPI* api)
         reply = QMessageBox::warning(this, ATTENTION_MESSAGE, ERROR_MESSAGE_MV_ALREADY_EXISTS.arg(api->source()).arg(api->target()));
     else
         reply = QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_MV.arg(api->source()).arg(api->target()).arg(api->lastErrorMessage()), QMessageBox::Retry | QMessageBox::Ignore);
+    messageBoxUnlock();
 
     if (api->deleted() == true)
         return;
@@ -771,7 +772,7 @@ void WidgetDisk::task_on_cut_paste_error(EteraAPI* api)
     // TODO: обработать асинхронную ошибку, т.к. вставка могла быть все же успешной
     if (reply == QMessageBox::Retry)
         api->mv(api->source(), api->target(), false);
-    else if (reply == QMessageBox::Ignore || QMessageBox::Ok)
+    else if (reply == QMessageBox::Ignore || reply == QMessageBox::Ok)
         releaseAPI(api);
 }
 //----------------------------------------------------------------------------------------------
