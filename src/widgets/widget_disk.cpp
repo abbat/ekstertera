@@ -1978,11 +1978,9 @@ QMessageBox::StandardButton WidgetDisk::getRemoteFile(const QString& source, con
 
             if (reply != QMessageBox::Retry)
                 return reply;
-        } else {
+        } else
             // никогда не должно случиться
-            QMessageBox::critical(this, ERROR_MESSAGE, ERROR_MESSAGE_UNKNOWN_OBJECT.arg(info.absoluteFilePath()));
-            return QMessageBox::Abort;
-        }
+            qFatal(ERROR_MESSAGE_UNKNOWN_OBJECT.arg(info.absoluteFilePath()).toUtf8());
     }
 
     addGetActivity(agatGet, parent, source, target);
