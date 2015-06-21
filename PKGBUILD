@@ -8,7 +8,7 @@ arch=('i686' 'x86_64')
 url="https://github.com/abbat/${pkgname}"
 license=('BSD')
 makedepends=('qt5-base' 'qt5-tools' 'git')
-source=("git+https://github.com/abbat/${pkgname}.git")
+source=("git+https://github.com/abbat/${pkgname}.git#tag=v${pkgver}")
 sha256sums=('SKIP')
 
 export QT_SELECT=5
