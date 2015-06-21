@@ -1,3 +1,9 @@
+ekstertera (0.1.2) testing; urgency=low
+
+  * Исправление ошибки получения превью на Qt5;
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Sun, 21 Jun 2015 23:30:00 +0300
+
 ekstertera (0.1.1) testing; urgency=low
 
   * Релиз v0.1.1;
