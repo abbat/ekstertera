@@ -436,7 +436,7 @@ void WidgetDisk::task_on_ls_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_ls_error, api);
         return;
     }
@@ -557,7 +557,7 @@ void WidgetDisk::task_on_mkdir_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_mkdir_error, api);
         return;
     }
@@ -602,7 +602,7 @@ void WidgetDisk::task_on_mkdir_stat_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_mkdir_stat_error, api);
         return;
     }
@@ -699,7 +699,7 @@ void WidgetDisk::task_on_copy_paste_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_copy_paste_error, api);
         return;
     }
@@ -747,7 +747,7 @@ void WidgetDisk::task_on_cut_paste_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_cut_paste_error, api);
         return;
     }
@@ -795,7 +795,7 @@ void WidgetDisk::task_on_copy_cut_paste_stat_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_copy_cut_paste_stat_error, api);
         return;
     }
@@ -866,7 +866,7 @@ void WidgetDisk::task_on_rm_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_rm_error, api);
         return;
     }
@@ -1070,7 +1070,7 @@ void WidgetDisk::task_on_publish_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_publish_error, api);
         return;
     }
@@ -1117,7 +1117,7 @@ void WidgetDisk::task_on_unpublish_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_unpublish_error, api);
         return;
     }
@@ -1164,7 +1164,7 @@ void WidgetDisk::task_on_publish_stat_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_publish_stat_error, api);
         return;
     }
@@ -1206,7 +1206,7 @@ void WidgetDisk::task_on_unpublish_stat_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_unpublish_stat_error, api);
         return;
     }
@@ -1330,7 +1330,7 @@ void WidgetDisk::task_on_put_mkdir_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_put_mkdir_error, api);
         return;
     }
@@ -1415,7 +1415,7 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_put_file_error, api);
         return;
     }
@@ -1495,7 +1495,7 @@ void WidgetDisk::task_on_put_stat_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_put_stat_error, api);
         return;
     }
@@ -1553,7 +1553,7 @@ void WidgetDisk::task_on_put_ensure_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_put_ensure_error, api);
         return;
     }
@@ -1689,7 +1689,7 @@ void WidgetDisk::task_on_put_rm_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_put_rm_error, api);
         return;
     }
@@ -1995,7 +1995,7 @@ void WidgetDisk::task_on_get_file_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_get_file_error, api);
         return;
     }
@@ -2075,7 +2075,7 @@ void WidgetDisk::task_on_get_dir_error(EteraAPI* api)
         return;
     }
 
-    if (canDelayTask(api->lastErrorCode()) == true) {
+    if (api->canRetry() == true) {
         delayTask(slot_task_on_get_dir_error, api);
         return;
     }
@@ -2412,14 +2412,5 @@ void WidgetDisk::removeDelayed(const EteraAPI* api)
             m_delayed_task_queue.removeAt(i);
             return;
         }
-}
-//----------------------------------------------------------------------------------------------
-
-bool WidgetDisk::canDelayTask(int code)
-{
-    if (code == 429 || code >= 500)
-        return true;
-
-    return false;
 }
 //----------------------------------------------------------------------------------------------

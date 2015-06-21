@@ -30,42 +30,42 @@
         <translation>An error occurred when opening the file</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="448"/>
+        <location filename="../utils/api.cpp" line="405"/>
         <source>КБ</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="451"/>
+        <location filename="../utils/api.cpp" line="408"/>
         <source>МБ</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="454"/>
+        <location filename="../utils/api.cpp" line="411"/>
         <source>ГБ</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="457"/>
+        <location filename="../utils/api.cpp" line="414"/>
         <source>ТБ</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="519"/>
+        <location filename="../utils/api.cpp" line="528"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="616"/>
+        <location filename="../utils/api.cpp" line="625"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="761"/>
+        <location filename="../utils/api.cpp" line="770"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="765"/>
+        <location filename="../utils/api.cpp" line="774"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>

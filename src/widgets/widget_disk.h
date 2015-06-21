@@ -568,13 +568,6 @@ class WidgetDisk : public QTabWidget
          */
         void removeDelayed(const EteraAPI* api);
 
-        /*!
-         * \brief Проверка, что код ошибки позволяет отложить задачу
-         * \param code Код HTTP
-         * \return true, если задачу можно отложить (восстановимая ошибка)
-         */
-        bool canDelayTask(int code);
-
     private slots:
 
         /*!

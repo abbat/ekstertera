@@ -366,6 +366,12 @@ class EteraAPI : public QObject
         bool deleted() const { return m_deleted; }
 
         /*!
+         * \brief Проверка кода ошибки на возможность повторного запроса
+         * \return true если возможен повторный запрос
+         */
+        bool canRetry() const;
+
+        /*!
          * \brief Получение OAuth токена
          * Сигнал onTOKEN
          * \param auth_code Код для получения токена или пустое значения для открытия браузера и запроса кода

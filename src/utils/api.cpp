@@ -383,6 +383,41 @@ quint64 EteraAPI::nextID()
 }
 //----------------------------------------------------------------------------------------------
 
+QString EteraAPI::humanZeros(const QString& val)
+{
+    int i = val.length() - 1;
+    while (i >= 0 && (val[i] == '0' || val[i] == '.'))
+        i--;
+
+    return val.left(i + 1);
+}
+//----------------------------------------------------------------------------------------------
+
+QString EteraAPI::humanBytes(quint64 val)
+{
+    QString prefix;
+    QString postfix;
+
+    if (val < (quint64)1024) {
+        prefix = QString::number(val);
+    } else if (val < (quint64)1024 * 1024) {
+        prefix  = QString("%1").arg((double)val / 1024, 0, 'f', 0);
+        postfix = trUtf8("КБ");
+    } else if (val < (quint64)1024 * 1024 * 1024) {
+        prefix  = QString("%1").arg((double)val / 1024 / 1024, 0, 'f', 0);
+        postfix = trUtf8("МБ");
+    } else if (val < (quint64)1024 * 1024 * 1024 * 1024) {
+        prefix  = humanZeros(QString("%1").arg((double)val / 1024 / 1024 / 1024, 0, 'f', 2));
+        postfix = trUtf8("ГБ");
+    } else {
+        prefix  = humanZeros(QString("%1").arg((double)val / 1024 / 1024 / 1024 / 1024, 0, 'f', 2));
+        postfix = trUtf8("ТБ");
+    }
+
+    return prefix + postfix;
+}
+//----------------------------------------------------------------------------------------------
+
 void EteraAPI::on_progress(qint64 done, qint64 total)
 {
     if (g_api_enabled == true)
@@ -426,45 +461,19 @@ bool EteraAPI::setLastError(int code, const QString& message)
 }
 //----------------------------------------------------------------------------------------------
 
-QString EteraAPI::humanZeros(const QString& val)
-{
-    int i = val.length() - 1;
-    while (i >= 0 && (val[i] == '0' || val[i] == '.'))
-        i--;
-
-    return val.left(i + 1);
-}
-//----------------------------------------------------------------------------------------------
-
-QString EteraAPI::humanBytes(quint64 val)
-{
-    QString prefix;
-    QString postfix;
-
-    if (val < (quint64)1024) {
-        prefix = QString::number(val);
-    } else if (val < (quint64)1024 * 1024) {
-        prefix  = QString("%1").arg((double)val / 1024, 0, 'f', 0);
-        postfix = trUtf8("КБ");
-    } else if (val < (quint64)1024 * 1024 * 1024) {
-        prefix  = QString("%1").arg((double)val / 1024 / 1024, 0, 'f', 0);
-        postfix = trUtf8("МБ");
-    } else if (val < (quint64)1024 * 1024 * 1024 * 1024) {
-        prefix  = humanZeros(QString("%1").arg((double)val / 1024 / 1024 / 1024, 0, 'f', 2));
-        postfix = trUtf8("ГБ");
-    } else {
-        prefix  = humanZeros(QString("%1").arg((double)val / 1024 / 1024 / 1024 / 1024, 0, 'f', 2));
-        postfix = trUtf8("ТБ");
-    }
-
-    return prefix + postfix;
-}
-//----------------------------------------------------------------------------------------------
-
 void EteraAPI::abort()
 {
     if (m_reply != NULL && m_deleted == false)
         m_reply->abort();
+}
+//----------------------------------------------------------------------------------------------
+
+bool EteraAPI::canRetry() const
+{
+    if (m_error_code == 429 || m_error_code >= 500)
+        return true;
+
+    return false;
 }
 //----------------------------------------------------------------------------------------------
 
