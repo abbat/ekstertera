@@ -184,7 +184,6 @@ void WidgetDisk::retranslateUi()
     START_MESSAGE_DOWNLOAD              = trUtf8("Загрузка %1 в %2");
     START_MESSAGE_DOWNLOAD_CAPTION      = trUtf8("Файл уже существует!");
     START_MESSAGE_DOWNLOAD_TEXT         = trUtf8("Файл %1 уже существует, перезаписать?");
-    ERROR_MESSAGE_UNKNOWN_OBJECT        = trUtf8("Неизвестный объект %1");
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1980,7 +1979,7 @@ QMessageBox::StandardButton WidgetDisk::getRemoteFile(const QString& source, con
                 return reply;
         } else
             // никогда не должно случиться
-            qFatal(ERROR_MESSAGE_UNKNOWN_OBJECT.arg(info.absoluteFilePath()).toUtf8());
+            qFatal("Unknown object (not dir, not file)");
     }
 
     addGetActivity(agatGet, parent, source, target);

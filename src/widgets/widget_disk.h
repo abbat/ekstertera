@@ -158,7 +158,6 @@ class WidgetDisk : public QTabWidget
         QString START_MESSAGE_DOWNLOAD;                /*!< \brief "Загрузка %1 в %2" для get                                  */
         QString START_MESSAGE_DOWNLOAD_CAPTION;        /*!< \brief "Файл уже существует!" для get                              */
         QString START_MESSAGE_DOWNLOAD_TEXT;           /*!< \brief "Файл %1 уже существует, перезаписать?" для get             */
-        QString ERROR_MESSAGE_UNKNOWN_OBJECT;          /*!< \brief "Неизвестный объект %1" для get                             */
 
     private:
 
