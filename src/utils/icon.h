@@ -161,7 +161,11 @@ class EteraIconProvider : public QObject
          * \brief Поддерживаемые размеры иконок
          */
         QList<int> m_icon_sizes;
-        int        m_default_icon_size_index;   /*!< \brief Индекс размера иконки по умолчанию */
+
+        /*!
+         * \brief Индекс размера иконки по умолчанию
+         */
+        int m_default_icon_size_index;
 
         QIcon m_link;        /*!< \brief Стандартная иконка публичности          */
         QIcon m_dir;         /*!< \brief Стандартная иконка директории           */
@@ -187,9 +191,9 @@ class EteraIconProvider : public QObject
         typedef QMap<QString, EteraPreviewCacheItem*> EteraPreviewCache;
 
         /*!
-         * \brief Кэш ожидающих превью
+         * \brief Карта элементов ожидающих превью
          */
-        typedef QMultiMap<QString, WidgetDiskItem*> EteraPreviewWaitCache;
+        typedef QMap<QString, WidgetDiskItem*> EteraPreviewWaitCache;
 
         QSet<QString>         m_preview_queue;        /*!< \brief Очередь ожидающих начала загрузки превью */
         EteraPreviewWaitCache m_preview_wait;         /*!< \brief Карта ожидающих превью элементов         */

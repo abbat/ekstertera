@@ -411,7 +411,7 @@
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="135"/>
-        <location filename="../widgets/widget_disk.cpp" line="271"/>
+        <location filename="../widgets/widget_disk.cpp" line="270"/>
         <source>Задачи</source>
         <translation>Tasks</translation>
     </message>
@@ -499,7 +499,7 @@
         <translation>Download %1 to %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="268"/>
+        <location filename="../widgets/widget_disk.cpp" line="267"/>
         <source>Задачи (%1)</source>
         <translation>Tasks (%1)</translation>
     </message>
@@ -654,11 +654,6 @@
 %3</source>
         <translation>Error upload %1 to %2:
 %3</translation>
-    </message>
-    <message>
-        <location filename="../widgets/widget_disk.cpp" line="187"/>
-        <source>Неизвестный объект %1</source>
-        <translation>Unknown object %1</translation>
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="172"/>

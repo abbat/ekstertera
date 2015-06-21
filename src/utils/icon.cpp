@@ -434,9 +434,11 @@ void EteraIconProvider::cancelPreview()
 void EteraIconProvider::cancelPreview(const WidgetDiskItem* item)
 {
     QString preview = item->item()->preview();
-    m_preview_wait.remove(preview, const_cast<WidgetDiskItem*>(item));
 
-    if (m_preview_wait.count(preview) == 0)
+    if (m_preview_wait.contains(preview) == true)
+        m_preview_wait.remove(preview);
+
+    if (m_preview_queue.contains(preview) == true)
         m_preview_queue.remove(preview);
 }
 //----------------------------------------------------------------------------------------------
@@ -455,8 +457,11 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
     api->device()->deleteLater();
 
     if (pixmap.isNull() == true) {
-        m_preview_wait.remove(api->url());
+        if (m_preview_wait.contains(url) == true)
+            m_preview_wait.remove(url);
+
         loadNextPreview(api);
+
         return;
     }
 
@@ -474,9 +479,9 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
     m_preview_cache[url]  = citem;
     m_preview_cache_size += citem->Size;
 
-    EteraPreviewWaitCache::const_iterator i = m_preview_wait.constFind(url);
-    while (i != m_preview_wait.end() && i.key() == url) {
-        WidgetDiskItem* item = *i;
+    WidgetDiskItem* item = m_preview_wait.value(url, NULL);
+    if (item != NULL) {
+        m_preview_wait.remove(url);
 
         if (item->item()->isPublic() == false)
             item->setIcon(citem->Icon);
@@ -492,9 +497,6 @@ void EteraIconProvider::task_on_get_preview_success(EteraAPI* api)
 
             item->setIcon(litem->Icon);
         }
-
-        m_preview_wait.remove(url, item);
-        ++i;
     }
 
     if (m_preview_cache_size + m_preview_cache_link_size > m_preview_cache_size_limit)
@@ -513,7 +515,8 @@ void EteraIconProvider::task_on_get_preview_error(EteraAPI* api)
 
     device->deleteLater();
 
-    m_preview_wait.remove(url);
+    if (m_preview_wait.contains(url) == true)
+        m_preview_wait.remove(url);
 
     if (m_preview_cache_size + m_preview_cache_link_size > m_preview_cache_size_limit)
         gcPreviewCache();
