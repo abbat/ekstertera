@@ -40,7 +40,7 @@ export QT_SELECT=4
     src 3dparty/json 3dparty/qt5
 %{lrelease} -compress -removeidentical %{name}.pro
 %{qmake} %{name}.pro
-make
+make %{?_smp_mflags}
 
 
 %install
