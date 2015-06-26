@@ -276,7 +276,7 @@ QString WidgetDisk::localBasename(const QString& path)
     return remoteBasename(path);
 #else
     // под windows могут использоваться оба разделителя в зависимости от контекста
-    int idx = path.lastIndexOf('\');
+    int idx = path.lastIndexOf('\\');
     if (idx == -1)
         return remoteBasename(path);
 
