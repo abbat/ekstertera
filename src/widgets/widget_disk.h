@@ -246,26 +246,18 @@ class WidgetDisk : public QTabWidget
         void removeByPath(const QString& path);
 
         /*!
-         * \brief Получение имени файла из пути
-         * \param path Путь
-         * \param separator Разделитель
-         * \return Имя файла
-         */
-        static QString basename(const QString& path, QChar separator);
-
-        /*!
          * \brief Получение имени файла из локального пути
          * \param path Путь
          * \return Имя файла
          */
-        static QString localBasename(const QString& path) { return basename(path, QDir::separator()); }
+        static QString localBasename(const QString& path);
 
         /*!
          * \brief Получение имени файла из пути в хранилище
          * \param path Путь
          * \return Имя файла
          */
-        static QString remoteBasename(const QString& path) { return basename(path, '/'); }
+        static QString remoteBasename(const QString& path);
 
         /*!
          * \brief Загрузка локального файла или директории на диск

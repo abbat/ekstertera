@@ -260,13 +260,28 @@ void WidgetDisk::removeByPath(const QString& path)
 }
 //----------------------------------------------------------------------------------------------
 
-QString WidgetDisk::basename(const QString& path, QChar separator)
+QString WidgetDisk::remoteBasename(const QString& path)
 {
-    int idx = path.lastIndexOf(separator);
+    int idx = path.lastIndexOf('/');
     if (idx == -1)
         return "";
 
     return path.right(path.length() - idx - 1);
+}
+//----------------------------------------------------------------------------------------------
+
+QString WidgetDisk::localBasename(const QString& path)
+{
+#ifndef ETERA_WS_WIN
+    return remoteBasename(path)
+#else
+    // под windows могут использоваться оба разделителя в зависимости от контекста
+    int idx = path.lastIndexOf('\');
+    if (idx == -1)
+        return remoteBasename(path);
+
+    return path.right(path.length() - idx - 1);
+#endif
 }
 //----------------------------------------------------------------------------------------------
 
