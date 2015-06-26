@@ -264,7 +264,7 @@ QString WidgetDisk::remoteBasename(const QString& path)
 {
     int idx = path.lastIndexOf('/');
     if (idx == -1)
-        return "";
+        return path;
 
     return path.right(path.length() - idx - 1);
 }
@@ -273,7 +273,7 @@ QString WidgetDisk::remoteBasename(const QString& path)
 QString WidgetDisk::localBasename(const QString& path)
 {
 #ifndef ETERA_WS_WIN
-    return remoteBasename(path)
+    return remoteBasename(path);
 #else
     // под windows могут использоваться оба разделителя в зависимости от контекста
     int idx = path.lastIndexOf('\');

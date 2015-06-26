@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.0" language="en_US" sourcelanguage="ru_RU">
-<defaultcodec>UTF-8</defaultcodec>
+<TS version="2.1" language="en_US" sourcelanguage="ru_RU">
 <context>
     <name>EteraAPI</name>
     <message>
@@ -365,14 +364,6 @@
     </message>
 </context>
 <context>
-    <name>QStandardPaths</name>
-    <message>
-        <location filename="../../3dparty/qt5/standardpaths/qstandardpaths_mac.cpp" line="157"/>
-        <source>Home</source>
-        <translation>Home</translation>
-    </message>
-</context>
-<context>
     <name>WidgetDisk</name>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="123"/>
@@ -431,7 +422,7 @@
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="135"/>
-        <location filename="../widgets/widget_disk.cpp" line="280"/>
+        <location filename="../widgets/widget_disk.cpp" line="295"/>
         <source>Задачи</source>
         <translation>Tasks</translation>
     </message>
@@ -519,7 +510,7 @@
         <translation>Download %1 to %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="277"/>
+        <location filename="../widgets/widget_disk.cpp" line="292"/>
         <source>Задачи (%1)</source>
         <translation>Tasks (%1)</translation>
     </message>
