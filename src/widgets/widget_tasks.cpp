@@ -176,7 +176,8 @@ void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
         return;
 
     if (item->bar() == NULL) {
-        QProgressBar* bar = new QProgressBar();
+        WidgetProgressbar* bar = new WidgetProgressbar();
+
         bar->setMinimum(0);
 
         item->setBar(bar);
@@ -184,7 +185,7 @@ void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
         setItemWidget(item, 1, bar);
     }
 
-    QProgressBar* bar = item->bar();
+    WidgetProgressbar* bar = item->bar();
 
     bar->setMaximum(total);
     bar->setValue(done);

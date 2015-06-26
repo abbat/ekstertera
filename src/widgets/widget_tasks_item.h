@@ -6,7 +6,7 @@
 #ifndef _ekstertera_widgets_widget_tasks_item_h_
 #define _ekstertera_widgets_widget_tasks_item_h_
 
-#include "sysheaders.h"
+#include "widget_progress.h"
 
 /*!
  * \brief Элемент виджета списка асинхронных задач
@@ -41,18 +41,18 @@ class WidgetTasksItem : public QTreeWidgetItem
          * \brief Виджет прогресса задачи
          * \return Виджет прогресса задачи
          */
-        QProgressBar* bar() const { return m_bar; }
+        WidgetProgressbar* bar() const { return m_bar; }
 
         /*!
          * \brief Установка виджета прогресса задачи
          * \param bar Виджет прогресса
          */
-        void setBar(QProgressBar* bar) { m_bar = bar; }
+        void setBar(WidgetProgressbar* bar) { m_bar = bar; }
 
     private:
 
-        quint64       m_id;    /*!< \brief ID задачи        */
-        QProgressBar* m_bar;   /*!< \brief Виджет прогресса */
+        quint64            m_id;    /*!< \brief ID задачи        */
+        WidgetProgressbar* m_bar;   /*!< \brief Виджет прогресса */
 };
 
 #endif   // _ekstertera_widgets_widget_tasks_item_h_
