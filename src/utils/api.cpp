@@ -433,11 +433,11 @@ QString EteraAPI::humanSpeed(quint64 bps)
         postfix = trUtf8("Кб/с");
     } else if (bps < (quint64)1000 * 1000 * 1000) {
         if (bps / 1000 / 1000 <= 10)
-            prefix  = humanZeros(QString("%1").arg((double)bps / 1000 / 1000, 0, 'f', 2));
+            prefix = humanZeros(QString("%1").arg((double)bps / 1000 / 1000, 0, 'f', 2));
         else if (bps / 1000 / 1000 <= 20)
-            prefix  = humanZeros(QString("%1").arg((double)bps / 1000 / 1000, 0, 'f', 1));
+            prefix = humanZeros(QString("%1").arg((double)bps / 1000 / 1000, 0, 'f', 1));
         else
-            prefix  = QString("%1").arg((double)bps / 1000 / 1000, 0, 'f', 0);
+            prefix = QString("%1").arg((double)bps / 1000 / 1000, 0, 'f', 0);
         postfix = trUtf8("Мб/с");
     } else if (bps < (quint64)1000 * 1000 * 1000 * 1000) {
         // Like a NOC!!!

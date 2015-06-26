@@ -1,3 +1,10 @@
+ekstertera (0.1.3) testing; urgency=low
+
+  * Исправление ошибки отображения прогресса на больших файлах;
+  * Вывод ETA и скорости в области прогресса.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Fri, 26 Jun 2015 22:55:00 +0300
+
 ekstertera (0.1.2) testing; urgency=low
 
   * Исправление ошибки получения превью на Qt5;
