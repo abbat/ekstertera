@@ -50,22 +50,42 @@
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="528"/>
+        <location filename="../utils/api.cpp" line="430"/>
+        <source>б/с</source>
+        <translation>b/s</translation>
+    </message>
+    <message>
+        <location filename="../utils/api.cpp" line="433"/>
+        <source>Кб/с</source>
+        <translation>Kb/s</translation>
+    </message>
+    <message>
+        <location filename="../utils/api.cpp" line="436"/>
+        <source>Мб/с</source>
+        <translation>Mb/s</translation>
+    </message>
+    <message>
+        <location filename="../utils/api.cpp" line="440"/>
+        <source>Гб/с</source>
+        <translation>Gb/s</translation>
+    </message>
+    <message>
+        <location filename="../utils/api.cpp" line="554"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="625"/>
+        <location filename="../utils/api.cpp" line="651"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="770"/>
+        <location filename="../utils/api.cpp" line="796"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="774"/>
+        <location filename="../utils/api.cpp" line="800"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>

@@ -327,6 +327,13 @@ class EteraAPI : public QObject
         static QString humanBytes(quint64 val);
 
         /*!
+         * \brief Человекочитаемая скорость
+         * \param bps Размер в байтах (не битах!) в секунду
+         * \return Человекочитаемая скорость
+         */
+        static QString humanSpeed(quint64 bps);
+
+        /*!
          * \brief Удаление концевых нулей
          * \param val Строковое представление дробного числа
          * \return Человекочитаемый размер без концевых нулей

@@ -19,8 +19,8 @@ void WidgetTasks::resizeEvent(QResizeEvent* event)
 {
     QSize size = event->size();
 
-    setColumnWidth(0, size.width() * 70 / 100);
-    setColumnWidth(1, size.width() * 30 / 100);
+    setColumnWidth(0, size.width() * 50 / 100);
+    setColumnWidth(1, size.width() * 50 / 100);
 
     QTreeWidget::resizeEvent(event);
 }
@@ -177,11 +177,7 @@ void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
 
     if (item->bar() == NULL) {
         WidgetProgressbar* bar = new WidgetProgressbar();
-
-        bar->setMinimum(0);
-
         item->setBar(bar);
-
         setItemWidget(item, 1, bar);
     }
 

@@ -399,7 +399,7 @@ QString EteraAPI::humanBytes(quint64 val)
     QString postfix;
 
     if (val < (quint64)1024) {
-        prefix = QString::number(val);
+        prefix = QString("%1").arg(val);
     } else if (val < (quint64)1024 * 1024) {
         prefix  = QString("%1").arg((double)val / 1024, 0, 'f', 0);
         postfix = trUtf8("КБ");
@@ -412,6 +412,32 @@ QString EteraAPI::humanBytes(quint64 val)
     } else {
         prefix  = humanZeros(QString("%1").arg((double)val / 1024 / 1024 / 1024 / 1024, 0, 'f', 2));
         postfix = trUtf8("ТБ");
+    }
+
+    return prefix + postfix;
+}
+//----------------------------------------------------------------------------------------------
+
+QString EteraAPI::humanSpeed(quint64 bps)
+{
+    bps *= 8;
+
+    QString prefix;
+    QString postfix;
+
+    if (bps < (quint64)1000) {
+        prefix = QString("%1").arg(bps);
+        postfix = trUtf8("б/с");
+    } else if (bps < (quint64)1000 * 1000) {
+        prefix  = QString("%1").arg((double)bps / 1000, 0, 'f', 0);
+        postfix = trUtf8("Кб/с");
+    } else if (bps < (quint64)1000 * 1000 * 1000) {
+        prefix  = QString("%1").arg((double)bps / 1000 / 1000, 0, 'f', 0);
+        postfix = trUtf8("Мб/с");
+    } else if (bps < (quint64)1000 * 1000 * 1000 * 1000) {
+        // Like a NOC!!!
+        prefix  = humanZeros(QString("%1").arg((double)bps / 1000 / 1000 / 1000, 0, 'f', 2));
+        postfix = trUtf8("Гб/с");
     }
 
     return prefix + postfix;

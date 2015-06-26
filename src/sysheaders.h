@@ -25,6 +25,7 @@
 #include <QPainter>
 #include <QMenuBar>
 #include <QToolBar>
+#include <QDateTime>
 #include <QMultiMap>
 #include <QCheckBox>
 #include <QComboBox>
