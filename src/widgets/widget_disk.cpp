@@ -260,6 +260,16 @@ void WidgetDisk::removeByPath(const QString& path)
 }
 //----------------------------------------------------------------------------------------------
 
+QString WidgetDisk::basename(const QString& path, QChar separator)
+{
+    int idx = path.lastIndexOf(separator);
+    if (idx == -1)
+        return "";
+
+    return path.right(path.length() - idx - 1);
+}
+//----------------------------------------------------------------------------------------------
+
 void WidgetDisk::widget_tasks_on_change_count(int count)
 {
     if (count > 0) {
@@ -1655,7 +1665,7 @@ void WidgetDisk::task_on_put_ensure_success(EteraAPI* api, const EteraItem& item
                 if (item.isFile() == true) {
                     ETERA_API_TASK_PUT(api, task_on_put_file_success, task_on_put_file_error, task_on_put_file_progress);
 
-                    m_tasks->addChildTask(api->parentID(), api->id(), START_MESSAGE_UPLOAD.arg(api->source()).arg(api->target()));
+                    m_tasks->addChildTask(api->parentID(), api->id(), localBasename(api->source()), START_MESSAGE_UPLOAD.arg(api->source()).arg(api->target()));
 
                     api->put(api->source(), api->target(), true);
                 } else if (item.isDir() == true) {
@@ -1734,7 +1744,7 @@ void WidgetDisk::task_on_put_rm_success(EteraAPI* api)
     else if (api->ensure() == eitFile) {
         ETERA_API_TASK_PUT(api, task_on_put_file_success, task_on_put_file_error, task_on_put_file_progress);
 
-        m_tasks->addChildTask(api->parentID(), api->id(), START_MESSAGE_UPLOAD.arg(api->source()).arg(api->target()));
+        m_tasks->addChildTask(api->parentID(), api->id(), localBasename(api->source()), START_MESSAGE_UPLOAD.arg(api->source()).arg(api->target()));
 
         api->put(api->source(), api->target(), api->overwrite());
     }
@@ -1757,7 +1767,7 @@ void WidgetDisk::addPutActivity(EteraPutActivityType type, quint64 parent, const
             m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_MKDIR.arg(item.Source));
         } else if (type == epatFile) {
             m_put_queue_put.enqueue(item);
-            m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_UPLOAD.arg(item.Source).arg(item.Target));
+            m_tasks->addChildTask(item.Parent, item.ID, localBasename(item.Source), START_MESSAGE_UPLOAD.arg(item.Source).arg(item.Target));
         }
     }
 
@@ -2149,7 +2159,7 @@ void WidgetDisk::addGetActivity(EteraGetActivityType type, quint64 parent, const
             m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_LS.arg(item.Source));
         } else if (type == agatGet) {
             m_get_queue_get.enqueue(item);
-            m_tasks->addChildTask(item.Parent, item.ID, START_MESSAGE_DOWNLOAD.arg(item.Source).arg(item.Target));
+            m_tasks->addChildTask(item.Parent, item.ID, remoteBasename(item.Source), START_MESSAGE_DOWNLOAD.arg(item.Source).arg(item.Target));
         }
     }
 

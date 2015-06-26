@@ -60,32 +60,32 @@
         <translation>Kb/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="436"/>
+        <location filename="../utils/api.cpp" line="441"/>
         <source>Мб/с</source>
         <translation>Mb/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="440"/>
+        <location filename="../utils/api.cpp" line="445"/>
         <source>Гб/с</source>
         <translation>Gb/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="554"/>
+        <location filename="../utils/api.cpp" line="559"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="651"/>
+        <location filename="../utils/api.cpp" line="656"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="796"/>
+        <location filename="../utils/api.cpp" line="801"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="800"/>
+        <location filename="../utils/api.cpp" line="805"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>
@@ -431,7 +431,7 @@
     </message>
     <message>
         <location filename="../widgets/widget_disk.cpp" line="135"/>
-        <location filename="../widgets/widget_disk.cpp" line="270"/>
+        <location filename="../widgets/widget_disk.cpp" line="280"/>
         <source>Задачи</source>
         <translation>Tasks</translation>
     </message>
@@ -519,7 +519,7 @@
         <translation>Download %1 to %2</translation>
     </message>
     <message>
-        <location filename="../widgets/widget_disk.cpp" line="267"/>
+        <location filename="../widgets/widget_disk.cpp" line="277"/>
         <source>Задачи (%1)</source>
         <translation>Tasks (%1)</translation>
     </message>

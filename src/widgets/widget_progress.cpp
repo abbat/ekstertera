@@ -2,28 +2,6 @@
 //----------------------------------------------------------------------------------------------
 #include "utils/api.h"
 //----------------------------------------------------------------------------------------------
-/*!
- * \brief Получение номера старшего значимого бита (обратная ffs)
- * \param x Анализируемое значение
- * \return Старший значимый бит (счет с 1) или 0 для 0
- */
-int msb(unsigned int x)
-{
-    int ret = sizeof(unsigned int) * CHAR_BIT;
-    return x ? ret - __builtin_clz(x) : ret;
-}
-//----------------------------------------------------------------------------------------------
-/*!
- * \brief Получение номера старшего значимого бита (обратная ffsll)
- * \param x Анализируемое значение
- * \return Старший значимый бит (счет с 1) или 0 для 0
- */
-int msbll(unsigned long long x)
-{
-    int ret = sizeof(unsigned long long) * CHAR_BIT;
-    return x ? ret - __builtin_clzll(x) : ret;
-}
-//----------------------------------------------------------------------------------------------
 
 WidgetProgressbar::WidgetProgressbar(QWidget* parent) : QWidget(parent)
 {
@@ -48,6 +26,20 @@ WidgetProgressbar::WidgetProgressbar(QWidget* parent) : QWidget(parent)
 
 WidgetProgressbar::~WidgetProgressbar()
 {
+}
+//----------------------------------------------------------------------------------------------
+
+int WidgetProgressbar::msb(unsigned int x)
+{
+    int ret = sizeof(unsigned int) * CHAR_BIT;
+    return x ? ret - __builtin_clz(x) : ret;
+}
+//----------------------------------------------------------------------------------------------
+
+int WidgetProgressbar::msbll(unsigned long long x)
+{
+    int ret = sizeof(unsigned long long) * CHAR_BIT;
+    return x ? ret - __builtin_clzll(x) : ret;
 }
 //----------------------------------------------------------------------------------------------
 
@@ -92,7 +84,7 @@ QString WidgetProgressbar::formatTime(qint64 seconds)
     else
         result += QString("%1:").arg(h);
 
-    if (h < 10)
+    if (m < 10)
         result += QString("0%1:").arg(m);
     else
         result += QString("%1:").arg(m);
