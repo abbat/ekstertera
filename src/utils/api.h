@@ -580,6 +580,16 @@ class EteraAPI : public QObject
         QString m_error_message;
 
         /*!
+         * \brief Номер попытки
+         */
+        int m_retry;
+
+        /*!
+         * \brief Максимальное число неудачных попыток
+         */
+        int m_max_retries;
+
+        /*!
          * \brief Транспорт HTTPS
          */
         QNetworkAccessManager m_http;
@@ -624,6 +634,11 @@ class EteraAPI : public QObject
          * \return true для code = 0 иначе false
          */
         bool setLastError(int code, const QString& message = "");
+
+        /*!
+         * \brief Сброс последней ошибки перед началом новой операции
+         */
+        void resetLastError() { m_error_code = 0; m_error_message = OK_MESSAGE; }
 
         /*!
          * \brief Установка стандартных заголовков для запроса

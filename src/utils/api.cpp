@@ -348,9 +348,12 @@ EteraAPI::EteraAPI(QObject* parent, quint64 id) : QObject(parent)
     m_parent_id   = 0;
     m_ensure      = eitUnknown;
 
+    m_retry       = 0;
+    m_max_retries = 3;
+
     retranslateUi();
 
-    setLastError(0);
+    resetLastError();
 }
 //----------------------------------------------------------------------------------------------
 
@@ -482,11 +485,13 @@ bool EteraAPI::setLastError(int code, const QString& message)
     m_error_code = code;
 
     if (code != 0) {
+        m_retry++;
         m_error_message = QString("[%1]: %2").arg(code).arg(message);
-
         emit onError(this);
-    } else
+    } else {
+        m_retry         = 0;
         m_error_message = OK_MESSAGE;
+    }
 
     return code == 0;
 }
@@ -501,7 +506,10 @@ void EteraAPI::abort()
 
 bool EteraAPI::canRetry() const
 {
-    if (m_error_code == 429 || m_error_code >= 500)
+    if (m_retry >= m_max_retries)
+        return false;
+
+    if (m_error_code == 99 /* Unable to write */ || m_error_code == 429  /* Too Many Requests */ || m_error_code >= 500)
         return true;
 
     return false;
@@ -633,7 +641,7 @@ bool EteraAPI::parseReply(int& code, QString& body)
 
 bool EteraAPI::startSimpleRequest(const QString& url, const EteraArgs& args, EteraRequestMethod method)
 {
-    setLastError(0);
+    resetLastError();
 
     QNetworkRequest request;
     prepareRequest(request, url, args);
@@ -650,7 +658,7 @@ bool EteraAPI::startSimpleRequest(const QString& url, const EteraArgs& args, Ete
 
 void EteraAPI::getToken(const QString& auth_code)
 {
-    setLastError(0);
+    resetLastError();
 
     // базовый домен для авторизации по OAuth, разный для разных языков
     QString oauth_base = trUtf8("oauth.yandex.ru");

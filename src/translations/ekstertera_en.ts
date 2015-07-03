@@ -1,90 +1,91 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE TS>
-<TS version="2.1" language="en_US" sourcelanguage="ru_RU">
+<TS version="2.0" language="en_US" sourcelanguage="ru_RU">
+<defaultcodec>UTF-8</defaultcodec>
 <context>
     <name>EteraAPI</name>
     <message>
-        <location filename="../utils/api.cpp" line="364"/>
+        <location filename="../utils/api.cpp" line="367"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="365"/>
+        <location filename="../utils/api.cpp" line="368"/>
         <source>Ошибка разбора JSON</source>
         <translation>JSON parse error</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="366"/>
+        <location filename="../utils/api.cpp" line="369"/>
         <source>Неподдерживаемый URL объекта Link</source>
         <translation>Malformed URL of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="367"/>
+        <location filename="../utils/api.cpp" line="370"/>
         <source>Неподдерживаемый метод объекта Link</source>
         <translation>Unsupported method of Link object</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="368"/>
+        <location filename="../utils/api.cpp" line="371"/>
         <source>Ошибка открытия файла</source>
         <translation>An error occurred when opening the file</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="405"/>
+        <location filename="../utils/api.cpp" line="408"/>
         <source>КБ</source>
         <translation>KB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="408"/>
+        <location filename="../utils/api.cpp" line="411"/>
         <source>МБ</source>
         <translation>MB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="411"/>
+        <location filename="../utils/api.cpp" line="414"/>
         <source>ГБ</source>
         <translation>GB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="414"/>
+        <location filename="../utils/api.cpp" line="417"/>
         <source>ТБ</source>
         <translation>TB</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="430"/>
+        <location filename="../utils/api.cpp" line="433"/>
         <source>б/с</source>
         <translation>b/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="433"/>
+        <location filename="../utils/api.cpp" line="436"/>
         <source>Кб/с</source>
         <translation>Kb/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="441"/>
+        <location filename="../utils/api.cpp" line="444"/>
         <source>Мб/с</source>
         <translation>Mb/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="445"/>
+        <location filename="../utils/api.cpp" line="448"/>
         <source>Гб/с</source>
         <translation>Gb/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="559"/>
+        <location filename="../utils/api.cpp" line="567"/>
         <source>API не инициализировано</source>
         <translation>API is not initialized</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="656"/>
+        <location filename="../utils/api.cpp" line="664"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="801"/>
+        <location filename="../utils/api.cpp" line="809"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>Operation failed, try repeating the initial request later</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="805"/>
+        <location filename="../utils/api.cpp" line="813"/>
         <source>Неизвестный статус операции</source>
         <translation>Unknow operation status</translation>
     </message>
@@ -361,6 +362,14 @@
         <location filename="../forms/form_settings_ui.cpp" line="101"/>
         <source>Отмена</source>
         <translation>Cancel</translation>
+    </message>
+</context>
+<context>
+    <name>QStandardPaths</name>
+    <message>
+        <location filename="../../3dparty/qt5/standardpaths/qstandardpaths_mac.cpp" line="157"/>
+        <source>Home</source>
+        <translation>Home</translation>
     </message>
 </context>
 <context>
