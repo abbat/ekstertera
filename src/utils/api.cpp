@@ -619,6 +619,10 @@ bool EteraAPI::parseReply(int& code, QString& body)
         m_reply->deleteLater();
         m_reply = NULL;
 
+        // коды NetworkError пересекаются с HTTP-кодами
+        if (error >= 100 && error < 600)
+            error += 1000;
+
         return setLastError(error, message);
     }
 
