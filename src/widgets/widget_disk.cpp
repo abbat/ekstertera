@@ -15,8 +15,8 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
 
     m_message_box_active = false;
 
-    m_put_activity_limit = QThread::idealThreadCount();
-    m_get_activity_limit = QThread::idealThreadCount();
+    m_put_activity_limit = 8 /* TODO: #3 */;
+    m_get_activity_limit = 8 /* TODO: #3 */;
 
     m_explorer = new QListWidget(this);
 

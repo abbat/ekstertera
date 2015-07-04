@@ -404,7 +404,7 @@ bool EteraIconProvider::preview(WidgetDiskItem* item)
 
     m_preview_wait.insert(preview, item);
 
-    if (m_preview_queue_size >= (quint64)QThread::idealThreadCount()) {
+    if (m_preview_queue_size >= 8 /* TODO: #3 */) {
         m_preview_queue.insert(preview);
         return false;
     }
