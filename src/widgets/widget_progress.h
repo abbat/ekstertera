@@ -30,6 +30,7 @@ class WidgetProgressbar : public QWidget
 
         void setMaximum(qint64 maximum);
         void setValue(qint64 value);
+        void reset();
 
     private:
 

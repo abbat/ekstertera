@@ -187,3 +187,19 @@ void WidgetTasks::setProgress(quint64 id, qint64 done, qint64 total)
     bar->setValue(done);
 }
 //----------------------------------------------------------------------------------------------
+
+void WidgetTasks::resetProgress(quint64 id)
+{
+    Q_ASSERT(id != 0);
+
+    WidgetTasksItem* item = m_tasks.value(id, NULL);
+    if (item == NULL)
+        return;
+
+    WidgetProgressbar* bar = item->bar();
+    if (bar == NULL)
+        return;
+
+    bar->reset();
+}
+//----------------------------------------------------------------------------------------------

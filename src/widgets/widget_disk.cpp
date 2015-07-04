@@ -109,7 +109,7 @@ WidgetDisk::WidgetDisk(QWidget* parent) : QTabWidget(parent)
     // таймер отложенных сигналов / задач
     m_emit_timer = new QTimer(this);
     connect(m_emit_timer, SIGNAL(timeout()), SLOT(emit_delayed_signals()));
-    m_emit_timer->start(5000);
+    m_emit_timer->start(10000); /* TODO: #2 */
 }
 //----------------------------------------------------------------------------------------------
 
@@ -1441,6 +1441,7 @@ void WidgetDisk::task_on_put_file_error(EteraAPI* api)
     }
 
     if (api->canRetry() == true) {
+        m_tasks->resetProgress(api->id());
         delayTask(slot_task_on_put_file_error, api);
         return;
     }
@@ -2021,6 +2022,7 @@ void WidgetDisk::task_on_get_file_error(EteraAPI* api)
     }
 
     if (api->canRetry() == true) {
+        m_tasks->resetProgress(api->id());
         delayTask(slot_task_on_get_file_error, api);
         return;
     }

@@ -89,6 +89,12 @@ class WidgetTasks : public QTreeWidget
          */
         void setProgress(quint64 id, qint64 done, qint64 total);
 
+        /*!
+         * \brief Сброс прогресса задачи
+         * \param id ID задачи
+         */
+        void resetProgress(quint64 id);
+
     protected:
 
         /*!

@@ -557,6 +557,11 @@ class EteraAPI : public QObject
          */
         QString FILE_OPEN_ERROR;
 
+        /*!
+         * \brief Таймаут сетевой операции
+         */
+        QString TIMED_OUT_ERROR;
+
     private:
 
         /*!
@@ -588,6 +593,21 @@ class EteraAPI : public QObject
          * \brief Максимальное число неудачных попыток
          */
         int m_max_retries;
+
+        /*!
+         * \brief Текущий tick для определения таймаута
+         */
+        qint64 m_tick;
+
+        /*!
+         * \brief Последний известный tick для определения таймаута
+         */
+        qint64 m_prev_tick;
+
+        /*!
+         * \brief Таймер определения таймаута
+         */
+        QTimer* m_tick_timer;
 
         /*!
          * \brief Транспорт HTTPS
@@ -730,6 +750,12 @@ class EteraAPI : public QObject
         bool parseWait(bool& wait);
 
     private slots:
+
+        //
+        // события таймера таймаута
+        //
+
+        void on_tick_timer();   /*!< \brief Таймер определения таймаута */
 
         //
         // события HTTPS обработчика

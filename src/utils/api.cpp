@@ -349,11 +349,19 @@ EteraAPI::EteraAPI(QObject* parent, quint64 id) : QObject(parent)
     m_ensure      = eitUnknown;
 
     m_retry       = 0;
-    m_max_retries = 3;
+    m_max_retries = 5; /* TODO: #2 */
+
+    m_tick      = 0;
+    m_prev_tick = 0;
+
+    m_tick_timer = new QTimer(this);
 
     retranslateUi();
 
     resetLastError();
+
+    connect(m_tick_timer, SIGNAL(timeout()), this, SLOT(on_tick_timer()));
+    m_tick_timer->start(30000); /* TODO: #2 */
 }
 //----------------------------------------------------------------------------------------------
 
@@ -369,6 +377,7 @@ void EteraAPI::retranslateUi()
     MALFORMED_LINK_URL      = trUtf8("Неподдерживаемый URL объекта Link");
     UNSUPPORTED_LINK_METHOD = trUtf8("Неподдерживаемый метод объекта Link");
     FILE_OPEN_ERROR         = trUtf8("Ошибка открытия файла");
+    TIMED_OUT_ERROR         = trUtf8("Таймаут сетевой операции");
 }
 //----------------------------------------------------------------------------------------------
 
@@ -452,11 +461,25 @@ QString EteraAPI::humanSpeed(quint64 bps)
 }
 //----------------------------------------------------------------------------------------------
 
+void EteraAPI::on_tick_timer()
+{
+    if (g_api_enabled == false || m_deleted == true || m_reply == NULL)
+        return;
+
+    if (m_prev_tick == m_tick) {
+        m_prev_tick = -1;
+        m_reply->abort();
+    } else
+        m_prev_tick = m_tick;
+}
+//----------------------------------------------------------------------------------------------
+
 void EteraAPI::on_progress(qint64 done, qint64 total)
 {
-    if (g_api_enabled == true)
+    if (g_api_enabled == true) {
+        m_tick++;
         emit onProgress(this, done, total);
-    else
+    } else
         m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
@@ -473,9 +496,10 @@ void EteraAPI::on_ssl_errors(const QList<QSslError>& errors)
 
 void EteraAPI::on_ready_read()
 {
-    if (g_api_enabled == true)
+    if (g_api_enabled == true) {
+        m_tick++;
         m_io->write(m_reply->readAll());
-    else
+    } else
         m_reply->abort();
 }
 //----------------------------------------------------------------------------------------------
@@ -509,7 +533,10 @@ bool EteraAPI::canRetry() const
     if (m_retry >= m_max_retries)
         return false;
 
-    if (m_error_code == 99 /* Unable to write */ || m_error_code == 429  /* Too Many Requests */ || m_error_code >= 500)
+    if (m_error_code == 99  || /* Unable to write    */
+        m_error_code == 4   || /* Operation timedout */
+        m_error_code == 429 || /* Too Many Requests  */
+        m_error_code >= 500)
         return true;
 
     return false;
@@ -563,6 +590,9 @@ bool EteraAPI::startRequest(const QNetworkRequest& request, EteraRequestMethod m
     m_io    = NULL;
     m_reply = NULL;
 
+    m_tick      = 1;
+    m_prev_tick = 0;
+
     if (g_api_enabled == false)
         return setLastError(1, trUtf8("API не инициализировано"));
 
@@ -609,11 +639,16 @@ bool EteraAPI::startRequest(const QNetworkRequest& request, EteraRequestMethod m
 
 bool EteraAPI::parseReply(int& code, QString& body)
 {
-    QVariant http_code = m_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+    code = m_reply->attribute(QNetworkRequest::HttpStatusCodeAttribute).toInt();
 
-    if (http_code.isValid() == false || http_code.isNull() == true) {
-        QNetworkReply::NetworkError error   = m_reply->error();
-        QString                     message = m_reply->errorString();
+    int error = m_reply->error();
+    if (code == 0 || (error != 0 && code >= 200 && code < 400)) {
+        QString message = m_reply->errorString();
+
+        if (error == QNetworkReply::OperationCanceledError && m_prev_tick == -1) {
+            error   = QNetworkReply::TimeoutError;
+            message = TIMED_OUT_ERROR;
+        }
 
         m_reply->close();
         m_reply->deleteLater();
@@ -625,8 +660,6 @@ bool EteraAPI::parseReply(int& code, QString& body)
 
         return setLastError(error, message);
     }
-
-    code = http_code.toInt();
 
     if (code >= 200 && code < 300)
         body = QString::fromUtf8(m_reply->readAll());

@@ -52,8 +52,8 @@ void WidgetProgressbar::updateProgressText()
 
     QString text = "%p% ";
 
-    if (m_maximum > 0 && m_value >= 0) {
-        if (m_value == 0)
+    if (m_maximum >= 0 && m_value >= 0) {
+        if (m_maximum == 0 || m_value == 0)
             text += QString("%1").arg("--:--:--");
         else {
             qint64 eta = (qint64)((double)elapsed * m_maximum / m_value) - elapsed;
@@ -121,10 +121,21 @@ void WidgetProgressbar::setValue(qint64 value)
     if (m_value == value)
         return;
 
+    if (value < m_value) {
+        m_elapsed = 0;
+        m_start   = QDateTime::currentDateTime();
+    }
+
     m_value = value;
 
     m_bar->setValue(shift(m_value));
 
     updateProgressText();
+}
+//----------------------------------------------------------------------------------------------
+
+void WidgetProgressbar::reset()
+{
+    m_bar->setFormat("%p% --:--:--");
 }
 //----------------------------------------------------------------------------------------------
