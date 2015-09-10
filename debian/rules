@@ -17,7 +17,7 @@ override_dh_auto_build:
 		"CONFIG += release" \
 		"QT += network" \
 		"INCLUDEPATH += src" \
-		"TRANSLATIONS += src/translations/ekstertera_en.ts" \
+		"TRANSLATIONS += src/translations/ekstertera_*.ts" \
 		"QMAKE_CPPFLAGS *= $(shell dpkg-buildflags --get CPPFLAGS)" \
 		"QMAKE_CFLAGS   *= $(shell dpkg-buildflags --get CFLAGS)" \
 		"QMAKE_CXXFLAGS *= $(shell dpkg-buildflags --get CXXFLAGS)" \

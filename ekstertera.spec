@@ -1,5 +1,5 @@
 Name:          ekstertera
-Version:       0.1.4
+Version:       0.1.5
 Release:       1
 Summary:       Yandex.Disk GUI client
 Group:         Applications/Internet
@@ -36,7 +36,7 @@ export QT_SELECT=4
     "CONFIG += release" \
     "QT += network" \
     "INCLUDEPATH += src" \
-    "TRANSLATIONS += src/translations/%{name}_en.ts" \
+    "TRANSLATIONS += src/translations/%{name}_*.ts" \
     src 3dparty/json 3dparty/qt5
 %{lrelease} -compress -removeidentical %{name}.pro
 %{qmake} %{name}.pro
@@ -66,5 +66,5 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Sat Jul 4 2015 Anton Batenev <antonbatenev@yandex.ru> 0.1.4-1
+* Thu Sep 10 2015 Anton Batenev <antonbatenev@yandex.ru> 0.1.5-1
 - Initial RPM release

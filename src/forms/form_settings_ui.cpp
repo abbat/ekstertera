@@ -18,8 +18,9 @@ FormSettingsUI::FormSettingsUI(QWidget* parent) : QDialog(parent, Qt::WindowTitl
 
     m_label_language = new QLabel(this);
     m_combo_language = new QComboBox(this);
-    m_combo_language->addItem(QString::fromUtf8("Русский"), "ru");
-    m_combo_language->addItem(QString::fromUtf8("English"), "en");
+    m_combo_language->addItem(QString::fromUtf8("Русский"),  "ru");
+    m_combo_language->addItem(QString::fromUtf8("English"),  "en");
+    m_combo_language->addItem(QString::fromUtf8("Français"), "fr");
     m_layout_settings->addRow(m_label_language, m_combo_language);
 
     m_layout_token = new QHBoxLayout();

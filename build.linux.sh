@@ -34,7 +34,7 @@ qmake -project -recursive -Wall -nopwd -o "${PROJECT}.pro" \
     "QT += ${QT_OPTS}" \
     "INCLUDEPATH += src" \
     "TRANSLATIONS += \
-    src/translations/${PROJECT}_en.ts" \
+    src/translations/${PROJECT}_*.ts" \
     src ${SRC_3DPARTY}
 
 # qttools5-dev-tools для qt5
