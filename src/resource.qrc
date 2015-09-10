@@ -54,5 +54,6 @@
 
         <!-- переводы -->
         <file>translations/ekstertera_en.qm</file>
+        <file>translations/ekstertera_fr.qm</file>
     </qresource>
 </RCC>

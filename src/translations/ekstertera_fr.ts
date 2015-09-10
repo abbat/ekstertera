@@ -12,17 +12,17 @@
     <message>
         <location filename="../utils/api.cpp" line="376"/>
         <source>Ошибка разбора JSON</source>
-        <translation>Erreur d'analyse JSON</translation>
+        <translation>Erreur d&apos;analyse JSON</translation>
     </message>
     <message>
         <location filename="../utils/api.cpp" line="377"/>
         <source>Неподдерживаемый URL объекта Link</source>
-        <translation>URL de l'objet Link malformée</translation>
+        <translation>URL de l&apos;objet Link malformée</translation>
     </message>
     <message>
         <location filename="../utils/api.cpp" line="378"/>
         <source>Неподдерживаемый метод объекта Link</source>
-        <translation>Méthode non supportée par l'objet Link</translation>
+        <translation>Méthode non supportée par l&apos;objet Link</translation>
     </message>
     <message>
         <location filename="../utils/api.cpp" line="379"/>
@@ -32,7 +32,7 @@
     <message>
         <location filename="../utils/api.cpp" line="380"/>
         <source>Таймаут сетевой операции</source>
-        <translation>L'opération réseau a expiré</translation>
+        <translation>L&apos;opération réseau a expiré</translation>
     </message>
     <message>
         <location filename="../utils/api.cpp" line="417"/>
@@ -77,7 +77,7 @@
     <message>
         <location filename="../utils/api.cpp" line="597"/>
         <source>API не инициализировано</source>
-        <translation>L'API n'est pas initialisée</translation>
+        <translation>L&apos;API n&apos;est pas initialisée</translation>
     </message>
     <message>
         <location filename="../utils/api.cpp" line="701"/>
@@ -87,12 +87,12 @@
     <message>
         <location filename="../utils/api.cpp" line="846"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
-        <translation>L'opération a échoué, essayez de recommencer la requête initiale dans un moment</translation>
+        <translation>L&apos;opération a échoué, essayez de recommencer la requête initiale dans un moment</translation>
     </message>
     <message>
         <location filename="../utils/api.cpp" line="850"/>
         <source>Неизвестный статус операции</source>
-        <translation>Statut de l'opération inconnu</translation>
+        <translation>Statut de l&apos;opération inconnu</translation>
     </message>
 </context>
 <context>
@@ -275,7 +275,7 @@
     <message>
         <location filename="../forms/form_main_ui.cpp" line="193"/>
         <source>Панель инструментов</source>
-        <translation>Barre d'outils</translation>
+        <translation>Barre d&apos;outils</translation>
     </message>
     <message>
         <location filename="../forms/form_main_ui.cpp" line="195"/>
@@ -308,7 +308,7 @@
     <message>
         <location filename="../forms/form_settings.cpp" line="82"/>
         <source>Введите код подтверждения</source>
-        <translation>Entrez le code d'authentification</translation>
+        <translation>Entrez le code d&apos;authentification</translation>
     </message>
     <message>
         <location filename="../forms/form_settings.cpp" line="85"/>
@@ -318,7 +318,7 @@
     <message>
         <location filename="../forms/form_settings.cpp" line="85"/>
         <source>Необходимо ввести код подтверждения!</source>
-        <translation>Le code d'authentification est requis !</translation>
+        <translation>Le code d&apos;authentification est requis !</translation>
     </message>
     <message>
         <location filename="../forms/form_settings.cpp" line="98"/>
@@ -329,42 +329,42 @@
 <context>
     <name>FormSettingsUI</name>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="90"/>
+        <location filename="../forms/form_settings_ui.cpp" line="91"/>
         <source>Параметры</source>
         <translation>Paramètres</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="92"/>
+        <location filename="../forms/form_settings_ui.cpp" line="93"/>
         <source>Язык</source>
         <translation>Langue</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="93"/>
+        <location filename="../forms/form_settings_ui.cpp" line="94"/>
         <source>OAuth токен</source>
         <translation>Jeton OAuth</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="95"/>
+        <location filename="../forms/form_settings_ui.cpp" line="96"/>
         <source>Получить OAuth токен</source>
         <translation>Obtenir un jeton OAuth</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="97"/>
+        <location filename="../forms/form_settings_ui.cpp" line="98"/>
         <source>Скрывать в трее</source>
         <translation>Fermer vers la zone de notification</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="98"/>
+        <location filename="../forms/form_settings_ui.cpp" line="99"/>
         <source>Скрывать в значок в области уведомления вместо закрытия при нажатии на кнопку закрытия окна</source>
-        <translation>Masquer dans la zone de notification au lieu de quitter l'application</translation>
+        <translation>Masquer dans la zone de notification au lieu de quitter l&apos;application</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="100"/>
+        <location filename="../forms/form_settings_ui.cpp" line="101"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="101"/>
+        <location filename="../forms/form_settings_ui.cpp" line="102"/>
         <source>Отмена</source>
         <translation>Annuler</translation>
     </message>

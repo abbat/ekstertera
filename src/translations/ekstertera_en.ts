@@ -329,42 +329,42 @@
 <context>
     <name>FormSettingsUI</name>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="90"/>
+        <location filename="../forms/form_settings_ui.cpp" line="91"/>
         <source>Параметры</source>
         <translation>Settings</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="92"/>
+        <location filename="../forms/form_settings_ui.cpp" line="93"/>
         <source>Язык</source>
         <translation>Language</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="93"/>
+        <location filename="../forms/form_settings_ui.cpp" line="94"/>
         <source>OAuth токен</source>
         <translation>OAuth token</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="95"/>
+        <location filename="../forms/form_settings_ui.cpp" line="96"/>
         <source>Получить OAuth токен</source>
         <translation>Get OAuth token</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="97"/>
+        <location filename="../forms/form_settings_ui.cpp" line="98"/>
         <source>Скрывать в трее</source>
         <translation>Close to tray</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="98"/>
+        <location filename="../forms/form_settings_ui.cpp" line="99"/>
         <source>Скрывать в значок в области уведомления вместо закрытия при нажатии на кнопку закрытия окна</source>
         <translation>Hide using the tray icon instead of closing when the window close button is clicked</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="100"/>
+        <location filename="../forms/form_settings_ui.cpp" line="101"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../forms/form_settings_ui.cpp" line="101"/>
+        <location filename="../forms/form_settings_ui.cpp" line="102"/>
         <source>Отмена</source>
         <translation>Cancel</translation>
     </message>

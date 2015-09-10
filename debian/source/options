@@ -14,3 +14,4 @@ tar-ignore = ekstertera.wxs
 tar-ignore = src/resource.rc
 tar-ignore = src/icons/ekstertera.ico
 tar-ignore = src/translations/ekstertera_en.qm
+tar-ignore = src/translations/ekstertera_fr.qm
