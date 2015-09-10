@@ -31,7 +31,7 @@ REM *******************************
     "QT += network" ^
     "INCLUDEPATH += src" ^
     "LIBS += -L$$quote(%MS_SDK_LIB%) -luuid" ^
-    "TRANSLATIONS += src/translations/ekstertera_*.ts" ^
+    "TRANSLATIONS += src/translations/ekstertera_en.ts src/translations/ekstertera_fr.ts" ^
     "RC_FILE += src/resource.rc" ^
     src 3dparty/json
 

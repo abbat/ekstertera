@@ -11,17 +11,19 @@ override_dh_auto_clean:
 
 override_dh_auto_build:
 	export QT_SELECT=4
-	qmake -project -recursive -Wall -nopwd -o "ekstertera.pro" \
-		"CODEC = UTF-8" \
-		"CODECFORTR = UTF-8" \
-		"CONFIG += release" \
-		"QT += network" \
-		"INCLUDEPATH += src" \
-		"TRANSLATIONS += src/translations/ekstertera_*.ts" \
+	qmake -project -recursive -Wall -nopwd -o "ekstertera.pro"          \
+		"CODEC = UTF-8"                                             \
+		"CODECFORTR = UTF-8"                                        \
+		"CONFIG += release"                                         \
+		"QT += network"                                             \
+		"INCLUDEPATH += src"                                        \
+		"TRANSLATIONS +=                                            \
+		   src/translations/ekstertera_en.ts                        \
+		   src/translations/ekstertera_fr.ts"                       \
 		"QMAKE_CPPFLAGS *= $(shell dpkg-buildflags --get CPPFLAGS)" \
-		"QMAKE_CFLAGS   *= $(shell dpkg-buildflags --get CFLAGS)" \
+		"QMAKE_CFLAGS   *= $(shell dpkg-buildflags --get CFLAGS)"   \
 		"QMAKE_CXXFLAGS *= $(shell dpkg-buildflags --get CXXFLAGS)" \
-		"QMAKE_LFLAGS   *= $(shell dpkg-buildflags --get LDFLAGS)" \
+		"QMAKE_LFLAGS   *= $(shell dpkg-buildflags --get LDFLAGS)"  \
 		src 3dparty/json 3dparty/qt5
 	lrelease -compress -removeidentical "ekstertera.pro"
 	qmake "ekstertera.pro"

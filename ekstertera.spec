@@ -31,12 +31,14 @@ GUI tool to upload, retrieve and manage data in Yandex.Disk service
 %build
 export QT_SELECT=4
 %{qmake} -project -recursive -Wall -nopwd -o %{name}.pro \
-    "CODEC = UTF-8" \
-    "CODECFORTR = UTF-8" \
-    "CONFIG += release" \
-    "QT += network" \
-    "INCLUDEPATH += src" \
-    "TRANSLATIONS += src/translations/%{name}_*.ts" \
+    "CODEC = UTF-8"                    \
+    "CODECFORTR = UTF-8"               \
+    "CONFIG += release"                \
+    "QT += network"                    \
+    "INCLUDEPATH += src"               \
+    "TRANSLATIONS +=                   \
+       src/translations/%{name}_en.ts  \
+       src/translations/%{name}_fr.ts" \
     src 3dparty/json 3dparty/qt5
 %{lrelease} -compress -removeidentical %{name}.pro
 %{qmake} %{name}.pro
