@@ -215,7 +215,7 @@
     <message>
         <location filename="../forms/form_main_ui.cpp" line="173"/>
         <source>&amp;Файл</source>
-        <translation>&amp;Fchier</translation>
+        <translation>&amp;Fichier</translation>
     </message>
     <message>
         <location filename="../forms/form_main_ui.cpp" line="175"/>
@@ -235,7 +235,7 @@
     <message>
         <location filename="../forms/form_main_ui.cpp" line="181"/>
         <source>&amp;Вид</source>
-        <translation>&amp;Afficher</translation>
+        <translation>&amp;Affichage</translation>
     </message>
     <message>
         <location filename="../forms/form_main_ui.cpp" line="183"/>
