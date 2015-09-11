@@ -398,8 +398,11 @@ quint64 EteraAPI::nextID()
 QString EteraAPI::humanZeros(const QString& val)
 {
     int i = val.length() - 1;
-    while (i >= 0 && (val[i] == '0' || val[i] == '.'))
+    while (i >= 0 && (val[i] == '0' || val[i] == '.')) {
         i--;
+        if (val[i + 1] == '.')
+            break;
+    }
 
     return val.left(i + 1);
 }
