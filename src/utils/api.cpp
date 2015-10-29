@@ -575,7 +575,7 @@ void EteraAPI::prepareRequest(QNetworkRequest& request, const QString& relurl, c
 #if QT_VERSION < 0x050000
         url.addEncodedQueryItem(i.key().toUtf8(), QUrl::toPercentEncoding(i.value()));
 #else
-        query.addQueryItem(i.key(), i.value());
+        query.addQueryItem(i.key(), QUrl::toPercentEncoding(i.value()));
 #endif
 
 #if QT_VERSION >= 0x050000
