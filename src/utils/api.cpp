@@ -667,7 +667,11 @@ bool EteraAPI::parseReply(int& code, QString& body)
     if (code >= 200 && code < 300)
         body = QString::fromUtf8(m_reply->readAll());
     else if (code == 301 || code == 302)
-        body = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toUrl().toString();
+#if QT_VERSION < 0x050000
+        body = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString().replace("+", "%2B");
+#else
+        body = m_reply->attribute(QNetworkRequest::RedirectionTargetAttribute).toString();
+#endif
     else
         body = m_reply->attribute(QNetworkRequest::HttpReasonPhraseAttribute).toString();
 

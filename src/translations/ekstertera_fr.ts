@@ -80,17 +80,17 @@
         <translation>L&apos;API n&apos;est pas initialisée</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="704"/>
+        <location filename="../utils/api.cpp" line="708"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="849"/>
+        <location filename="../utils/api.cpp" line="853"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>L&apos;opération a échoué, essayez de recommencer la requête initiale dans un moment</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="853"/>
+        <location filename="../utils/api.cpp" line="857"/>
         <source>Неизвестный статус операции</source>
         <translation>Statut de l&apos;opération inconnu</translation>
     </message>
