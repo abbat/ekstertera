@@ -35,62 +35,62 @@
         <translation>L&apos;opération réseau a expiré</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="417"/>
+        <location filename="../utils/api.cpp" line="420"/>
         <source>КБ</source>
         <translation>Ko</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="420"/>
+        <location filename="../utils/api.cpp" line="423"/>
         <source>МБ</source>
         <translation>Mo</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="423"/>
+        <location filename="../utils/api.cpp" line="426"/>
         <source>ГБ</source>
         <translation>Go</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="426"/>
+        <location filename="../utils/api.cpp" line="429"/>
         <source>ТБ</source>
         <translation>To</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="442"/>
+        <location filename="../utils/api.cpp" line="445"/>
         <source>б/с</source>
         <translation>o/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="445"/>
+        <location filename="../utils/api.cpp" line="448"/>
         <source>Кб/с</source>
         <translation>Ko/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="453"/>
+        <location filename="../utils/api.cpp" line="456"/>
         <source>Мб/с</source>
         <translation>Mo/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="457"/>
+        <location filename="../utils/api.cpp" line="460"/>
         <source>Гб/с</source>
         <translation>Go/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="597"/>
+        <location filename="../utils/api.cpp" line="600"/>
         <source>API не инициализировано</source>
         <translation>L&apos;API n&apos;est pas initialisée</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="701"/>
+        <location filename="../utils/api.cpp" line="704"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="846"/>
+        <location filename="../utils/api.cpp" line="849"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>L&apos;opération a échoué, essayez de recommencer la requête initiale dans un moment</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="850"/>
+        <location filename="../utils/api.cpp" line="853"/>
         <source>Неизвестный статус операции</source>
         <translation>Statut de l&apos;opération inconnu</translation>
     </message>
