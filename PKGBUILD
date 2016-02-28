@@ -3,7 +3,7 @@
 pkgname=('ekstertera')
 pkgver=0.1.8
 pkgrel=1
-pkgdesc=("GUI client for Yandex.Disk")
+pkgdesc="GUI client for Yandex.Disk"
 arch=('i686' 'x86_64')
 url="https://github.com/abbat/${pkgname}"
 license=('BSD')
