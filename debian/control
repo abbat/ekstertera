@@ -2,7 +2,11 @@ Source: ekstertera
 Section: utils
 Priority: optional
 Maintainer: Anton Batenev <antonbatenev@yandex.ru>
-Build-Depends: debhelper (>= 7.0.50~), libqt4-dev (>= 4.6)
+Build-Depends: debhelper (>= 7.0.50~), lsb-release,
+ qt5-default (>= 5.0) | libqt4-dev (>= 4.6),
+ qtbase5-dev (>= 5.0) | libqt4-dev (>= 4.6),
+ qttools5-dev-tools (>= 5.0) | libqt4-dev (>= 4.6),
+ libqt5svg5-dev (>= 5.0) | libqt4-dev (>= 4.6)
 Standards-Version: 3.9.4
 Vcs-Git: https://github.com/abbat/ekstertera.git
 Vcs-Browser: https://github.com/abbat/ekstertera
@@ -12,5 +16,14 @@ Package: ekstertera
 Architecture: any
 Depends: ${misc:Depends}, ${shlibs:Depends}
 Description: Yandex.Disk GUI client
+ GUI tool to upload, retrieve and manage data in Yandex.Disk
+ service (https://disk.yandex.com).
+
+Package: ekstertera-dbg
+Section: debug
+Priority: extra
+Depends: ekstertera (= ${binary:Version}), ${misc:Depends}
+Architecture: any
+Description: Debug symbols for ekstertera
  GUI tool to upload, retrieve and manage data in Yandex.Disk
  service (https://disk.yandex.com).

@@ -1,6 +1,22 @@
 #!/usr/bin/make -f
 # -*- makefile -*-
 
+DISTRONAME = $(shell /usr/bin/lsb_release --id --short)
+CODENAME   = $(shell /usr/bin/lsb_release --codename --short)
+
+QT_OPTS     = network
+SRC_3DPARTY = $(CURDIR)/3dparty/json
+
+ifneq (,$(filter wheezy precise, $(CODENAME)))
+    QT_VERSION  = 4
+    SRC_3DPARTY += $(CURDIR)/3dparty/qt5
+else
+    QT_VERSION  = 5
+    QT_OPTS    += core widgets
+endif
+
+export QT_SELECT=$(QT_VERSION)
+
 override_dh_auto_clean:
 	if [ -f Makefile ]; then make clean; fi
 	rm -f Makefile
@@ -9,25 +25,29 @@ override_dh_auto_clean:
 	rm -f ekstertera.pro
 	rm -f ekstertera
 
-override_dh_auto_build:
-	export QT_SELECT=4
+override_dh_auto_configure:
 	qmake -project -recursive -Wall -nopwd -o "ekstertera.pro"          \
 		"CODEC = UTF-8"                                             \
 		"CODECFORTR = UTF-8"                                        \
 		"CONFIG += release"                                         \
-		"QT += network"                                             \
-		"INCLUDEPATH += src"                                        \
+		"QT += $(QT_OPTS)"                                          \
+		"INCLUDEPATH += $(CURDIR)/src"                              \
 		"TRANSLATIONS +=                                            \
-		   src/translations/ekstertera_en.ts                        \
-		   src/translations/ekstertera_fr.ts"                       \
+		   $(CURDIR)/src/translations/ekstertera_en.ts              \
+		   $(CURDIR)/src/translations/ekstertera_fr.ts"             \
 		"QMAKE_CPPFLAGS *= $(shell dpkg-buildflags --get CPPFLAGS)" \
 		"QMAKE_CFLAGS   *= $(shell dpkg-buildflags --get CFLAGS)"   \
 		"QMAKE_CXXFLAGS *= $(shell dpkg-buildflags --get CXXFLAGS)" \
 		"QMAKE_LFLAGS   *= $(shell dpkg-buildflags --get LDFLAGS)"  \
-		src 3dparty/json 3dparty/qt5
+		$(CURDIR)/src $(SRC_3DPARTY)
 	lrelease -compress -removeidentical "ekstertera.pro"
 	qmake "ekstertera.pro"
-	make
+
+override_dh_auto_test:
+	/bin/true
+
+override_dh_strip:
+	dh_strip --dbg-package=ekstertera-dbg
 
 %:
-	dh $@
+	dh $@ --parallel

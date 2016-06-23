@@ -1,24 +1,18 @@
-Name:          ekstertera
-Version:       0.1.8
-Release:       1
-Summary:       Yandex.Disk GUI client
-Group:         Applications/Internet
-License:       BSD-2-clause
-URL:           https://github.com/abbat/ekstertera
-Requires:      libqt4 >= 4.6
-BuildRequires: libqt4-devel >= 4.6
+Name:           ekstertera
+Version:        0.1.9
+Release:        1
+Summary:        Yandex.Disk GUI client
+Group:          Applications/Internet
+License:        BSD-2-clause
+URL:            https://github.com/abbat/ekstertera
+Source0:        https://build.opensuse.org/source/home:antonbatenev:%{name}/%{name}/%{name}_%{version}.tar.bz2
+BuildRoot:      %{_tmppath}/%{name}-%{version}-build
 
-%define qmake qmake
-%define lrelease lrelease
-
-%if 0%{?fedora} || 0%{?centos}
-%define qmake qmake-qt4
-%define lrelease lrelease-qt4
+%if 0%{?suse_version}
+BuildRequires:  libqt5-qtbase-devel, libqt5-qttools-devel, libqt5-qtsvg-devel
+%else
+BuildRequires:  qt5-qtbase-devel, qt5-qttools-devel, qt5-qtsvg-devel
 %endif
-
-Source0:       https://build.opensuse.org/source/home:antonbatenev:%{name}/%{name}/%{name}_%{version}.tar.bz2
-BuildRoot:     %{_tmppath}/%{name}-%{version}-build
-
 
 %description
 GUI tool to upload, retrieve and manage data in Yandex.Disk service
@@ -29,19 +23,25 @@ GUI tool to upload, retrieve and manage data in Yandex.Disk service
 
 
 %build
-export QT_SELECT=4
-%{qmake} -project -recursive -Wall -nopwd -o %{name}.pro \
-    "CODEC = UTF-8"                    \
-    "CODECFORTR = UTF-8"               \
-    "CONFIG += release"                \
-    "QT += network"                    \
-    "INCLUDEPATH += src"               \
-    "TRANSLATIONS +=                   \
-       src/translations/%{name}_en.ts  \
-       src/translations/%{name}_fr.ts" \
-    src 3dparty/json 3dparty/qt5
-%{lrelease} -compress -removeidentical %{name}.pro
-%{qmake} %{name}.pro
+export builddir=$(pwd)
+
+qmake-qt5 -project -recursive -Wall -nopwd -o %{name}.pro \
+    "CODEC = UTF-8"                                       \
+    "CODECFORTR = UTF-8"                                  \
+    "CONFIG += release"                                   \
+    "QT += network core widgets"                          \
+    "INCLUDEPATH += src"                                  \
+    "TRANSLATIONS +=                                      \
+        ${builddir}/src/translations/ekstertera_en.ts     \
+        ${builddir}/src/translations/ekstertera_fr.ts"    \
+    "${builddir}/src" "${builddir}/3dparty/json"
+
+%if 0%{?suse_version} == 1320
+export QMAKE=/usr/bin/qmake-qt5
+%endif
+
+lrelease-qt5 -compress -removeidentical %{name}.pro
+qmake-qt5 %{name}.pro
 make %{?_smp_mflags}
 
 
@@ -68,5 +68,5 @@ rm -rf %{buildroot}
 
 
 %changelog
-* Thu Oct 29 2015 Anton Batenev <antonbatenev@yandex.ru> 0.1.8-1
+* Thu Jun 23 2016 Anton Batenev <antonbatenev@yandex.ru> 0.1.9-1
 - Initial RPM release
