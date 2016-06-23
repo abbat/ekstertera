@@ -9,6 +9,7 @@ tar-ignore = doxygen
 tar-ignore = Doxyfile
 tar-ignore = build.linux.sh
 tar-ignore = build.mingw.bat
+tar-ignore = PKGBUILD
 tar-ignore = ekstertera.spec
 tar-ignore = ekstertera.wxs
 tar-ignore = src/resource.rc
