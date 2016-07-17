@@ -1,11 +1,13 @@
 <RCC>
     <qresource prefix="">
-        <!-- http://www.iconsearch.ru/detailed/26087/ (c) Everaldo Coelho, GPL -->
+        <!-- http://www.iconarchive.com/show/tuxlets-icons-by-mathijssen/Alien-Tux-icon.html (c) Peter & Bart Mathijssen, Public Domain -->
         <file>icons/main16.png</file>
+        <file>icons/main24.png</file>
         <file>icons/main32.png</file>
         <file>icons/main48.png</file>
         <file>icons/main64.png</file>
         <file>icons/main128.png</file>
+        <file>icons/main256.png</file>
 
         <!-- http://www.iconsearch.ru/detailed/21400/3/ (c) MidTone Design, ??? -->
         <file>icons/upload32.png</file>

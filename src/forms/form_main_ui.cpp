@@ -7,10 +7,12 @@ FormMainUI::FormMainUI() : QMainWindow()
 {
     QIcon icon;
     icon.addFile(":/icons/main16.png",  QSize(16, 16));
+    icon.addFile(":/icons/main24.png",  QSize(24, 24));
     icon.addFile(":/icons/main32.png",  QSize(32, 32));
     icon.addFile(":/icons/main48.png",  QSize(48, 48));
     icon.addFile(":/icons/main64.png",  QSize(64, 64));
     icon.addFile(":/icons/main128.png", QSize(128, 128));
+    icon.addFile(":/icons/main256.png", QSize(256, 256));
     setWindowIcon(icon);
 
     setMinimumSize(280, 280);
