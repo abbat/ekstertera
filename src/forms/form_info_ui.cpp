@@ -5,7 +5,7 @@ FormInfoUI::FormInfoUI(QWidget* parent) : QDialog(parent, Qt::WindowTitleHint | 
 {
     setWindowIcon(QIcon::fromTheme("document-properties", QIcon(":/icons/tango/document-properties.svg")));
 
-    setMinimumSize(360, 240);
+    setMinimumSize(605, 260);
 
     setWindowTitle(trUtf8("Свойства"));
 
@@ -19,6 +19,7 @@ FormInfoUI::FormInfoUI(QWidget* parent) : QDialog(parent, Qt::WindowTitleHint | 
     m_label_modified   = new QLabel(this);
     m_label_size       = new QLabel(this);
     m_label_md5        = new QLabel(this);
+    m_label_sha256     = new QLabel(this);
     m_label_media      = new QLabel(this);
     m_label_mime       = new QLabel(this);
     m_label_public_url = new QLabel(this);
@@ -53,6 +54,10 @@ FormInfoUI::FormInfoUI(QWidget* parent) : QDialog(parent, Qt::WindowTitleHint | 
     m_text_md5->setTextInteractionFlags(flags);
     m_layout->addRow(m_label_md5, m_text_md5);
 
+    m_text_sha256 = new QLabel(this);
+    m_text_sha256->setTextInteractionFlags(flags);
+    m_layout->addRow(m_label_sha256, m_text_sha256);
+
     m_text_media = new QLabel(this);
     m_text_media->setTextInteractionFlags(flags);
     m_layout->addRow(m_label_media, m_text_media);
@@ -86,6 +91,7 @@ void FormInfoUI::retranslateUi()
     m_label_modified->setText(label(trUtf8("Изменен")));
     m_label_size->setText(label(trUtf8("Размер")));
     m_label_md5->setText(label(trUtf8("MD5")));
+    m_label_sha256->setText(label(trUtf8("SHA256")));
     m_label_media->setText(label(trUtf8("Медиа")));
     m_label_mime->setText(label(trUtf8("MIME")));
     m_label_public_url->setText(label(trUtf8("URL")));

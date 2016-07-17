@@ -5,92 +5,92 @@
 <context>
     <name>EteraAPI</name>
     <message>
-        <location filename="../utils/api.cpp" line="375"/>
+        <location filename="../utils/api.cpp" line="376"/>
         <source>OK</source>
         <translation>OK</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="376"/>
+        <location filename="../utils/api.cpp" line="377"/>
         <source>Ошибка разбора JSON</source>
         <translation>Erreur d&apos;analyse JSON</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="377"/>
+        <location filename="../utils/api.cpp" line="378"/>
         <source>Неподдерживаемый URL объекта Link</source>
         <translation>URL de l&apos;objet Link malformée</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="378"/>
+        <location filename="../utils/api.cpp" line="379"/>
         <source>Неподдерживаемый метод объекта Link</source>
         <translation>Méthode non supportée par l&apos;objet Link</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="379"/>
+        <location filename="../utils/api.cpp" line="380"/>
         <source>Ошибка открытия файла</source>
         <translation>Une erreur est survenue en ouvrant le fichier</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="380"/>
+        <location filename="../utils/api.cpp" line="381"/>
         <source>Таймаут сетевой операции</source>
         <translation>L&apos;opération réseau a expiré</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="420"/>
+        <location filename="../utils/api.cpp" line="421"/>
         <source>КБ</source>
         <translation>Ko</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="423"/>
+        <location filename="../utils/api.cpp" line="424"/>
         <source>МБ</source>
         <translation>Mo</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="426"/>
+        <location filename="../utils/api.cpp" line="427"/>
         <source>ГБ</source>
         <translation>Go</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="429"/>
+        <location filename="../utils/api.cpp" line="430"/>
         <source>ТБ</source>
         <translation>To</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="445"/>
+        <location filename="../utils/api.cpp" line="446"/>
         <source>б/с</source>
         <translation>o/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="448"/>
+        <location filename="../utils/api.cpp" line="449"/>
         <source>Кб/с</source>
         <translation>Ko/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="456"/>
+        <location filename="../utils/api.cpp" line="457"/>
         <source>Мб/с</source>
         <translation>Mo/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="460"/>
+        <location filename="../utils/api.cpp" line="461"/>
         <source>Гб/с</source>
         <translation>Go/s</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="600"/>
+        <location filename="../utils/api.cpp" line="601"/>
         <source>API не инициализировано</source>
         <translation>L&apos;API n&apos;est pas initialisée</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="704"/>
+        <location filename="../utils/api.cpp" line="705"/>
         <source>oauth.yandex.ru</source>
         <translation>oauth.yandex.com</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="849"/>
+        <location filename="../utils/api.cpp" line="850"/>
         <source>Операцию завершить не удалось, попробуйте повторить запрос позже</source>
         <translation>L&apos;opération a échoué, essayez de recommencer la requête initiale dans un moment</translation>
     </message>
     <message>
-        <location filename="../utils/api.cpp" line="853"/>
+        <location filename="../utils/api.cpp" line="854"/>
         <source>Неизвестный статус операции</source>
         <translation>Statut de l&apos;opération inconnu</translation>
     </message>
@@ -98,12 +98,12 @@
 <context>
     <name>FormInfo</name>
     <message>
-        <location filename="../forms/form_info.cpp" line="42"/>
+        <location filename="../forms/form_info.cpp" line="43"/>
         <source>Директория</source>
         <translation>Dossier</translation>
     </message>
     <message>
-        <location filename="../forms/form_info.cpp" line="44"/>
+        <location filename="../forms/form_info.cpp" line="45"/>
         <source>Файл</source>
         <translation>Fichier</translation>
     </message>
@@ -112,57 +112,62 @@
     <name>FormInfoUI</name>
     <message>
         <location filename="../forms/form_info_ui.cpp" line="10"/>
-        <location filename="../forms/form_info_ui.cpp" line="80"/>
+        <location filename="../forms/form_info_ui.cpp" line="85"/>
         <source>Свойства</source>
         <translation>Propriétés</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="82"/>
+        <location filename="../forms/form_info_ui.cpp" line="87"/>
         <source>Имя</source>
         <translation>Nom</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="83"/>
+        <location filename="../forms/form_info_ui.cpp" line="88"/>
         <source>Путь</source>
         <translation>Chemin</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="84"/>
+        <location filename="../forms/form_info_ui.cpp" line="89"/>
         <source>Тип</source>
         <translation>Type</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="85"/>
+        <location filename="../forms/form_info_ui.cpp" line="90"/>
         <source>Создан</source>
         <translation>Créé</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="86"/>
+        <location filename="../forms/form_info_ui.cpp" line="91"/>
         <source>Изменен</source>
         <translation>Modifié</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="87"/>
+        <location filename="../forms/form_info_ui.cpp" line="92"/>
         <source>Размер</source>
         <translation>Taille</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="88"/>
+        <location filename="../forms/form_info_ui.cpp" line="93"/>
         <source>MD5</source>
         <translation>MD5</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="89"/>
+        <location filename="../forms/form_info_ui.cpp" line="94"/>
+        <source>SHA256</source>
+        <translation>SHA256</translation>
+    </message>
+    <message>
+        <location filename="../forms/form_info_ui.cpp" line="95"/>
         <source>Медиа</source>
         <translation>Média</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="90"/>
+        <location filename="../forms/form_info_ui.cpp" line="96"/>
         <source>MIME</source>
         <translation>MIME</translation>
     </message>
     <message>
-        <location filename="../forms/form_info_ui.cpp" line="91"/>
+        <location filename="../forms/form_info_ui.cpp" line="97"/>
         <source>URL</source>
         <translation>URL</translation>
     </message>

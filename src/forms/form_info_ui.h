@@ -56,6 +56,7 @@ class FormInfoUI : public QDialog
           QLabel*    m_label_modified;     /*!< \brief Дата изменения   */
           QLabel*    m_label_size;         /*!< \brief Размер           */
           QLabel*    m_label_md5;          /*!< \brief MD5              */
+          QLabel*    m_label_sha256;       /*!< \brief SHA256           */
           QLabel*    m_label_media;        /*!< \brief Медиа            */
           QLabel*    m_label_mime;         /*!< \brief MIME             */
           QLabel*    m_label_public_url;   /*!< \brief Публичная ссылка */
@@ -67,6 +68,7 @@ class FormInfoUI : public QDialog
           QLabel*    m_text_modified;      /*!< \brief Дата изменения   */
           QLabel*    m_text_size;          /*!< \brief Размер           */
           QLabel*    m_text_md5;           /*!< \brief MD5              */
+          QLabel*    m_text_sha256;        /*!< \brief SHA256           */
           QLabel*    m_text_media;         /*!< \brief Медиа            */
           QLabel*    m_text_mime;          /*!< \brief MIME             */
           QLabel*    m_text_public_url;    /*!< \brief Публичная ссылка */

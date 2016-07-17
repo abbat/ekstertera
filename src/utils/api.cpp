@@ -114,6 +114,7 @@ bool EteraItem::parse(const QtJson::JsonObject& json)
         return true;
 
     m_md5       = json["md5"].toString();
+    m_sha256    = json["sha256"].toString();
     m_mime_type = json["mime_type"].toString();
     m_preview   = json["preview"].toString();
 

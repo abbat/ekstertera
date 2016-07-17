@@ -210,6 +210,12 @@ class EteraItem
         QString md5() const { return m_md5; }
 
         /*!
+         * \brief SHA256 объекта
+         * \return SHA256 объекта
+         */
+        QString sha256() const { return m_sha256; }
+
+        /*!
          * \brief Тип медиа объекта
          * \return Тип медиа объекта
          */
@@ -263,6 +269,7 @@ class EteraItem
 
         quint64            m_size;           /*!< \brief Размер              */
         QString            m_md5;            /*!< \brief MD5                 */
+        QString            m_sha256;         /*!< \brief SHA256              */
         QString            m_media_string;   /*!< \brief Тип медиа           */
         EteraItemMediaType m_media_type;     /*!< \brief Тип медиа           */
         QString            m_mime_type;      /*!< \brief MIME                */

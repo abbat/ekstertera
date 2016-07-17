@@ -14,6 +14,7 @@ FormInfo::FormInfo(const EteraItem& item, QWidget* parent) : FormInfoUI(parent)
 
     m_text_size->setText(EteraAPI::humanBytes(m_item.size()));
     m_text_md5->setText(m_item.md5());
+    m_text_sha256->setText(m_item.sha256());
     m_text_media->setText(m_item.mediaString());
     m_text_mime->setText(m_item.mimeType());
     m_text_public_url->setText(m_item.publicURL());
