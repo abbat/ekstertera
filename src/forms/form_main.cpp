@@ -25,6 +25,7 @@ FormMain::FormMain() : FormMainUI()
 
     // иконка трея
     connect(m_tray_icon, SIGNAL(activated(QSystemTrayIcon::ActivationReason)), this, SLOT(tray_icon_activated(QSystemTrayIcon::ActivationReason)));
+    connect(m_tray_menu_show, SIGNAL(triggered()), this, SLOT(tray_menu_show_triggered()));
 
     // тулбар
     connect(m_action_upload,   SIGNAL(triggered()), this, SLOT(action_upload_triggered()));
@@ -137,6 +138,12 @@ void FormMain::tray_icon_activated(QSystemTrayIcon::ActivationReason reason)
 {
     if (reason == QSystemTrayIcon::Trigger)
         setVisible(!isVisible());
+}
+//----------------------------------------------------------------------------------------------
+
+void FormMain::tray_menu_show_triggered()
+{
+    setVisible(true);
 }
 //----------------------------------------------------------------------------------------------
 

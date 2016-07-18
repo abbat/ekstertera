@@ -60,7 +60,8 @@ class FormMain : public FormMainUI
         // обработчики иконки трея
         //
 
-        void tray_icon_activated(QSystemTrayIcon::ActivationReason reason);
+        void tray_icon_activated(QSystemTrayIcon::ActivationReason reason);   /*!< \brief Скрыть / Показать */
+        void tray_menu_show_triggered();                                      /*!< \brief Показать */
 
         //
         // тулбар

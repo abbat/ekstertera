@@ -78,6 +78,7 @@ class FormMainUI : public QMainWindow
          * \brief Иконка в трее
          */
         QSystemTrayIcon* m_tray_icon;
+          QAction*       m_tray_menu_show;   /*!< \brief Показать */
 
         /*!
          * \brief Меню в трее

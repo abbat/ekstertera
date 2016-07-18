@@ -130,6 +130,8 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     // меню трея
     m_tray_menu = new QMenu(this);
+    m_tray_menu_show = m_tray_menu->addAction(QIcon(":/icons/main16.png"), "");
+    m_tray_menu->addSeparator();
     m_tray_menu->addAction(m_menu_file_exit);
 
     // иконка трея
@@ -199,6 +201,8 @@ void FormMainUI::retranslateUi()
 
     m_label_used->setToolTip(trUtf8("Используется"));
     m_label_total->setToolTip(trUtf8("Всего"));
+
+    m_tray_menu_show->setText(trUtf8("Показать"));
 }
 //----------------------------------------------------------------------------------------------
 
