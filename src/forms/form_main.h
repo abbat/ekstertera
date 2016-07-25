@@ -88,8 +88,8 @@ class FormMain : public FormMainUI
         // обработчики получения информации о диске
         //
 
-        void task_on_info_error(EteraAPI* api);
-        void task_on_info_success(EteraAPI* api, const EteraInfo& info);
+        void task_on_info_error(EteraAPI* api);                            /*!< \brief Ошибка обновления информации о диске   */
+        void task_on_info_success(EteraAPI* api, const EteraInfo& info);   /*!< \brief Успешное обновление информации о диске */
 };
 
 #endif   // _ekstertera_forms_form_main_h_

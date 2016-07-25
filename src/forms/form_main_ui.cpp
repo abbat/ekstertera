@@ -6,13 +6,13 @@
 FormMainUI::FormMainUI() : QMainWindow()
 {
     QIcon icon;
-    icon.addFile(":/icons/main16.png",  QSize(16, 16));
-    icon.addFile(":/icons/main24.png",  QSize(24, 24));
-    icon.addFile(":/icons/main32.png",  QSize(32, 32));
-    icon.addFile(":/icons/main48.png",  QSize(48, 48));
-    icon.addFile(":/icons/main64.png",  QSize(64, 64));
-    icon.addFile(":/icons/main128.png", QSize(128, 128));
-    icon.addFile(":/icons/main256.png", QSize(256, 256));
+    icon.addFile(":/icons/ekstertera16.png",  QSize(16, 16));
+    icon.addFile(":/icons/ekstertera24.png",  QSize(24, 24));
+    icon.addFile(":/icons/ekstertera32.png",  QSize(32, 32));
+    icon.addFile(":/icons/ekstertera48.png",  QSize(48, 48));
+    icon.addFile(":/icons/ekstertera64.png",  QSize(64, 64));
+    icon.addFile(":/icons/ekstertera128.png", QSize(128, 128));
+    icon.addFile(":/icons/ekstertera256.png", QSize(256, 256));
     setWindowIcon(icon);
 
     setMinimumSize(280, 280);
@@ -130,12 +130,12 @@ FormMainUI::FormMainUI() : QMainWindow()
 
     // меню трея
     m_tray_menu = new QMenu(this);
-    m_tray_menu_show = m_tray_menu->addAction(QIcon(":/icons/main16.png"), "");
+    m_tray_menu_show = m_tray_menu->addAction(QIcon(":/icons/ekstertera16.png"), "");
     m_tray_menu->addSeparator();
     m_tray_menu->addAction(m_menu_file_exit);
 
     // иконка трея
-    m_tray_icon = new QSystemTrayIcon(this);
+    m_tray_icon = new WidgetTrayIcon(this);
     m_tray_icon->setContextMenu(m_tray_menu);
     m_tray_icon->setIcon(icon);
     m_tray_icon->setVisible(true);
@@ -203,6 +203,10 @@ void FormMainUI::retranslateUi()
     m_label_total->setToolTip(trUtf8("Всего"));
 
     m_tray_menu_show->setText(trUtf8("Показать"));
+
+#ifdef ETERA_CUSTOM_TRAY_ICON
+    m_tray_icon->retranslateUi();
+#endif
 }
 //----------------------------------------------------------------------------------------------
 

@@ -15,6 +15,9 @@ QT_VERSION=$(qmake -query 'QT_VERSION' | cut -d '.' -f 1)
 
 # опции (модули) qt
 QT_OPTS="network"
+QT_CONFIG="debug_and_release link_pkgconfig"
+QT_PKGCONFIG="glib-2.0 gtk+-2.0 gdk-pixbuf-2.0 appindicator-0.1"
+QT_DEFINES="ETERA_CUSTOM_TRAY_ICON_GTK ETERA_CUSTOM_TRAY_ICON_UNITY"
 SRC_3DPARTY="3dparty/json"
 
 if [ "${QT_VERSION}" -eq "4" ]; then
@@ -26,13 +29,19 @@ else
     exit 1
 fi
 
+PKG_CONFIG_PATH=$(pkg-config --variable pc_path pkg-config)
+
+export PKG_CONFIG_PATH="${PKG_CONFIG_PATH}"
+
 # создание pro-файла
 qmake -project -recursive -Wall -nopwd -o "${PROJECT}.pro" \
-    "CODEC = UTF-8"                       \
-    "CODECFORTR = UTF-8"                  \
-    "CONFIG += debug_and_release"         \
-    "QT += ${QT_OPTS}"                    \
-    "INCLUDEPATH += src"                  \
+    "CODEC         = UTF-8"               \
+    "CODECFORTR    = UTF-8"               \
+    "QT           += ${QT_OPTS}"          \
+    "CONFIG       += ${QT_CONFIG}"        \
+    "PKGCONFIG    += ${QT_PKGCONFIG}"     \
+    "DEFINES      += ${QT_DEFINES}"       \
+    "INCLUDEPATH  += src"                 \
     "TRANSLATIONS +=                      \
        src/translations/${PROJECT}_en.ts  \
        src/translations/${PROJECT}_fr.ts" \

@@ -121,7 +121,7 @@ void FormMain::menu_view_preview_changed()
 void FormMain::menu_help_about_triggered()
 {
     QString text;
-    text += QString("<b>Ekstertera v%1</b><br><br>").arg(ETERA_VERSION);
+    text += QString("<b>%1 v%2</b><br><br>").arg(ETERA_APP_NAME).arg(ETERA_VERSION);
     text += QString("<a href=\"%1\">%1</a><br>").arg("https://github.com/abbat/ekstertera");
 
     QMessageBox::about(this, trUtf8("О программе"), text);

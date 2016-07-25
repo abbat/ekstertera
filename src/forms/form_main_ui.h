@@ -8,6 +8,7 @@
 
 #include "widgets/widget_disk.h"
 #include "widgets/widget_disk_path.h"
+#include "widgets/widget_tray_icon.h"
 
 /*!
  * \brief Класс для генерации GUI части главной формы
@@ -77,8 +78,8 @@ class FormMainUI : public QMainWindow
         /*!
          * \brief Иконка в трее
          */
-        QSystemTrayIcon* m_tray_icon;
-          QAction*       m_tray_menu_show;   /*!< \brief Показать */
+        WidgetTrayIcon* m_tray_icon;
+          QAction*      m_tray_menu_show;   /*!< \brief Показать */
 
         /*!
          * \brief Меню в трее

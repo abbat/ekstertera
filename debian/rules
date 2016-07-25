@@ -4,15 +4,30 @@
 DISTRONAME = $(shell /usr/bin/lsb_release --id --short)
 CODENAME   = $(shell /usr/bin/lsb_release --codename --short)
 
-QT_OPTS     = network
-SRC_3DPARTY = $(CURDIR)/3dparty/json
+QT_OPTS      = network
+QT_CONFIG    = release
+QT_DEFINES   =
+QT_PKGCONFIG =
+SRC_3DPARTY  = $(CURDIR)/3dparty/json
 
 ifneq (,$(filter wheezy precise, $(CODENAME)))
-    QT_VERSION  = 4
+    QT_VERSION   = 4
     SRC_3DPARTY += $(CURDIR)/3dparty/qt5
 else
-    QT_VERSION  = 5
-    QT_OPTS    += core widgets
+    QT_VERSION    = 5
+    QT_OPTS      += core widgets
+    QT_DEFINES   += ETERA_CUSTOM_TRAY_ICON_GTK
+    QT_CONFIG    += link_pkgconfig
+    QT_PKGCONFIG += glib-2.0 gtk+-2.0 gdk-pixbuf-2.0
+endif
+
+ifneq (,$(filter Ubuntu, $(DISTRONAME)))
+    QT_DEFINES   += ETERA_CUSTOM_TRAY_ICON_UNITY
+ifeq ($(QT_VERSION), 4)
+    QT_CONFIG    += link_pkgconfig
+    QT_PKGCONFIG += glib-2.0 gtk+-2.0 gdk-pixbuf-2.0
+endif
+    QT_PKGCONFIG += appindicator-0.1
 endif
 
 export QT_SELECT=$(QT_VERSION)
@@ -26,13 +41,15 @@ override_dh_auto_clean:
 	rm -f ekstertera
 
 override_dh_auto_configure:
-	qmake -project -recursive -Wall -nopwd -o "ekstertera.pro"          \
-		"CODEC = UTF-8"                                             \
-		"CODECFORTR = UTF-8"                                        \
-		"CONFIG += release"                                         \
-		"QT += $(QT_OPTS)"                                          \
-		"INCLUDEPATH += $(CURDIR)/src"                              \
-		"TRANSLATIONS +=                                            \
+	qmake -project -recursive -Wall -nopwd -o "ekstertera.pro"      \
+		"CODEC           = UTF-8"                                   \
+		"CODECFORTR      = UTF-8"                                   \
+		"QT             += $(QT_OPTS)"                              \
+		"CONFIG         += $(QT_CONFIG)"                            \
+		"PKGCONFIG      += $(QT_PKGCONFIG)"                         \
+		"DEFINES        += $(QT_DEFINES)"                           \
+		"INCLUDEPATH    += $(CURDIR)/src"                           \
+		"TRANSLATIONS   +=                                          \
 		   $(CURDIR)/src/translations/ekstertera_en.ts              \
 		   $(CURDIR)/src/translations/ekstertera_fr.ts"             \
 		"QMAKE_CPPFLAGS *= $(shell dpkg-buildflags --get CPPFLAGS)" \

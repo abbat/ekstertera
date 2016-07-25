@@ -64,6 +64,7 @@
 #include <QDesktopServices>
 #include <QSslConfiguration>
 #include <QStyledItemDelegate>
+#include <QProcessEnvironment>
 #include <QNetworkAccessManager>
 
 #if QT_VERSION >= 0x050000
@@ -144,11 +145,22 @@
     #define ETERA_WS_X11_OR_WIN
 #endif
 
+// в Qt 5.x сломана иконка трея, необходима собственная реализация
+// так же необходима реализация отдельного поведения для Ubuntu Unity
+#ifndef ETERA_CUSTOM_TRAY_ICON
+    #if defined(ETERA_WS_X11) && (defined(ETERA_CUSTOM_TRAY_ICON_GTK) || defined(ETERA_CUSTOM_TRAY_ICON_UNITY))
+        #define ETERA_CUSTOM_TRAY_ICON
+    #endif
+#else
+    #error "Use ETERA_CUSTOM_TRAY_ICON_GTK or ETERA_CUSTOM_TRAY_ICON_UNITY directive instead ETERA_CUSTOM_TRAY_ICON"
+#endif
+
 // конкатенация строк для макроса версии
 #define ETERA_STR_EXPAND(token) #token
 #define ETERA_STR(token)        ETERA_STR_EXPAND(token)
 
 // версия (0.1.9)
+#define ETERA_APP_NAME      "ekstertera"
 #define ETERA_VERSION_MAJOR 0
 #define ETERA_VERSION_MINOR 1
 #define ETERA_VERSION_PATCH 9
@@ -156,7 +168,7 @@
 #define ETERA_VERSION       ETERA_STR(ETERA_VERSION_MAJOR) "." ETERA_STR(ETERA_VERSION_MINOR) "." ETERA_STR(ETERA_VERSION_PATCH)
 
 // константы api
-#define ETERA_API_USER_AGENT "ekstertera/" ETERA_VERSION
+#define ETERA_API_USER_AGENT ETERA_APP_NAME "/" ETERA_VERSION
 #define ETERA_API_BASE_URL   "https://cloud-api.yandex.net/v1/disk"
 #define ETERA_API_APP_ID     "51cba73d70c343fd96f0765e1eeb0435"
 #define ETERA_API_APP_SECRET "73cf4dacd4f74e7a97b77d036f90eb91"
