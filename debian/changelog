@@ -1,3 +1,10 @@
+ekstertera (0.1.10) stable; urgency=low
+
+  * Отображение SHA-256 в свойствах файла;
+  * Исправление иконки трея для Qt5 и Unity.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Fri, 29 Jul 2016 00:26:11 +0300
+
 ekstertera (0.1.9) stable; urgency=low
 
   * Стабилизация релиза;

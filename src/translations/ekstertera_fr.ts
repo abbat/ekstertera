@@ -175,37 +175,37 @@
 <context>
     <name>FormMain</name>
     <message>
-        <location filename="../forms/form_main.cpp" line="127"/>
+        <location filename="../forms/form_main.cpp" line="129"/>
         <source>О программе</source>
         <translation>À propos</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="133"/>
+        <location filename="../forms/form_main.cpp" line="135"/>
         <source>О Qt</source>
         <translation>À propos de Qt</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="218"/>
+        <location filename="../forms/form_main.cpp" line="220"/>
         <source>директорий: %1</source>
         <translation>dossiers: %1</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="220"/>
+        <location filename="../forms/form_main.cpp" line="222"/>
         <source>файлов: %1 (%2)</source>
         <translation>fichiers: %1 (%2)</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="222"/>
+        <location filename="../forms/form_main.cpp" line="224"/>
         <source>директорий: %1, файлов: %2 (%3)</source>
         <translation>dossiers: %1, fichiers: %2 (%3)</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="231"/>
+        <location filename="../forms/form_main.cpp" line="233"/>
         <source>Загрузка файлов на Яндекс.Диск</source>
         <translation>Envoyer des fichiers vers Yandex.Disk</translation>
     </message>
     <message>
-        <location filename="../forms/form_main.cpp" line="238"/>
+        <location filename="../forms/form_main.cpp" line="240"/>
         <source>Загрузка файлов с Яндекс.Диска</source>
         <translation>Télécharger des fichiers depuis Yandex.Disk</translation>
     </message>
