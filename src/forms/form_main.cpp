@@ -80,6 +80,8 @@ void FormMain::menu_edit_settings_triggered()
             updateInfoStatus();
             m_widget_disk->changePath("disk:/");
         }
+
+        m_tray_icon->setVisible(EteraSettings::instance()->closeToTray());
     }
 }
 //----------------------------------------------------------------------------------------------

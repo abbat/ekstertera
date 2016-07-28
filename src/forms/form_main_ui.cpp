@@ -138,7 +138,7 @@ FormMainUI::FormMainUI() : QMainWindow()
     m_tray_icon = new WidgetTrayIcon(this);
     m_tray_icon->setContextMenu(m_tray_menu);
     m_tray_icon->setIcon(icon);
-    m_tray_icon->setVisible(true);
+    m_tray_icon->setVisible(EteraSettings::instance()->closeToTray());
 
     // локализация
     retranslateUi();
