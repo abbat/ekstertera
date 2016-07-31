@@ -48,9 +48,12 @@ class EteraTranslator
         EteraTranslator();
         ~EteraTranslator();
 
-        QString     m_language;         /*!< \brief Текущий язык                     */
-        QTranslator m_qt_translator;    /*!< \brief Транслятор стандартных сообщений */
-        QTranslator m_app_translator;   /*!< \brief Транслятор приложения            */
+        QString     m_language;         /*!< \brief Текущий язык                            */
+        QTranslator m_qt_translator;    /*!< \brief Транслятор стандартных сообщений        */
+#if QT_VERSION >= 0x050000
+        QTranslator m_qt5_translator;   /*!< \brief Транслятор стандартных сообщений Qt 5.x */
+#endif
+        QTranslator m_app_translator;   /*!< \brief Транслятор приложения                   */
 };
 
 #endif   // _ekstertera_translator_h_

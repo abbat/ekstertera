@@ -47,17 +47,26 @@ void EteraTranslator::changeTranslator(const QString& language)
     QCoreApplication::removeTranslator(&m_qt_translator);
 
     QString tr_file = QLibraryInfo::location(QLibraryInfo::TranslationsPath) + "/qt_" + m_language + ".qm";
-
     if (QFileInfo(tr_file).exists() == true) {
         m_qt_translator.load(tr_file, "");
         QCoreApplication::installTranslator(&m_qt_translator);
     }
 
+#if QT_VERSION >= 0x050000
+    // переводчик стандартных сообщений и диалогов Qt 5.x
+    QCoreApplication::removeTranslator(&m_qt5_translator);
+
+    tr_file = QLibraryInfo::location(QLibraryInfo::TranslationsPath) + "/qtbase_" + m_language + ".qm";
+    if (QFileInfo(tr_file).exists() == true) {
+        m_qt5_translator.load(tr_file, "");
+        QCoreApplication::installTranslator(&m_qt5_translator);
+    }
+#endif
+
     // переводчик приложения
     QCoreApplication::removeTranslator(&m_app_translator);
 
     tr_file = ":translations/ekstertera_" + m_language + ".qm";
-
     if (QFileInfo(tr_file).exists() == true) {
         m_app_translator.load(tr_file, "");
         QCoreApplication::installTranslator(&m_app_translator);
