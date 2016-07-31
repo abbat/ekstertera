@@ -1,3 +1,9 @@
+ekstertera (0.1.11) stable; urgency=low
+
+  * Исправление перевода стандартных сообщений для Qt 5.x.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Sun, 31 Jul 2016 19:26:51 +0300
+
 ekstertera (0.1.10) stable; urgency=low
 
   * Отображение SHA-256 в свойствах файла;
