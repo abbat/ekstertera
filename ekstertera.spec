@@ -27,14 +27,18 @@ GUI tool to upload, retrieve and manage data in Yandex.Disk service
 export builddir=$(pwd)
 
 qmake-qt5 -project -recursive -Wall -nopwd -o %{name}.pro \
-    "CODEC         = UTF-8"                               \
-    "CODECFORTR    = UTF-8"                               \
-    "QT           += network core widgets"                \
-    "CONFIG       += release link_pkgconfig"              \
-    "PKGCONFIG    += glib-2.0 gtk+-2.0 gdk-pixbuf-2.0"    \
-    "DEFINES      += ETERA_CUSTOM_TRAY_ICON_GTK"          \
-    "INCLUDEPATH  += src"                                 \
-    "TRANSLATIONS +=                                      \
+    "CODEC           = UTF-8"                             \
+    "CODECFORTR      = UTF-8"                             \
+    "QT             += network core widgets"              \
+    "CONFIG         += release link_pkgconfig"            \
+    "PKGCONFIG      += glib-2.0 gtk+-2.0 gdk-pixbuf-2.0"  \
+    "DEFINES        += ETERA_CUSTOM_TRAY_ICON_GTK"        \
+    "INCLUDEPATH    += src"                               \
+    "QMAKE_CPPFLAGS *= ${RPM_OPT_FLAGS}"                  \
+    "QMAKE_CFLAGS   *= ${RPM_OPT_FLAGS}"                  \
+    "QMAKE_CXXFLAGS *= ${RPM_OPT_FLAGS}"                  \
+    "QMAKE_LFLAGS   *= ${RPM_LD_FLAGS}"                   \
+    "TRANSLATIONS   +=                                    \
         ${builddir}/src/translations/ekstertera_en.ts     \
         ${builddir}/src/translations/ekstertera_fr.ts"    \
     "${builddir}/src" "${builddir}/3dparty/json"
