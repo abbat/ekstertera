@@ -206,72 +206,38 @@ void EteraAPI::init()
 {
 #if QT_VERSION < 0x050400
     // предпочитаемый список шифров tls1 (см. ниже про версии Qt и поддержку)
-    // openssl ciphers -tls1 -s 'HIGH:!TLSv1.2:!aNULL:!MD5:!3DES:!CAMELLIA:!SRP:!PSK:@STRENGTH'
     static const char* ETERA_CIPHERS[] =
     {
-        "ECDHE-RSA-AES256-SHA",     // SSLv3 Kx=ECDH        Au=RSA   Enc=AES(256) Mac=SHA1
-        "ECDHE-ECDSA-AES256-SHA",   // SSLv3 Kx=ECDH        Au=ECDSA Enc=AES(256) Mac=SHA1
-        "DHE-RSA-AES256-SHA",       // SSLv3 Kx=DH          Au=RSA   Enc=AES(256) Mac=SHA1
-        "DHE-DSS-AES256-SHA",       // SSLv3 Kx=DH          Au=DSS   Enc=AES(256) Mac=SHA1
-        "ECDH-RSA-AES256-SHA",      // SSLv3 Kx=ECDH/RSA    Au=ECDH  Enc=AES(256) Mac=SHA1
-        "ECDH-ECDSA-AES256-SHA",    // SSLv3 Kx=ECDH/ECDSA  Au=ECDH  Enc=AES(256) Mac=SHA1
-        "AES256-SHA",               // SSLv3 Kx=RSA         Au=RSA   Enc=AES(256) Mac=SHA1
-        "ECDHE-RSA-AES128-SHA",     // SSLv3 Kx=ECDH        Au=RSA   Enc=AES(128) Mac=SHA1
-        "ECDHE-ECDSA-AES128-SHA",   // SSLv3 Kx=ECDH        Au=ECDSA Enc=AES(128) Mac=SHA1
-        "DHE-RSA-AES128-SHA",       // SSLv3 Kx=DH          Au=RSA   Enc=AES(128) Mac=SHA1
-        "DHE-DSS-AES128-SHA",       // SSLv3 Kx=DH          Au=DSS   Enc=AES(128) Mac=SHA1
-        "ECDH-RSA-AES128-SHA",      // SSLv3 Kx=ECDH/RSA    Au=ECDH  Enc=AES(128) Mac=SHA1
-        "ECDH-ECDSA-AES128-SHA",    // SSLv3 Kx=ECDH/ECDSA  Au=ECDH  Enc=AES(128) Mac=SHA1
-        "AES128-SHA",               // SSLv3 Kx=RSA         Au=RSA   Enc=AES(128) Mac=SHA1
+        "ECDHE-RSA-AES128-SHA",     // SSLv3 Kx=ECDH Au=RSA   Enc=AES(128) Mac=SHA1
+        "ECDHE-ECDSA-AES128-SHA",   // SSLv3 Kx=ECDH Au=ECDSA Enc=AES(128) Mac=SHA1
+        "ECDHE-RSA-AES256-SHA",     // SSLv3 Kx=ECDH Au=RSA   Enc=AES(256) Mac=SHA1
+        "ECDHE-ECDSA-AES256-SHA",   // SSLv3 Kx=ECDH Au=ECDSA Enc=AES(256) Mac=SHA1
+        "AES128-SHA",               // SSLv3 Kx=RSA  Au=RSA   Enc=AES(128) Mac=SHA1
+        "AES256-SHA",               // SSLv3 Kx=RSA  Au=RSA   Enc=AES(256) Mac=SHA1
         NULL
     };
 #else
     // предпочитаемый список шифров tls1.2 (см. ниже про версии Qt и поддержку)
-    // openssl ciphers -tls1 -s 'HIGH:!aNULL:!MD5:!3DES:!CAMELLIA:!SRP:!PSK:@STRENGTH'
     static const char* ETERA_CIPHERS[] =
     {
-        "ECDHE-RSA-AES256-GCM-SHA384",     // TLSv1.2 Kx=ECDH       Au=RSA   Enc=AESGCM(256) Mac=AEAD
-        "ECDHE-ECDSA-AES256-GCM-SHA384",   // TLSv1.2 Kx=ECDH       Au=ECDSA Enc=AESGCM(256) Mac=AEAD
-        "ECDHE-RSA-AES256-SHA384",         // TLSv1.2 Kx=ECDH       Au=RSA   Enc=AES(256)    Mac=SHA384
-        "ECDHE-ECDSA-AES256-SHA384",       // TLSv1.2 Kx=ECDH       Au=ECDSA Enc=AES(256)    Mac=SHA384
-        "ECDHE-RSA-AES256-SHA",            // SSLv3   Kx=ECDH       Au=RSA   Enc=AES(256)    Mac=SHA1
-        "ECDHE-ECDSA-AES256-SHA",          // SSLv3   Kx=ECDH       Au=ECDSA Enc=AES(256)    Mac=SHA1
-        "DHE-DSS-AES256-GCM-SHA384",       // TLSv1.2 Kx=DH         Au=DSS   Enc=AESGCM(256) Mac=AEAD
-        "DHE-RSA-AES256-GCM-SHA384",       // TLSv1.2 Kx=DH         Au=RSA   Enc=AESGCM(256) Mac=AEAD
-        "DHE-RSA-AES256-SHA256",           // TLSv1.2 Kx=DH         Au=RSA   Enc=AES(256)    Mac=SHA256
-        "DHE-DSS-AES256-SHA256",           // TLSv1.2 Kx=DH         Au=DSS   Enc=AES(256)    Mac=SHA256
-        "DHE-RSA-AES256-SHA",              // SSLv3   Kx=DH         Au=RSA   Enc=AES(256)    Mac=SHA1
-        "DHE-DSS-AES256-SHA",              // SSLv3   Kx=DH         Au=DSS   Enc=AES(256)    Mac=SHA1
-        "ECDH-RSA-AES256-GCM-SHA384",      // TLSv1.2 Kx=ECDH/RSA   Au=ECDH  Enc=AESGCM(256) Mac=AEAD
-        "ECDH-ECDSA-AES256-GCM-SHA384",    // TLSv1.2 Kx=ECDH/ECDSA Au=ECDH  Enc=AESGCM(256) Mac=AEAD
-        "ECDH-RSA-AES256-SHA384",          // TLSv1.2 Kx=ECDH/RSA   Au=ECDH  Enc=AES(256)    Mac=SHA384
-        "ECDH-ECDSA-AES256-SHA384",        // TLSv1.2 Kx=ECDH/ECDSA Au=ECDH  Enc=AES(256)    Mac=SHA384
-        "ECDH-RSA-AES256-SHA",             // SSLv3   Kx=ECDH/RSA   Au=ECDH  Enc=AES(256)    Mac=SHA1
-        "ECDH-ECDSA-AES256-SHA",           // SSLv3   Kx=ECDH/ECDSA Au=ECDH  Enc=AES(256)    Mac=SHA1
-        "AES256-GCM-SHA384",               // TLSv1.2 Kx=RSA        Au=RSA   Enc=AESGCM(256) Mac=AEAD
-        "AES256-SHA256",                   // TLSv1.2 Kx=RSA        Au=RSA   Enc=AES(256)    Mac=SHA256
-        "AES256-SHA",                      // SSLv3   Kx=RSA        Au=RSA   Enc=AES(256)    Mac=SHA1
-        "ECDHE-RSA-AES128-GCM-SHA256",     // TLSv1.2 Kx=ECDH       Au=RSA   Enc=AESGCM(128) Mac=AEAD
-        "ECDHE-ECDSA-AES128-GCM-SHA256",   // TLSv1.2 Kx=ECDH       Au=ECDSA Enc=AESGCM(128) Mac=AEAD
-        "ECDHE-RSA-AES128-SHA256",         // TLSv1.2 Kx=ECDH       Au=RSA   Enc=AES(128)    Mac=SHA256
-        "ECDHE-ECDSA-AES128-SHA256",       // TLSv1.2 Kx=ECDH       Au=ECDSA Enc=AES(128)    Mac=SHA256
-        "ECDHE-RSA-AES128-SHA",            // SSLv3   Kx=ECDH       Au=RSA   Enc=AES(128)    Mac=SHA1
-        "ECDHE-ECDSA-AES128-SHA",          // SSLv3   Kx=ECDH       Au=ECDSA Enc=AES(128)    Mac=SHA1
-        "DHE-DSS-AES128-GCM-SHA256",       // TLSv1.2 Kx=DH         Au=DSS   Enc=AESGCM(128) Mac=AEAD
-        "DHE-RSA-AES128-GCM-SHA256",       // TLSv1.2 Kx=DH         Au=RSA   Enc=AESGCM(128) Mac=AEAD
-        "DHE-RSA-AES128-SHA256",           // TLSv1.2 Kx=DH         Au=RSA   Enc=AES(128)    Mac=SHA256
-        "DHE-DSS-AES128-SHA256",           // TLSv1.2 Kx=DH         Au=DSS   Enc=AES(128)    Mac=SHA256
-        "DHE-RSA-AES128-SHA",              // SSLv3   Kx=DH         Au=RSA   Enc=AES(128)    Mac=SHA1
-        "DHE-DSS-AES128-SHA",              // SSLv3   Kx=DH         Au=DSS   Enc=AES(128)    Mac=SHA1
-        "ECDH-RSA-AES128-GCM-SHA256",      // TLSv1.2 Kx=ECDH/RSA   Au=ECDH  Enc=AESGCM(128) Mac=AEAD
-        "ECDH-ECDSA-AES128-GCM-SHA256",    // TLSv1.2 Kx=ECDH/ECDSA Au=ECDH  Enc=AESGCM(128) Mac=AEAD
-        "ECDH-RSA-AES128-SHA256",          // TLSv1.2 Kx=ECDH/RSA   Au=ECDH  Enc=AES(128)    Mac=SHA256
-        "ECDH-ECDSA-AES128-SHA256",        // TLSv1.2 Kx=ECDH/ECDSA Au=ECDH  Enc=AES(128)    Mac=SHA256
-        "ECDH-RSA-AES128-SHA",             // SSLv3   Kx=ECDH/RSA   Au=ECDH  Enc=AES(128)    Mac=SHA1
-        "ECDH-ECDSA-AES128-SHA",           // SSLv3   Kx=ECDH/ECDSA Au=ECDH  Enc=AES(128)    Mac=SHA1
-        "AES128-GCM-SHA256",               // TLSv1.2 Kx=RSA        Au=RSA   Enc=AESGCM(128) Mac=AEAD
-        "AES128-SHA256",                   // TLSv1.2 Kx=RSA        Au=RSA   Enc=AES(128)    Mac=SHA256
-        "AES128-SHA",                      // SSLv3   Kx=RSA        Au=RSA   Enc=AES(128)    Mac=SHA1
+        "ECDHE-RSA-AES128-GCM-SHA256",     // TLSv1.2 Kx=ECDH Au=RSA   Enc=AESGCM(128) Mac=AEAD
+        "ECDHE-ECDSA-AES128-GCM-SHA256",   // TLSv1.2 Kx=ECDH Au=ECDSA Enc=AESGCM(128) Mac=AEAD
+        "ECDHE-RSA-AES128-SHA256",         // TLSv1.2 Kx=ECDH Au=RSA   Enc=AES(128)    Mac=SHA256
+        "ECDHE-ECDSA-AES128-SHA256",       // TLSv1.2 Kx=ECDH Au=ECDSA Enc=AES(128)    Mac=SHA256
+        "ECDHE-RSA-AES128-SHA",            // SSLv3   Kx=ECDH Au=RSA   Enc=AES(128)    Mac=SHA1
+        "ECDHE-ECDSA-AES128-SHA",          // SSLv3   Kx=ECDH Au=ECDSA Enc=AES(128)    Mac=SHA1
+        "ECDHE-RSA-AES256-GCM-SHA384",     // TLSv1.2 Kx=ECDH Au=RSA   Enc=AESGCM(256) Mac=AEAD
+        "ECDHE-ECDSA-AES256-GCM-SHA384",   // TLSv1.2 Kx=ECDH Au=ECDSA Enc=AESGCM(256) Mac=AEAD
+        "ECDHE-RSA-AES256-SHA384",         // TLSv1.2 Kx=ECDH Au=RSA   Enc=AES(256)    Mac=SHA384
+        "ECDHE-ECDSA-AES256-SHA384",       // TLSv1.2 Kx=ECDH Au=ECDSA Enc=AES(256)    Mac=SHA384
+        "ECDHE-RSA-AES256-SHA",            // SSLv3   Kx=ECDH Au=RSA   Enc=AES(256)    Mac=SHA1
+        "ECDHE-ECDSA-AES256-SHA",          // SSLv3   Kx=ECDH Au=ECDSA Enc=AES(256)    Mac=SHA1
+        "AES128-GCM-SHA256",               // TLSv1.2 Kx=RSA  Au=RSA   Enc=AESGCM(128) Mac=AEAD
+        "AES128-SHA256",                   // TLSv1.2 Kx=RSA  Au=RSA   Enc=AES(128)    Mac=SHA256
+        "AES128-SHA",                      // SSLv3   Kx=RSA  Au=RSA   Enc=AES(128)    Mac=SHA1
+        "AES256-GCM-SHA384",               // TLSv1.2 Kx=RSA  Au=RSA   Enc=AESGCM(256) Mac=AEAD
+        "AES256-SHA256",                   // TLSv1.2 Kx=RSA  Au=RSA   Enc=AES(256)    Mac=SHA256
+        "AES256-SHA",                      // SSLv3   Kx=RSA  Au=RSA   Enc=AES(256)    Mac=SHA1
         NULL
     };
 #endif
