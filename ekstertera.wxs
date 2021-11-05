@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Wix xmlns="http://schemas.microsoft.com/wix/2006/wi">
-    <Product Id="F9EAA3B6-AFF9-45BC-B15D-E77B094702BE" Name="Ekstertera" Language="1049" Version="0.1.12.0" Manufacturer="Anton Batenev" UpgradeCode="94DF00F1-67F1-49AC-9094-6941AD11D659">
+    <Product Id="F9EAA3B6-AFF9-45BC-B15D-E77B094702BE" Name="Ekstertera" Language="1049" Version="0.1.13.0" Manufacturer="Anton Batenev" UpgradeCode="94DF00F1-67F1-49AC-9094-6941AD11D659">
         <Package Description="Yandex.Disk GUI client" Comments="Ekstertera" InstallerVersion="200" Compressed="yes" />
         <Media Id="1" Cabinet="simple.cab" EmbedCab="yes" />
         <Directory Id="TARGETDIR" Name="SourceDir">

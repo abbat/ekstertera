@@ -3,11 +3,13 @@ Section: utils
 Priority: optional
 Maintainer: Anton Batenev <antonbatenev@yandex.ru>
 Build-Depends: debhelper (>= 7.0.50~), lsb-release,
- qt5-default (>= 5.0) | libqt4-dev (>= 4.6),
+ libjpeg62-turbo-dev | libjpeg-dev,
+ qt5-default (>= 5.0) | qt5-qmake (>= 5.0) | libqt4-dev (>= 4.6),
  qtbase5-dev (>= 5.0) | libqt4-dev (>= 4.6),
  qttools5-dev-tools (>= 5.0) | libqt4-dev (>= 4.6),
  libqt5svg5-dev (>= 5.0) | libqt4-dev (>= 4.6),
- libglib2.0-dev, libgtk2.0-dev, libgdk-pixbuf2.0-dev, libappindicator-dev
+ libfontconfig-dev, libglib2.0-dev, libgtk2.0-dev, libgdk-pixbuf2.0-dev,
+ libappindicator-dev | libayatana-appindicator-dev
 Standards-Version: 3.9.4
 Vcs-Git: https://github.com/abbat/ekstertera.git
 Vcs-Browser: https://github.com/abbat/ekstertera

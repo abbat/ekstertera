@@ -1,3 +1,9 @@
+ekstertera (0.1.13) unstable; urgency=low
+
+  * Поддержка Debian 11.
+
+ -- Anton Batenev <antonbatenev@yandex.ru>  Fri, 05 Nov 2021 20:00:21 +0300
+
 ekstertera (0.1.12) unstable; urgency=low
 
   * Удаление DHE-шифров из списка возможных (не используются).
